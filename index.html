@@ -552,7 +552,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       </div>
     </div>
     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem">
-      <div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:300;font-style:italic;color:var(--ink);margin-bottom:0.5rem">Guía de talles</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:0.5rem">
+        <div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:300;font-style:italic;color:var(--ink)">Guía de talles</div>
+        <button onclick="openGuiaModal()" style="display:flex;align-items:center;gap:6px;padding:9px 18px;background:var(--rose);border:none;border-radius:999px;color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;cursor:pointer">🔍 Encontrá tu talle</button>
+      </div>
       <div style="font-size:13px;color:var(--ink-light);margin-bottom:1.5rem">Medidas en centímetros. Para el mejor ajuste, medite antes de elegir tu talla.</div>
 
       <div style="font-weight:500;font-size:13px;color:var(--ink);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase">Tops y conjuntos (corpiño)</div>
@@ -829,6 +832,56 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   </div>
 </div>
 
+<!-- GUÍA DE TALLES INTELIGENTE -->
+<div id="guia-modal-bg" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(26,17,24,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:var(--radius);max-width:480px;width:90%;max-height:90vh;overflow-y:auto;padding:2rem;position:relative;box-shadow:0 24px 80px rgba(26,17,24,0.2)">
+    <button onclick="closeGuiaModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:20px;color:var(--ink-light);cursor:pointer">✕</button>
+    <div style="font-family:Cormorant Garamond,serif;font-size:26px;font-weight:300;font-style:italic;color:var(--ink);margin-bottom:4px">Encontrá tu talle</div>
+    <div style="font-size:13px;color:var(--ink-light);margin-bottom:1.5rem">Ingresá tus medidas en centímetros</div>
+
+    <div style="background:var(--rose-pale);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem;font-size:12px;color:var(--ink-mid);line-height:1.7">
+      📏 <strong>¿Cómo medirte?</strong><br>
+      • <strong>Busto:</strong> pasá la cinta por la parte más ancha del pecho<br>
+      • <strong>Cintura:</strong> medí en la parte más angosta del torso<br>
+      • <strong>Cadera:</strong> pasá la cinta por la parte más ancha de las caderas
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:1.5rem">
+      <div>
+        <label style="font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink-mid);display:block;margin-bottom:6px">Busto (cm)</label>
+        <input type="number" id="guia-busto" min="60" max="140" placeholder="ej: 88" oninput="calcularTalle()" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:16px;text-align:center;color:var(--ink);outline:none;transition:border-color 0.2s">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink-mid);display:block;margin-bottom:6px">Cintura (cm)</label>
+        <input type="number" id="guia-cintura" min="50" max="130" placeholder="ej: 70" oninput="calcularTalle()" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:16px;text-align:center;color:var(--ink);outline:none;transition:border-color 0.2s">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink-mid);display:block;margin-bottom:6px">Cadera (cm)</label>
+        <input type="number" id="guia-cadera" min="60" max="150" placeholder="ej: 96" oninput="calcularTalle()" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:16px;text-align:center;color:var(--ink);outline:none;transition:border-color 0.2s">
+      </div>
+    </div>
+
+    <div id="guia-resultado" style="display:none">
+      <div style="font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-mid);margin-bottom:12px">Tu talle recomendado</div>
+      <div id="guia-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem"></div>
+      <div id="guia-tip" style="background:var(--surface-2);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--ink-mid);line-height:1.6"></div>
+    </div>
+
+    <div id="guia-placeholder" style="text-align:center;padding:1.5rem;color:var(--ink-light)">
+      <div style="font-size:32px;margin-bottom:8px;opacity:0.3">📐</div>
+      <div style="font-size:13px">Ingresá tus medidas para ver tu talle</div>
+    </div>
+
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:center">
+      <a href="https://wa.me/541162620304?text=Hola!%20Necesito%20ayuda%20para%20elegir%20mi%20talle" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:#25D366;border-radius:999px;color:#fff;font-size:13px;font-weight:500;text-decoration:none">
+        <svg viewBox="0 0 24 24" fill="#fff" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Consultar por WhatsApp
+      </a>
+      <button onclick="closeGuiaModal()" style="padding:9px 18px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- RESULT PAGES -->
 <div class="result-page" id="page-success">
   <div class="result-icon">✦</div>
@@ -868,7 +921,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between">
         <div class="pm-section-label">Elegí tu talla</div>
-        <button onclick="showPage('nosotras');closeProdModal()" style="font-size:11px;color:var(--rose);background:none;border:none;cursor:pointer;text-decoration:underline">Ver guía de talles</button>
+        <button onclick="openGuiaModal()" style="font-size:11px;color:var(--rose);background:none;border:none;cursor:pointer;text-decoration:underline">🔍 Encontrá tu talle</button>
       </div>
         <div class="tallas-grid" id="pm-tallas"></div>
       </div>
@@ -1800,6 +1853,118 @@ window.showToast = function(msg, type = 'success') {
   toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 };
 
+
+// ── GUÍA DE TALLES INTELIGENTE ──
+const TABLA_TALLES = [
+  { talle:'XS/1', bustoMin:78, bustoMax:82, cinturaMin:60, cinturaMax:64, caderaMin:86, caderaMax:90 },
+  { talle:'S/2',  bustoMin:82, bustoMax:86, cinturaMin:64, cinturaMax:68, caderaMin:90, caderaMax:94 },
+  { talle:'M/3',  bustoMin:86, bustoMax:90, cinturaMin:68, cinturaMax:72, caderaMin:94, caderaMax:98 },
+  { talle:'L/4',  bustoMin:90, bustoMax:96, cinturaMin:72, cinturaMax:78, caderaMin:98, caderaMax:104 },
+  { talle:'XL/5', bustoMin:96, bustoMax:102,cinturaMin:78, cinturaMax:84, caderaMin:104,caderaMax:110 },
+];
+
+const TABLA_CORPINO = [
+  { talle:'75', bustoMin:78, bustoMax:82 },
+  { talle:'80', bustoMin:82, bustoMax:86 },
+  { talle:'85', bustoMin:86, bustoMax:90 },
+  { talle:'90', bustoMin:90, bustoMax:96 },
+  { talle:'95', bustoMin:96, bustoMax:100 },
+  { talle:'100',bustoMin:100,bustoMax:104 },
+  { talle:'105',bustoMin:104,bustoMax:108 },
+  { talle:'110',bustoMin:108,bustoMax:112 },
+  { talle:'115',bustoMin:112,bustoMax:116 },
+  { talle:'120',bustoMin:116,bustoMax:120 },
+];
+
+window.openGuiaModal = function() {
+  document.getElementById('guia-modal-bg').style.display = 'flex';
+  document.getElementById('guia-busto').value = '';
+  document.getElementById('guia-cintura').value = '';
+  document.getElementById('guia-cadera').value = '';
+  document.getElementById('guia-resultado').style.display = 'none';
+  document.getElementById('guia-placeholder').style.display = 'block';
+};
+
+window.closeGuiaModal = function() {
+  document.getElementById('guia-modal-bg').style.display = 'none';
+};
+
+window.calcularTalle = function() {
+  const busto = parseFloat(document.getElementById('guia-busto').value) || 0;
+  const cintura = parseFloat(document.getElementById('guia-cintura').value) || 0;
+  const cadera = parseFloat(document.getElementById('guia-cadera').value) || 0;
+
+  if (!busto && !cintura && !cadera) {
+    document.getElementById('guia-resultado').style.display = 'none';
+    document.getElementById('guia-placeholder').style.display = 'block';
+    return;
+  }
+
+  // Find best match for general size
+  function findTalle(medida, min, max, tabla) {
+    if (!medida) return null;
+    // Exact match
+    let match = tabla.find(t => medida >= t[min] && medida <= t[max]);
+    if (match) return { talle: match.talle, exacto: true };
+    // Closest
+    let closest = tabla.reduce((prev, curr) => {
+      const prevDist = Math.min(Math.abs(medida - prev[min]), Math.abs(medida - prev[max]));
+      const currDist = Math.min(Math.abs(medida - curr[min]), Math.abs(medida - curr[max]));
+      return currDist < prevDist ? curr : prev;
+    });
+    return { talle: closest.talle, exacto: false };
+  }
+
+  const porBusto = findTalle(busto, 'bustoMin', 'bustoMax', TABLA_TALLES);
+  const porCintura = findTalle(cintura, 'cinturaMin', 'cinturaMax', TABLA_TALLES);
+  const porCadera = findTalle(cadera, 'caderaMin', 'caderaMax', TABLA_TALLES);
+  const porCorpino = findTalle(busto, 'bustoMin', 'bustoMax', TABLA_CORPINO);
+
+  // Determine primary recommendation (prioritize bust, then waist, then hip)
+  const primary = (busto ? porBusto : null) || (cintura ? porCintura : null) || (cadera ? porCadera : null);
+
+  const cats = [
+    { cat: 'Tops y conjuntos', icon: '👙', talle: porBusto || porCintura },
+    { cat: 'Bodys y babydoll', icon: '🌸', talle: porCintura || porBusto },
+    { cat: 'Colaless', icon: '✨', talle: porCadera || porCintura },
+    { cat: 'Bikinis (corpiño)', icon: '🐚', talle: porCorpino },
+  ];
+
+  const cards = document.getElementById('guia-cards');
+  cards.innerHTML = cats.map(c => {
+    if (!c.talle) return '';
+    const color = c.talle.exacto ? 'var(--rose)' : '#BA7517';
+    const bg = c.talle.exacto ? 'var(--rose-pale)' : '#FAEEDA';
+    const badge = c.talle.exacto ? 'Talle exacto' : 'Talle aproximado';
+    return '<div style="background:' + bg + ';border-radius:var(--radius-sm);padding:14px;text-align:center">' +
+      '<div style="font-size:20px;margin-bottom:4px">' + c.icon + '</div>' +
+      '<div style="font-size:11px;color:var(--ink-mid);margin-bottom:4px">' + c.cat + '</div>' +
+      '<div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:300;color:' + color + ';line-height:1">' + c.talle.talle + '</div>' +
+      '<div style="font-size:10px;color:' + color + ';margin-top:4px;font-weight:500">' + badge + '</div>' +
+    '</div>';
+  }).join('');
+
+  // Tip
+  const tips = [];
+  if (porBusto && porCadera && porBusto.talle !== porCadera.talle) {
+    tips.push('Tu busto y tu cadera sugieren talles distintos. Te recomendamos elegir el mayor para mayor comodidad.');
+  }
+  if (!primary?.exacto) {
+    tips.push('Tus medidas quedan entre dos talles. Si dudás, elegí el más grande.');
+  }
+  tips.push('Para dudas específicas podés consultarnos por WhatsApp.');
+
+  const tipEl = document.getElementById('guia-tip');
+  tipEl.innerHTML = '💡 ' + tips.join(' ');
+
+  document.getElementById('guia-resultado').style.display = 'block';
+  document.getElementById('guia-placeholder').style.display = 'none';
+};
+
+// Close on background click
+document.getElementById('guia-modal-bg').addEventListener('click', function(e) {
+  if (e.target === this) closeGuiaModal();
+});
 
 // ── PEDIDOS ──
 const WA_NOTIF_NUMBER = "541162620304";
