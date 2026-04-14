@@ -310,7 +310,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 .form-btn:hover{background:var(--rose-dark)}
 .admin-products{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem}
 .admin-products h3{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:1rem;padding-bottom:10px;border-bottom:1px solid var(--border)}
-.admin-prod-list{display:flex;flex-direction:column;gap:8px;max-height:500px;overflow-y:auto}
+.admin-prod-list{display:flex;flex-direction:column;gap:8px;max-height:600px;overflow-y:auto}
 .admin-prod-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface-2);border-radius:var(--radius-sm)}
 .admin-prod-thumb{width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0}
 .admin-prod-info{flex:1;min-width:0}
@@ -706,7 +706,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       </div>
       <div class="form-field">
         <label class="form-label">Categoría</label>
-        <select class="form-select" id="prod-cat">
+        <select class="form-select" id="prod-cat" onchange="autoSelectTallas(this.value)">
           <option value="Conjuntos">Conjuntos</option>
           <option value="Tops">Tops</option>
           <option value="Bodys">Bodys</option>
@@ -798,10 +798,32 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       <button class="form-btn" style="background:transparent;color:var(--ink-mid);border:1px solid var(--border-strong);margin-top:6px" onclick="resetForm()">Cancelar</button>
     </div>
     <div class="admin-products">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:10px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
         <h3 style="margin:0;padding:0;border:none">Productos cargados</h3>
         <button onclick="exportarCatalogo()" style="padding:5px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:11px;color:var(--ink-mid);cursor:pointer">↓ Exportar catálogo</button>
       </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="position:relative;flex:1;min-width:120px">
+          <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--ink-light);font-size:12px;pointer-events:none">⌕</span>
+          <input type="text" id="admin-search" placeholder="Buscar..." oninput="renderAdminList()" style="width:100%;padding:6px 8px 6px 24px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:var(--surface-2);outline:none">
+        </div>
+        <select id="admin-cat-filter" onchange="renderAdminList()" style="padding:6px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink-mid);background:var(--surface-2);outline:none;cursor:pointer">
+          <option value="">Todas las categorías</option>
+          <option value="Conjuntos">Conjuntos</option>
+          <option value="Tops">Tops</option>
+          <option value="Bodys">Bodys</option>
+          <option value="Babydoll">Babydoll</option>
+          <option value="Colaless">Colaless</option>
+          <option value="Bikinis">Bikinis</option>
+        </select>
+        <select id="admin-estado-filter" onchange="renderAdminList()" style="padding:6px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink-mid);background:var(--surface-2);outline:none;cursor:pointer">
+          <option value="">Todos los estados</option>
+          <option value="activo">Activo</option>
+          <option value="agotado">Agotado</option>
+          <option value="oculto">Oculto</option>
+        </select>
+      </div>
+      <div style="font-size:11px;color:var(--ink-light);margin-bottom:8px" id="admin-count"></div>
       <div class="admin-prod-list" id="admin-prod-list"></div>
     </div>
   </div>
@@ -1016,9 +1038,9 @@ window.showPedidosPrompt = function() {
 onValue(ref(db, 'productos'), (snap) => {
   try {
     const data = snap.val();
-    products = data
-      ? Object.entries(data).map(([id, val]) => ({ id, ...val })).filter(p => p.estado !== 'oculto')
-      : [];
+    const allProds = data ? Object.entries(data).map(([id, val]) => ({ id, ...val })) : [];
+    window._allProducts = data || {};
+    products = allProds.filter(p => p.estado !== 'oculto');
   } catch(e) {
     products = [];
     console.error('Error procesando productos:', e);
@@ -1067,7 +1089,7 @@ function cardBadges(p) {
 
 // ── CATALOG ──
 let catalogPage = 1;
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 12;
 window.resetCatalogPage = function() { catalogPage = 1; };
 
 window.renderCatalog = function() {
@@ -1734,14 +1756,31 @@ window.deleteProduct = async function(id) {
 function renderAdminList() {
   const el = document.getElementById('admin-prod-list');
   if (!el) return;
-  const all = products;
-  if (!all.length) { el.innerHTML = '<div class="admin-empty">Aún no hay productos cargados</div>'; return; }
-  el.innerHTML = all.map(p => `
+  const searchVal = (document.getElementById('admin-search')?.value || '').toLowerCase();
+  const catFilter = document.getElementById('admin-cat-filter')?.value || '';
+  const estadoFilter = document.getElementById('admin-estado-filter')?.value || '';
+  // Admin shows all products including hidden
+  let all = products.concat(
+    Object.entries(window._allProducts || {})
+      .map(([id,val]) => ({id,...val}))
+      .filter(p => p.estado === 'oculto' && !products.find(x => x.id === p.id))
+  );
+  let filtered = all.filter(p => {
+    if (catFilter && p.cat !== catFilter) return false;
+    if (estadoFilter && (p.estado || 'activo') !== estadoFilter) return false;
+    if (searchVal && !p.name.toLowerCase().includes(searchVal)) return false;
+    return true;
+  });
+  const countEl = document.getElementById('admin-count');
+  if (countEl) countEl.textContent = filtered.length + ' producto' + (filtered.length !== 1 ? 's' : '') + (filtered.length !== all.length ? ' (filtrados de ' + all.length + ')' : '');
+  if (!filtered.length) { el.innerHTML = '<div class="admin-empty">No hay productos con ese filtro</div>'; return; }
+  const estadoColor = { activo: '#3B6D11', agotado: '#E24B4A', oculto: '#888780' };
+  el.innerHTML = filtered.map(p => `
     <div class="admin-prod-item">
       <img class="admin-prod-thumb" src="${p.img || ''}" alt="${p.name}">
       <div class="admin-prod-info">
         <div class="admin-prod-name">${p.name}</div>
-        <div class="admin-prod-meta">${p.cat} · ${p.descuento > 0 ? `<span style="text-decoration:line-through">$${Number(p.price).toLocaleString('es-AR')}</span> → <span style="color:#E24B4A;font-weight:500">$${Number(p.precioFinal).toLocaleString('es-AR')} (-${p.descuento}%)</span>` : `$${Number(p.price).toLocaleString('es-AR')}`}${p.cuotas > 1 ? ` · <span style="color:var(--rose)">${p.cuotas} cuotas</span>` : ''} · ${p.estado || 'activo'}</div>
+        <div class="admin-prod-meta">${p.cat} · ${p.descuento > 0 ? `<span style="text-decoration:line-through">$${Number(p.price).toLocaleString('es-AR')}</span> → <span style="color:#E24B4A;font-weight:500">$${Number(p.precioFinal).toLocaleString('es-AR')} (-${p.descuento}%)</span>` : `$${Number(p.price).toLocaleString('es-AR')}`}${p.cuotas > 1 ? ` · <span style="color:var(--rose)">${p.cuotas} cuotas</span>` : ''} · <span style="color:${estadoColor[p.estado||'activo']};font-weight:500">${p.estado || 'activo'}</span></div>
       </div>
       <div class="admin-prod-actions">
         <button class="adm-btn" onclick="editProduct('${p.id}')">Editar</button>
@@ -1986,6 +2025,28 @@ window.updateCuotasPreview = function() {
   preview.style.fontWeight = '500';
 };
 window.cuotasHTML = cuotasHTML;
+
+// ── AUTO TALLAS POR CATEGORÍA ──
+const TALLAS_POR_CAT = {
+  'Conjuntos': ['XS','S','M','L','XL','1','2','3','4','5'],
+  'Tops':      ['XS','S','M','L','XL','1','2','3','4','5'],
+  'Bodys':     ['XS','S','M','L','XL','1','2','3','4','5'],
+  'Babydoll':  ['XS','S','M','L','XL','1','2','3','4','5'],
+  'Colaless':  ['XS','S','M','L','XL','1','2','3','4','5'],
+  'Bikinis':   ['XS','S','M','L','XL','75','80','85','90','95','100','105','110','115','120'],
+};
+
+window.autoSelectTallas = function(cat) {
+  const tallas = TALLAS_POR_CAT[cat] || [];
+  // Uncheck all first
+  document.querySelectorAll('.talla-cb').forEach(cb => { cb.checked = false; });
+  // Check the ones for this category
+  tallas.forEach(t => {
+    const cb = document.querySelector('.talla-cb[value="' + t + '"]');
+    if (cb) cb.checked = true;
+  });
+  renderStockFields();
+};
 
 // ── STOCK ──
 function renderStockFields() {
