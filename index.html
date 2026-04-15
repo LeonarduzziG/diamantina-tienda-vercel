@@ -1815,7 +1815,7 @@ window.deleteProduct = async function(id) {
   showToast('Producto eliminado');
 };
 
-function renderAdminList() {
+window.renderAdminList = function renderAdminList() {
   const el = document.getElementById('admin-prod-list');
   if (!el) return;
   const searchVal = (document.getElementById('admin-search')?.value || '').toLowerCase();
