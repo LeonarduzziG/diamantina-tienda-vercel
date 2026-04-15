@@ -386,6 +386,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
     <div class="hero-title">Lencería <em>fina</em><br>para vos</div>
     <div class="hero-sub">Piezas únicas con el mejor confort y estilo para cada momento.</div>
     <button class="hero-btn" onclick="document.getElementById('ofertas-section').scrollIntoView({behavior:'smooth'})">Ver Ofertas</button>
+    <button onclick="openGuiaModal()" style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:11px 28px;background:transparent;border:1px solid var(--rose);color:var(--rose);border-radius:999px;font-size:14px;font-weight:500;cursor:pointer;font-family:DM Sans,sans-serif;transition:all var(--tr)">🔍 Encontrá tu talle</button>
   </div>
 
   <div class="ofertas-section" id="ofertas-section">
@@ -494,10 +495,13 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
     </div>
       <select id="filtro-talla" onchange="renderCatalog()" style="padding:6px 10px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);outline:none;cursor:pointer">
         <option value="">Todas las tallas</option>
-        <option value="XS">XS</option><option value="S">S</option><option value="M">M</option>
-        <option value="L">L</option><option value="XL">XL</option>
-        <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-        <option value="4">4</option><option value="5">5</option>
+        <option value="0">0</option>
+        <option value="XS">XS</option><option value="1">1</option>
+        <option value="S">S</option><option value="2">2</option>
+        <option value="M">M</option><option value="3">3</option>
+        <option value="L">L</option><option value="4">4</option>
+        <option value="XL">XL</option><option value="5">5</option>
+        <option value="XXL">XXL</option>
         <option value="75">75</option><option value="80">80</option><option value="85">85</option>
         <option value="90">90</option><option value="95">95</option><option value="100">100</option>
         <option value="105">105</option><option value="110">110</option><option value="115">115</option>
@@ -570,7 +574,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
             </tr>
           </thead>
           <tbody>
-            <tr style="background:#fff"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">XS / 1</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">78–82 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">60–64 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">A</td></tr>
+            <tr style="background:var(--surface-2)"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">0 / XS</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">74–78 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">56–60 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">A</td></tr>
+            <tr style="background:#fff"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">1 / S</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">78–82 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">60–64 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">A</td></tr>
             <tr style="background:var(--surface-2)"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">S / 2</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">82–86 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">64–68 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">A/B</td></tr>
             <tr style="background:#fff"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">M / 3</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">86–90 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">68–72 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">B/C</td></tr>
             <tr style="background:var(--surface-2)"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">L / 4</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">90–96 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">72–78 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">C</td></tr>
@@ -591,7 +596,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
             </tr>
           </thead>
           <tbody>
-            <tr style="background:#fff"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">XS / 1</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">60–64 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">86–90 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">34 / 36</td></tr>
+            <tr style="background:var(--surface-2)"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">0 / XS</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">74–78 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">56–60 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">A</td></tr>
+            <tr style="background:#fff"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">1 / S</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">60–64 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">86–90 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">34 / 36</td></tr>
             <tr style="background:var(--surface-2)"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">S / 2</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">64–68 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">90–94 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">36 / 38</td></tr>
             <tr style="background:#fff"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">M / 3</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">68–72 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">94–98 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">38 / 40</td></tr>
             <tr style="background:var(--surface-2)"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">L / 4</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">72–78 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">98–104 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">40 / 42</td></tr>
@@ -612,7 +618,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
             </tr>
           </thead>
           <tbody>
-            <tr style="background:#fff"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">XS / 1</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">78–82 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">60–64 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">86–90 cm</td></tr>
+            <tr style="background:var(--surface-2)"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">0 / XS</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">74–78 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">56–60 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">A</td></tr>
+            <tr style="background:#fff"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">1 / S</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">78–82 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">60–64 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">86–90 cm</td></tr>
             <tr style="background:var(--surface-2)"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">S / 2</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">82–86 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">64–68 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">90–94 cm</td></tr>
             <tr style="background:#fff"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">M / 3</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">86–90 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">68–72 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">94–98 cm</td></tr>
             <tr style="background:var(--surface-2)"><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--rose)">L / 4</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">90–96 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">72–78 cm</td><td style="padding:10px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-mid)">98–104 cm</td></tr>
@@ -750,16 +757,18 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       <div class="form-field">
         <label class="form-label">Tallas disponibles</label>
         <div class="tallas-check">
+          <label class="talla-check"><input type="checkbox" value="0" class="talla-cb"> 0</label>
           <label class="talla-check"><input type="checkbox" value="XS" class="talla-cb"> XS</label>
-          <label class="talla-check"><input type="checkbox" value="S" class="talla-cb"> S</label>
-          <label class="talla-check"><input type="checkbox" value="M" class="talla-cb"> M</label>
-          <label class="talla-check"><input type="checkbox" value="L" class="talla-cb"> L</label>
-          <label class="talla-check"><input type="checkbox" value="XL" class="talla-cb"> XL</label>
           <label class="talla-check"><input type="checkbox" value="1" class="talla-cb"> 1</label>
+          <label class="talla-check"><input type="checkbox" value="S" class="talla-cb"> S</label>
           <label class="talla-check"><input type="checkbox" value="2" class="talla-cb"> 2</label>
+          <label class="talla-check"><input type="checkbox" value="M" class="talla-cb"> M</label>
           <label class="talla-check"><input type="checkbox" value="3" class="talla-cb"> 3</label>
+          <label class="talla-check"><input type="checkbox" value="L" class="talla-cb"> L</label>
           <label class="talla-check"><input type="checkbox" value="4" class="talla-cb"> 4</label>
+          <label class="talla-check"><input type="checkbox" value="XL" class="talla-cb"> XL</label>
           <label class="talla-check"><input type="checkbox" value="5" class="talla-cb"> 5</label>
+          <label class="talla-check"><input type="checkbox" value="XXL" class="talla-cb"> XXL</label>
         </div>
         <div class="tallas-check" style="margin-top:6px">
           <label class="talla-check"><input type="checkbox" value="75" class="talla-cb"> 75</label>
@@ -1856,11 +1865,12 @@ window.showToast = function(msg, type = 'success') {
 
 // ── GUÍA DE TALLES INTELIGENTE ──
 const TABLA_TALLES = [
-  { talle:'XS/1', bustoMin:78, bustoMax:82, cinturaMin:60, cinturaMax:64, caderaMin:86, caderaMax:90 },
-  { talle:'S/2',  bustoMin:82, bustoMax:86, cinturaMin:64, cinturaMax:68, caderaMin:90, caderaMax:94 },
-  { talle:'M/3',  bustoMin:86, bustoMax:90, cinturaMin:68, cinturaMax:72, caderaMin:94, caderaMax:98 },
-  { talle:'L/4',  bustoMin:90, bustoMax:96, cinturaMin:72, cinturaMax:78, caderaMin:98, caderaMax:104 },
-  { talle:'XL/5', bustoMin:96, bustoMax:102,cinturaMin:78, cinturaMax:84, caderaMin:104,caderaMax:110 },
+  { talle:'0/XS', bustoMin:74, bustoMax:78, cinturaMin:56, cinturaMax:60, caderaMin:82, caderaMax:86 },
+  { talle:'1/S',  bustoMin:78, bustoMax:82, cinturaMin:60, cinturaMax:64, caderaMin:86, caderaMax:90 },
+  { talle:'2/M',  bustoMin:82, bustoMax:86, cinturaMin:64, cinturaMax:68, caderaMin:90, caderaMax:94 },
+  { talle:'3/L',  bustoMin:86, bustoMax:90, cinturaMin:68, cinturaMax:72, caderaMin:94, caderaMax:98 },
+  { talle:'4/XL', bustoMin:90, bustoMax:96, cinturaMin:72, cinturaMax:78, caderaMin:98, caderaMax:104 },
+  { talle:'5/XXL',bustoMin:96, bustoMax:102,cinturaMin:78, cinturaMax:84, caderaMin:104,caderaMax:110 },
 ];
 
 const TABLA_CORPINO = [
@@ -2193,12 +2203,12 @@ window.cuotasHTML = cuotasHTML;
 
 // ── AUTO TALLAS POR CATEGORÍA ──
 const TALLAS_POR_CAT = {
-  'Conjuntos': ['XS','S','M','L','XL','1','2','3','4','5'],
-  'Tops':      ['XS','S','M','L','XL','1','2','3','4','5'],
-  'Bodys':     ['XS','S','M','L','XL','1','2','3','4','5'],
-  'Babydoll':  ['XS','S','M','L','XL','1','2','3','4','5'],
-  'Colaless':  ['XS','S','M','L','XL','1','2','3','4','5'],
-  'Bikinis':   ['XS','S','M','L','XL','75','80','85','90','95','100','105','110','115','120'],
+  'Conjuntos': ['0','XS','1','S','2','M','3','L','4','XL','5','XXL'],
+  'Tops':      ['0','XS','1','S','2','M','3','L','4','XL','5','XXL'],
+  'Bodys':     ['0','XS','1','S','2','M','3','L','4','XL','5','XXL'],
+  'Babydoll':  ['0','XS','1','S','2','M','3','L','4','XL','5','XXL'],
+  'Colaless':  ['0','XS','1','S','2','M','3','L','4','XL','5','XXL'],
+  'Bikinis':   ['0','XS','1','S','2','M','3','L','4','XL','5','XXL','75','80','85','90','95','100','105','110','115','120'],
 };
 
 window.autoSelectTallas = function(cat) {
