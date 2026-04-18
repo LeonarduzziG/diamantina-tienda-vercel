@@ -2574,9 +2574,16 @@ else if (params.get('pago') === 'fallido' || params.get('pago') === 'pendiente')
 else showPage('tienda');
 
 // ── INIT ──
+let myName = localStorage.getItem('diamantina_user') || '';
+function loadUser() {
+  // Ask for name if not set (optional)
+  myName = localStorage.getItem('diamantina_user') || '';
+}
 loadUser();
 loadBanner();
 loadFavs();
+updateFavUI();
+updateCartUI();
 updateCartUI();
 </script>
 </body>
