@@ -339,7 +339,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 
 /* RESPONSIVE */
 @media(max-width:768px){
-  nav{padding:0 1rem}
+  nav{padding:0 0.5rem}
+  .nav-right{gap:0.4rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap;max-width:calc(100vw - 120px)}
+  .nav-right::-webkit-scrollbar{display:none}
+  .nav-link{font-size:11px;white-space:nowrap}
   .hero{padding:3rem 1rem 2rem}
   .filters{padding:1rem}
   .catalog{padding:1rem;grid-template-columns:repeat(2,1fr);gap:12px}
@@ -1305,6 +1308,8 @@ window.showPage = function(page) {
     const el = document.getElementById('page-pedidos');
     el.style.display = 'block'; el.classList.add('open');
     renderPedidos();
+  } else if (page === 'politicas') {
+    document.getElementById('page-politicas').style.display = 'block';
   } else if (page === 'nosotras') {
     const el = document.getElementById('page-nosotras');
     el.style.display = 'block';
