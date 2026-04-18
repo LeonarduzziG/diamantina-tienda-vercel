@@ -845,11 +845,12 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 
   <!-- CONFIGURACIÓN DE ENVÍOS -->
   <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div style="font-size:13px;font-weight:500;color:var(--ink)">Configuración de envíos</div>
-      <button onclick="saveEnvios()" style="padding:6px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer">Guardar</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.envio-arrow').textContent=this.nextElementSibling.style.display==='none'?'▼':'▲'">
+      <div style="font-size:13px;font-weight:500;color:var(--ink)">⚙️ Configuración de envíos</div>
+      <span class="envio-arrow" style="font-size:11px;color:var(--ink-light)">▼</span>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">
+    <div style="display:none;margin-top:12px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px">
       <div>
         <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">CABA ($)</label>
         <input type="number" id="envio-caba" placeholder="3500" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
@@ -866,14 +867,16 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
         <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Zona Sur ($)</label>
         <input type="number" id="envio-sur" placeholder="7000" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
       </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border)">
-      <label style="font-size:12px;color:var(--ink-mid)">Envío gratis desde $</label>
-      <input type="number" id="envio-gratis-min" placeholder="80000" style="width:120px;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
-      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-        <input type="checkbox" id="envio-gratis-activo" style="width:16px;height:16px;cursor:pointer">
-        <span style="font-size:12px;color:var(--ink-mid)">Activar</span>
-      </label>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap">
+        <label style="font-size:12px;color:var(--ink-mid)">Envío gratis desde $</label>
+        <input type="number" id="envio-gratis-min" placeholder="80000" style="width:120px;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="envio-gratis-activo" style="width:16px;height:16px;cursor:pointer">
+          <span style="font-size:12px;color:var(--ink-mid)">Activar</span>
+        </label>
+        <button onclick="saveEnvios()" style="padding:7px 16px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;margin-left:auto">Guardar</button>
+      </div>
     </div>
   </div>
   <div class="admin-grid">
