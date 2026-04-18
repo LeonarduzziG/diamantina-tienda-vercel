@@ -937,6 +937,9 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       <div id="pm-resenas-section" style="border-top:1px solid var(--border);padding-top:12px">
         <div style="font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-mid);margin-bottom:8px">Reseñas</div>
         <div id="pm-resenas-list" style="max-height:120px;overflow-y:auto;margin-bottom:8px"></div>
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <input type="text" id="pm-resena-nombre" placeholder="Tu nombre (opcional)" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:var(--surface-2);outline:none">
+        </div>
         <div style="display:flex;gap:6px">
           <input type="text" id="pm-resena-input" placeholder="Dejá tu opinión..." style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:var(--surface-2);outline:none">
           <div style="display:flex;gap:2px" id="pm-stars">
@@ -1460,7 +1463,9 @@ window.openProdModal = function(id) {
   const hiddenStars = document.getElementById('pm-stars-val');
   if (hiddenStars) hiddenStars.value = '0';
   document.getElementById('pm-resena-input').value = '';
-  renderResenas(p.id);
+  const nombreEl = document.getElementById('pm-resena-nombre');
+  if (nombreEl) nombreEl.value = '';
+  loadResenas(p.id);
 
   // Attach listeners fresh each time modal opens
   document.querySelectorAll('.star-btn').forEach(s => {
@@ -2050,15 +2055,36 @@ window.exportarCatalogo = function() {
 };
 
 // ── FAVORITOS ──
-function getFavs() { try { return JSON.parse(localStorage.getItem('diamantina_favs') || '[]'); } catch(e) { return []; } }
-function saveFavs(f) { localStorage.setItem('diamantina_favs', JSON.stringify(f)); }
-function isFav(id) { return getFavs().includes(id); }
+// Favoritos stored in Firebase per session key (no login needed)
+function getFavSessionKey() {
+  let k = localStorage.getItem('diamantina_fav_key');
+  if (!k) { k = 'anon_' + Math.random().toString(36).slice(2,10); localStorage.setItem('diamantina_fav_key', k); }
+  return k;
+}
 
-window.toggleFav = function(id) {
-  let favs = getFavs();
-  if (favs.includes(id)) { favs = favs.filter(f => f !== id); showToast('Eliminado de favoritos'); }
-  else { favs.push(id); showToast('♥ Guardado en favoritos'); }
-  saveFavs(favs);
+let _favs = [];
+function getFavs() { return _favs; }
+function isFav(id) { return _favs.includes(id); }
+
+function loadFavs() {
+  const key = getFavSessionKey();
+  onValue(ref(db, 'favoritos/' + key), (snap) => {
+    _favs = snap.val() ? Object.values(snap.val()) : [];
+    updateFavUI();
+    renderCatalog();
+  }, { onlyOnce: false });
+}
+
+window.toggleFav = async function(id) {
+  const key = getFavSessionKey();
+  if (_favs.includes(id)) {
+    _favs = _favs.filter(f => f !== id);
+    showToast('Eliminado de favoritos');
+  } else {
+    _favs.push(id);
+    showToast('♥ Guardado en favoritos');
+  }
+  await set(ref(db, 'favoritos/' + key), _favs.length ? Object.fromEntries(_favs.map((v,i)=>[i,v])) : null);
   updateFavUI();
   renderCatalog();
 };
@@ -2091,14 +2117,24 @@ window.renderFavoritos = function() {
   });
 };
 
-// ── RESEÑAS ──
+// ── RESEÑAS → Firebase ──
 let selectedStars = 0;
 window.selectedStars = 0;
-function getResenas(prodId) { try { return JSON.parse(localStorage.getItem('diamantina_resenas_' + prodId) || '[]'); } catch(e) { return []; } }
-function saveResena(prodId, resena) {
-  const all = getResenas(prodId);
-  all.unshift(resena);
-  localStorage.setItem('diamantina_resenas_' + prodId, JSON.stringify(all.slice(0, 20)));
+let _resenasCache = {};
+
+function getResenas(prodId) { return _resenasCache[prodId] || []; }
+
+function loadResenas(prodId) {
+  onValue(ref(db, 'resenas/' + prodId), (snap) => {
+    const data = snap.val();
+    _resenasCache[prodId] = data ? Object.values(data).sort((a,b) => b.ts - a.ts) : [];
+    renderResenas(prodId);
+    renderCatalog();
+  }, { onlyOnce: false });
+}
+
+async function saveResena(prodId, resena) {
+  await push(ref(db, 'resenas/' + prodId), resena);
 }
 function getResenaStarsHTML(prodId) {
   const resenas = getResenas(prodId);
@@ -2133,20 +2169,23 @@ window.renderResenas = function(prodId) {
   `).join('');
 };
 
-window.submitResena = function() {
+window.submitResena = async function() {
   if (!currentProd) { showToast('Error: no hay producto seleccionado', 'error'); return; }
   const texto = document.getElementById('pm-resena-input').value.trim();
+  const nombreInput = document.getElementById('pm-resena-nombre');
+  const nombre = (nombreInput?.value.trim()) || 'Anónima';
   const hiddenInput = document.getElementById('pm-stars-val');
   const stars = hiddenInput ? parseInt(hiddenInput.value) : 0;
   if (!texto) { showToast('Escribí tu opinión', 'error'); return; }
   if (!stars || stars < 1) { showToast('Elegí una puntuación tocando las estrellas', 'error'); return; }
-  saveResena(currentProd.id, { texto, stars, nombre: (typeof myName !== 'undefined' ? myName : null) || localStorage.getItem('diamantina_user') || 'Anónima', ts: Date.now() });
+  await saveResena(currentProd.id, { texto, stars, nombre, ts: Date.now() });
   document.getElementById('pm-resena-input').value = '';
+  const nombreEl = document.getElementById('pm-resena-nombre');
+  if (nombreEl) nombreEl.value = '';
+  if (nombreInput) nombreInput.value = '';
   if (hiddenInput) hiddenInput.value = '0';
   document.querySelectorAll('.star-btn').forEach(s => s.style.color = 'var(--border-strong)');
-  renderResenas(currentProd.id);
   showToast('¡Gracias por tu reseña! ✦');
-  renderCatalog();
 };
 
 // ── BUSCADOR ──
@@ -2240,26 +2279,27 @@ document.querySelectorAll('.talla-cb').forEach(cb => cb.addEventListener('change
 
 // ── BANNER ──
 function loadBanner() {
-  const text = localStorage.getItem('diamantina_banner');
-  const active = localStorage.getItem('diamantina_banner_active');
-  if (text && active === '1') {
-    document.getElementById('promo-banner-text').textContent = text;
-    document.getElementById('promo-banner').style.display = 'block';
-    const bannerInput = document.getElementById('banner-text');
-    if (bannerInput) bannerInput.value = text;
-  }
+  // Load from Firebase
+  onValue(ref(db, 'config/banner'), (snap) => {
+    const data = snap.val();
+    if (data && data.activo && data.texto) {
+      document.getElementById('promo-banner-text').textContent = data.texto;
+      document.getElementById('promo-banner').style.display = 'block';
+      const bannerInput = document.getElementById('banner-text');
+      if (bannerInput) bannerInput.value = data.texto;
+    } else {
+      document.getElementById('promo-banner').style.display = 'none';
+    }
+  }, { onlyOnce: false });
 }
-window.saveBanner = function() {
+window.saveBanner = async function() {
   const text = document.getElementById('banner-text').value.trim();
   if (!text) { showToast('Escribí el texto del banner', 'error'); return; }
-  localStorage.setItem('diamantina_banner', text);
-  localStorage.setItem('diamantina_banner_active', '1');
-  document.getElementById('promo-banner-text').textContent = text;
-  document.getElementById('promo-banner').style.display = 'block';
+  await set(ref(db, 'config/banner'), { texto: text, activo: true });
   showToast('Banner activado ✦');
 };
-window.hideBanner = function() {
-  localStorage.setItem('diamantina_banner_active', '0');
+window.hideBanner = async function() {
+  await set(ref(db, 'config/banner'), { activo: false, texto: '' });
   document.getElementById('promo-banner').style.display = 'none';
   showToast('Banner ocultado');
 };
@@ -2536,7 +2576,7 @@ else showPage('tienda');
 // ── INIT ──
 loadUser();
 loadBanner();
-updateFavUI();
+loadFavs();
 updateCartUI();
 </script>
 </body>
