@@ -370,6 +370,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
     <button class="nav-link active" id="nav-tienda" onclick="showPage('tienda')">Tienda</button>
     <button class="nav-link" id="nav-nosotras" onclick="showPage('nosotras')">Nosotras</button>
     <button class="nav-link" id="nav-politicas" onclick="showPage('politicas')">Políticas</button>
+    <a href="https://duzzistore2.mitiendanube.com/blog/" target="_blank" class="nav-link" style="text-decoration:none">Blog</a>
     <button class="nav-link" id="nav-pedidos" onclick="showPedidosPrompt()">Pedidos</button>
     <button class="nav-link" id="nav-admin" onclick="showAdminPrompt()">Admin</button>
     <button onclick="showPage('favoritos')" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px 8px;color:var(--ink-mid);transition:color var(--tr)" title="Mis favoritos" id="fav-nav-btn">♡ <span style="font-size:13px;font-family:DM Sans,sans-serif;vertical-align:middle" id="fav-nav-count"></span></button>
@@ -663,36 +664,97 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 
     <!-- CAMBIOS Y DEVOLUCIONES -->
     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem">
         <div style="width:40px;height:40px;border-radius:50%;background:var(--rose-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔄</div>
         <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink)">Cambios y devoluciones</div>
       </div>
       <div style="font-size:14px;color:var(--ink-mid);line-height:1.9">
-        <p style="margin-bottom:10px">Aceptamos cambios dentro de los <strong>10 días corridos</strong> desde la recepción del pedido, siempre que el producto esté en perfectas condiciones: sin uso, con etiquetas originales y en su packaging original.</p>
-        <p style="margin-bottom:10px">📦 El costo del envío del cambio corre por cuenta del cliente.</p>
-        <p style="margin-bottom:10px">⚠️ Por razones de higiene, <strong>no se aceptan devoluciones en colaless, bodys ni bikinis</strong> salvo que el producto presente un defecto de fabricación.</p>
-        <p>Para iniciar un cambio, escribinos por WhatsApp con tu número de pedido y una foto del producto.</p>
+
+        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">🔄 CAMBIOS</div>
+        <p style="margin-bottom:10px">Podés solicitar un cambio dentro de los <strong>2 días corridos</strong> desde la recepción del pedido. Para iniciar el proceso, escribinos por WhatsApp, mail o chat indicando:</p>
+        <ul style="margin:0 0 12px 1.2rem;padding:0">
+          <li>Número de pedido</li>
+          <li>Motivo del cambio</li>
+          <li>Producto que querés cambiar</li>
+        </ul>
+        <p style="margin-bottom:12px">Los cambios pueden gestionarse en puntos de retiro o por correo.</p>
+
+        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">✔️ Condiciones para cambios</div>
+        <ul style="margin:0 0 14px 1.2rem;padding:0">
+          <li style="margin-bottom:6px">El producto debe estar sin uso, en perfectas condiciones, con etiquetas y empaque original.</li>
+          <li style="margin-bottom:6px">Por motivos de higiene, <strong>no se aceptan cambios ni devoluciones en prendas íntimas</strong> como bombachas, bodys o conjuntos que hayan sido usados o sin su protector higiénico.</li>
+          <li style="margin-bottom:6px">Los soutiens, conjuntos y pijamas pueden cambiarse solo por talle o color, respetando las condiciones anteriores.</li>
+          <li>Los costos de envío por cambio son responsabilidad del cliente, salvo error nuestro (producto o talle equivocado).</li>
+        </ul>
+
+        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">💰 DEVOLUCIONES</div>
+        <p style="margin-bottom:8px">Solo aceptamos devoluciones en los siguientes casos:</p>
+        <ul style="margin:0 0 10px 1.2rem;padding:0">
+          <li>Producto defectuoso o con falla de fábrica.</li>
+          <li>Envío de un artículo distinto al solicitado.</li>
+        </ul>
+        <p style="margin-bottom:8px">En estas situaciones, Diamantina se hace cargo de los costos de envío y ofrece:</p>
+        <ul style="margin:0 0 12px 1.2rem;padding:0">
+          <li>Reposición del producto, o</li>
+          <li>Reintegro total del dinero (según prefieras).</li>
+        </ul>
+        <p style="margin-bottom:14px">Tenés <strong>3 días desde la recepción</strong> para solicitar la devolución. Puede realizarse en puntos de retiro o por correo.</p>
+
+        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">⏳ Tiempo de procesamiento del reembolso</div>
+        <p style="margin-bottom:14px">Una vez recibido y verificado el producto, el reembolso se procesa dentro de los <strong>3 días</strong>.</p>
+
+        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">🚚 Proceso de cambio o devolución</div>
+        <ol style="margin:0 0 14px 1.2rem;padding:0">
+          <li style="margin-bottom:4px">Escribinos indicando tu número de pedido y el motivo.</li>
+          <li style="margin-bottom:4px">Te enviaremos las instrucciones y el método de envío correspondiente.</li>
+          <li>Al recibir y verificar el producto, realizaremos el cambio o el reembolso.</li>
+        </ol>
+
+        <div style="background:var(--rose-pale);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;line-height:1.7">
+          <strong style="color:var(--rose)">💌 Importante:</strong><br>
+          • No se realizan cambios en productos de liquidación, outlet o personalizados.<br>
+          • Las diferencias de precio se ajustarán según el valor vigente al momento del cambio.<br>
+          • Consultas: 📧 ventas@diamantinashop &nbsp;|&nbsp; 💬 <a href="https://wa.me/541162620304" target="_blank" style="color:var(--rose)">WhatsApp</a>
+        </div>
       </div>
     </div>
 
     <!-- ENVÍOS -->
     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem">
         <div style="width:40px;height:40px;border-radius:50%;background:var(--rose-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📦</div>
         <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink)">Envíos</div>
       </div>
       <div style="font-size:14px;color:var(--ink-mid);line-height:1.9">
-        <p style="margin-bottom:10px">Realizamos envíos a <strong>todo el país</strong> a través de Andreani.</p>
+
+        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">📦 Envíos a todo el país</div>
+        <p style="margin-bottom:10px">Trabajamos con <strong>Correo Argentino</strong> y <strong>Andreani</strong> para que puedas recibir tu compra en tu domicilio o sucursal. Tiempo estimado: <strong>2 a 6 días hábiles</strong>. Despachamos en <strong>24 a 48hs hábiles</strong>.</p>
+
+        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">📍 Retiro sin costo adicional</div>
+        <p style="margin-bottom:4px">Podés retirar tu pedido en nuestros puntos de entrega:</p>
+        <ul style="margin:0 0 12px 1.2rem;padding:0">
+          <li>Castelar</li>
+          <li>Quilmes <em>(coordinamos día y horario luego de tu compra)</em></li>
+        </ul>
+
+        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">⚡ Envío en el día (AMBA)</div>
+        <p style="margin-bottom:14px">Si necesitás recibir tu pedido rápido, ofrecemos envíos en el día a través de Uber, Cabify u otros servicios de mensajería. Disponible dentro de zonas habilitadas.</p>
+
+        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">💸 Costo de envío</div>
+        <p style="margin-bottom:8px">El costo se calcula según el código postal, peso y tamaño del paquete. Todos los envíos son a cargo del comprador, salvo en productos que indiquen <strong>"Envío Gratis"</strong>.</p>
+        <p style="margin-bottom:12px">🎉 <strong>Con una compra total de $80.000 o más, tenés envío gratis.</strong></p>
+
         <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
           <div id="politica-precios-envio" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
-            <div><strong>CABA</strong><br><span style="color:var(--rose)" id="pol-caba">$3.500</span> · 2-3 días hábiles</div>
-            <div><strong>GBA</strong><br><span style="color:var(--rose)" id="pol-gba">$4.500</span> · 3-5 días hábiles</div>
-            <div><strong>Interior</strong><br><span style="color:var(--rose)" id="pol-interior">$6.000</span> · 5-7 días hábiles</div>
-            <div><strong>Zona Sur</strong><br><span style="color:var(--rose)" id="pol-sur">$7.000</span> · 7-10 días hábiles</div>
+            <div><strong>CABA</strong><br><span style="color:var(--rose)" id="pol-caba">$3.500</span></div>
+            <div><strong>GBA</strong><br><span style="color:var(--rose)" id="pol-gba">$4.500</span></div>
+            <div><strong>Interior</strong><br><span style="color:var(--rose)" id="pol-interior">$6.000</span></div>
+            <div><strong>Zona Sur</strong><br><span style="color:var(--rose)" id="pol-sur">$7.000</span></div>
           </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--ink-light)">Tiempo estimado: 3 a 6 días hábiles según la ubicación</div>
         </div>
-        <p style="margin-bottom:10px">📬 Una vez despachado tu pedido, te enviamos el número de seguimiento por WhatsApp.</p>
-        <p>Los envíos se procesan de <strong>lunes a viernes</strong> en días hábiles. Pedidos realizados después de las 17hs se procesan el siguiente día hábil.</p>
+
+        <p>📬 Una vez despachado tu pedido, te enviamos el número de seguimiento por WhatsApp.</p>
       </div>
     </div>
 
