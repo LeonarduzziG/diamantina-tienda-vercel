@@ -369,6 +369,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   <div class="nav-right">
     <button class="nav-link active" id="nav-tienda" onclick="showPage('tienda')">Tienda</button>
     <button class="nav-link" id="nav-nosotras" onclick="showPage('nosotras')">Nosotras</button>
+    <button class="nav-link" id="nav-politicas" onclick="showPage('politicas')">Políticas</button>
     <button class="nav-link" id="nav-pedidos" onclick="showPedidosPrompt()">Pedidos</button>
     <button class="nav-link" id="nav-admin" onclick="showAdminPrompt()">Admin</button>
     <button onclick="showPage('favoritos')" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px 8px;color:var(--ink-mid);transition:color var(--tr)" title="Mis favoritos" id="fav-nav-btn">♡ <span style="font-size:13px;font-family:DM Sans,sans-serif;vertical-align:middle" id="fav-nav-count"></span></button>
@@ -652,6 +653,151 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   <div id="favoritos-grid" class="grid g5"></div>
 </div>
 
+<div id="page-politicas" style="display:none">
+  <div style="max-width:760px;margin:0 auto;padding:3rem 2rem">
+
+    <div style="text-align:center;margin-bottom:3rem">
+      <div style="font-family:Cormorant Garamond,serif;font-size:42px;font-weight:300;color:var(--ink);line-height:1;margin-bottom:8px">Políticas</div>
+      <div style="font-size:13px;color:var(--ink-light)">Información importante sobre tu compra en Diamantina</div>
+    </div>
+
+    <!-- CAMBIOS Y DEVOLUCIONES -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--rose-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔄</div>
+        <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink)">Cambios y devoluciones</div>
+      </div>
+      <div style="font-size:14px;color:var(--ink-mid);line-height:1.9">
+        <p style="margin-bottom:10px">Aceptamos cambios dentro de los <strong>10 días corridos</strong> desde la recepción del pedido, siempre que el producto esté en perfectas condiciones: sin uso, con etiquetas originales y en su packaging original.</p>
+        <p style="margin-bottom:10px">📦 El costo del envío del cambio corre por cuenta del cliente.</p>
+        <p style="margin-bottom:10px">⚠️ Por razones de higiene, <strong>no se aceptan devoluciones en colaless, bodys ni bikinis</strong> salvo que el producto presente un defecto de fabricación.</p>
+        <p>Para iniciar un cambio, escribinos por WhatsApp con tu número de pedido y una foto del producto.</p>
+      </div>
+    </div>
+
+    <!-- ENVÍOS -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--rose-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📦</div>
+        <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink)">Envíos</div>
+      </div>
+      <div style="font-size:14px;color:var(--ink-mid);line-height:1.9">
+        <p style="margin-bottom:10px">Realizamos envíos a <strong>todo el país</strong> a través de Andreani.</p>
+        <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
+          <div id="politica-precios-envio" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
+            <div><strong>CABA</strong><br><span style="color:var(--rose)" id="pol-caba">$3.500</span> · 2-3 días hábiles</div>
+            <div><strong>GBA</strong><br><span style="color:var(--rose)" id="pol-gba">$4.500</span> · 3-5 días hábiles</div>
+            <div><strong>Interior</strong><br><span style="color:var(--rose)" id="pol-interior">$6.000</span> · 5-7 días hábiles</div>
+            <div><strong>Zona Sur</strong><br><span style="color:var(--rose)" id="pol-sur">$7.000</span> · 7-10 días hábiles</div>
+          </div>
+        </div>
+        <p style="margin-bottom:10px">📬 Una vez despachado tu pedido, te enviamos el número de seguimiento por WhatsApp.</p>
+        <p>Los envíos se procesan de <strong>lunes a viernes</strong> en días hábiles. Pedidos realizados después de las 17hs se procesan el siguiente día hábil.</p>
+      </div>
+    </div>
+
+    <!-- MEDIOS DE PAGO -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--rose-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💳</div>
+        <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink)">Medios de pago</div>
+      </div>
+      <div style="font-size:14px;color:var(--ink-mid);line-height:1.9">
+        <p style="margin-bottom:10px">Procesamos todos los pagos de forma segura a través de <strong>MercadoPago</strong>.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+          <span style="padding:5px 12px;background:var(--surface-2);border-radius:999px;font-size:12px;font-weight:500">💳 Tarjeta de crédito</span>
+          <span style="padding:5px 12px;background:var(--surface-2);border-radius:999px;font-size:12px;font-weight:500">🏦 Tarjeta de débito</span>
+          <span style="padding:5px 12px;background:var(--surface-2);border-radius:999px;font-size:12px;font-weight:500">📱 Dinero en cuenta MP</span>
+          <span style="padding:5px 12px;background:var(--surface-2);border-radius:999px;font-size:12px;font-weight:500">🏪 Rapipago / Pago fácil</span>
+        </div>
+        <p>Ofrecemos hasta <strong>12 cuotas sin interés</strong> según el producto y el banco emisor.</p>
+      </div>
+    </div>
+
+    <!-- PRIVACIDAD -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--rose-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔒</div>
+        <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink)">Privacidad y datos</div>
+      </div>
+      <div style="font-size:14px;color:var(--ink-mid);line-height:1.9">
+        <p style="margin-bottom:10px">En Diamantina respetamos tu privacidad. Los datos que recopilamos (nombre, dirección de entrega) se utilizan exclusivamente para procesar tu pedido y nunca son compartidos con terceros.</p>
+        <p>Tus datos de pago son procesados directamente por MercadoPago bajo sus estándares de seguridad. Diamantina no almacena información de tarjetas de crédito.</p>
+      </div>
+    </div>
+
+    <!-- GARANTÍA DE CALIDAD -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--rose-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✦</div>
+        <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink)">Garantía de calidad</div>
+      </div>
+      <div style="font-size:14px;color:var(--ink-mid);line-height:1.9">
+        <p style="margin-bottom:10px">Todos nuestros productos pasan por un control de calidad antes del despacho. Si recibís un producto con defecto de fabricación, lo reemplazamos sin costo adicional.</p>
+        <p>Para reclamar por defecto de fabricación tenés <strong>48 horas</strong> desde la recepción para notificarnos con foto del defecto por WhatsApp.</p>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div style="background:var(--rose-pale);border:1px solid var(--rose-light);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem">
+        <div style="width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">❓</div>
+        <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink)">Preguntas frecuentes</div>
+      </div>
+      <div id="faq-list">
+        <div class="faq-item" style="border-bottom:1px solid var(--rose-light);padding:12px 0">
+          <div onclick="toggleFaq(this)" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink)">
+            ¿Cómo sé qué talle elegir? <span style="color:var(--rose);font-size:18px;transition:transform 0.2s">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;font-size:13px;color:var(--ink-mid);margin-top:8px;line-height:1.7">
+            Usá nuestra <button onclick="openGuiaModal()" style="background:none;border:none;color:var(--rose);cursor:pointer;font-size:13px;text-decoration:underline;padding:0">guía de talles inteligente</button> — ingresás tus medidas y te decimos tu talle exacto para cada categoría. También podés consultar las tablas de medidas en la página <button onclick="showPage('nosotras')" style="background:none;border:none;color:var(--rose);cursor:pointer;font-size:13px;text-decoration:underline;padding:0">Nosotras</button>.
+          </div>
+        </div>
+        <div class="faq-item" style="border-bottom:1px solid var(--rose-light);padding:12px 0">
+          <div onclick="toggleFaq(this)" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink)">
+            ¿Cuánto tarda en llegar mi pedido? <span style="color:var(--rose);font-size:18px;transition:transform 0.2s">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;font-size:13px;color:var(--ink-mid);margin-top:8px;line-height:1.7">
+            CABA 2-3 días, GBA 3-5 días, Interior del país 5-7 días hábiles. Una vez despachado te mandamos el número de seguimiento por WhatsApp.
+          </div>
+        </div>
+        <div class="faq-item" style="border-bottom:1px solid var(--rose-light);padding:12px 0">
+          <div onclick="toggleFaq(this)" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink)">
+            ¿Puedo cambiar por otro talle? <span style="color:var(--rose);font-size:18px;transition:transform 0.2s">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;font-size:13px;color:var(--ink-mid);margin-top:8px;line-height:1.7">
+            Sí, aceptamos cambios dentro de los 10 días corridos de recibido el pedido. El producto debe estar sin uso, con etiquetas y en su packaging. El envío del cambio corre por cuenta del cliente.
+          </div>
+        </div>
+        <div class="faq-item" style="border-bottom:1px solid var(--rose-light);padding:12px 0">
+          <div onclick="toggleFaq(this)" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink)">
+            ¿Cómo pago? ¿Es seguro? <span style="color:var(--rose);font-size:18px;transition:transform 0.2s">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;font-size:13px;color:var(--ink-mid);margin-top:8px;line-height:1.7">
+            Pagás con MercadoPago — tarjeta de crédito, débito, dinero en cuenta o efectivo en Rapipago/Pago Fácil. Es 100% seguro, Diamantina nunca ve ni almacena los datos de tu tarjeta.
+          </div>
+        </div>
+        <div class="faq-item" style="padding:12px 0">
+          <div onclick="toggleFaq(this)" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink)">
+            ¿Puedo hacer una consulta antes de comprar? <span style="color:var(--rose);font-size:18px;transition:transform 0.2s">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;font-size:13px;color:var(--ink-mid);margin-top:8px;line-height:1.7">
+            ¡Claro! Escribinos por <a href="https://wa.me/541162620304" target="_blank" style="color:var(--rose)">WhatsApp</a> o por <a href="https://instagram.com/diamantinalenceria" target="_blank" style="color:var(--rose)">Instagram</a>. Respondemos todos los días.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:1.5rem">
+      <a href="https://wa.me/541162620304?text=Hola!%20Tengo%20una%20consulta%20sobre%20las%20pol%C3%ADticas%20de%20Diamantina" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:#25D366;border-radius:999px;color:#fff;font-size:14px;font-weight:500;text-decoration:none">
+        <svg viewBox="0 0 24 24" fill="#fff" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        ¿Otra consulta? Escribinos
+      </a>
+    </div>
+
+  </div>
+</div>
+
 <div class="admin-panel" id="page-pedidos">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
     <div class="admin-title" style="margin-bottom:0">Panel de pedidos</div>
@@ -695,6 +841,40 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
     <input type="text" id="banner-text" placeholder="ej: Envío gratis en compras mayores a $20.000" style="flex:1;min-width:200px;padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
     <button onclick="saveBanner()" style="padding:7px 16px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;cursor:pointer">Activar</button>
     <button onclick="hideBanner()" style="padding:7px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">Ocultar</button>
+  </div>
+
+  <!-- CONFIGURACIÓN DE ENVÍOS -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:500;color:var(--ink)">Configuración de envíos</div>
+      <button onclick="saveEnvios()" style="padding:6px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer">Guardar</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">
+      <div>
+        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">CABA ($)</label>
+        <input type="number" id="envio-caba" placeholder="3500" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">GBA ($)</label>
+        <input type="number" id="envio-gba" placeholder="4500" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Interior ($)</label>
+        <input type="number" id="envio-interior" placeholder="6000" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Zona Sur ($)</label>
+        <input type="number" id="envio-sur" placeholder="7000" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border)">
+      <label style="font-size:12px;color:var(--ink-mid)">Envío gratis desde $</label>
+      <input type="number" id="envio-gratis-min" placeholder="80000" style="width:120px;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="envio-gratis-activo" style="width:16px;height:16px;cursor:pointer">
+        <span style="font-size:12px;color:var(--ink-mid)">Activar</span>
+      </label>
+    </div>
   </div>
   <div class="admin-grid">
     <div class="admin-form">
@@ -982,6 +1162,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
     </div>
     <div style="margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;color:var(--ink-mid)"><span>Productos</span><span id="subtotal-productos">$0</span></div>
+      <div id="envio-gratis-banner" style="display:none;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:#3B6D11;font-weight:500;margin:4px 0">🎉 ¡Envío gratis!</div>
+      <div id="envio-gratis-progreso" style="display:none;font-size:11px;color:var(--ink-light);padding:2px 0"></div>
       <div id="envio-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:var(--ink-mid)"><span id="envio-label">Envío</span><span id="subtotal-envio">$0</span></div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);margin-top:4px">
         <span style="font-size:15px;font-weight:500;color:var(--ink)">Total</span>
@@ -1031,11 +1213,11 @@ let selectedTalla = null;
 
 // ── PAGES ──
 window.showPage = function(page) {
-  ['tienda','admin','pedidos','nosotras','favoritos','success','error'].forEach(p => {
+  ['tienda','admin','pedidos','nosotras','politicas','favoritos','success','error'].forEach(p => {
     const el = document.getElementById('page-' + p);
     if (el) { el.style.display = 'none'; el.classList.remove('open'); }
   });
-  ['tienda','admin','pedidos','nosotras'].forEach(p => {
+  ['tienda','admin','pedidos','nosotras','politicas'].forEach(p => {
     const navEl = document.getElementById('nav-' + p);
     if (navEl) navEl.classList.toggle('active', p === page);
   });
@@ -1546,6 +1728,35 @@ function updateCartUI() {
   document.getElementById('subtotal-productos') && (document.getElementById('subtotal-productos').textContent = '$' + total.toLocaleString('es-AR'));
   document.getElementById('cart-total').textContent = '$' + totalConEnvio.toLocaleString('es-AR');
   document.getElementById('checkout-btn').disabled = cart.length === 0;
+  // Check free shipping
+  const cfg = window._envioConfig || {};
+  const minGratis = cfg.gratisMin || 80000;
+  const gratisActivo = cfg.gratisActivo || false;
+  if (gratisActivo && total >= minGratis && typeof envioSeleccionado !== 'undefined' && envioSeleccionado) {
+    envioSeleccionado = { ...envioSeleccionado, precio: 0 };
+    const envioEl = document.getElementById('envio-result');
+    if (envioEl) envioEl.textContent = '🎉 ¡Envío gratis! Tu pedido supera $' + minGratis.toLocaleString('es-AR');
+  }
+  // Free shipping progress
+  const cfg2 = window._envioConfig || {};
+  const minGratis2 = cfg2.gratisMin || 80000;
+  const gratisActivo2 = cfg2.gratisActivo || false;
+  const bannerEl = document.getElementById('envio-gratis-banner');
+  const progresoEl = document.getElementById('envio-gratis-progreso');
+  if (gratisActivo2) {
+    if (total >= minGratis2) {
+      if (bannerEl) bannerEl.style.display = 'block';
+      if (progresoEl) progresoEl.style.display = 'none';
+    } else {
+      if (bannerEl) bannerEl.style.display = 'none';
+      const falta = minGratis2 - total;
+      if (progresoEl) { progresoEl.style.display = 'block'; progresoEl.textContent = 'Te faltan $' + falta.toLocaleString('es-AR') + ' para envío gratis'; }
+    }
+  } else {
+    if (bannerEl) bannerEl.style.display = 'none';
+    if (progresoEl) progresoEl.style.display = 'none';
+  }
+
   if (typeof envioSeleccionado !== 'undefined' && envioSeleccionado) {
     const er = document.getElementById('envio-row');
     if (er) { er.style.display='flex'; document.getElementById('envio-label').textContent='Envío ('+envioSeleccionado.zona+')'; document.getElementById('subtotal-envio').textContent='$'+envio.toLocaleString('es-AR'); }
@@ -1981,6 +2192,16 @@ document.getElementById('guia-modal-bg').addEventListener('click', function(e) {
   if (e.target === this) closeGuiaModal();
 });
 
+// ── FAQ ──
+window.toggleFaq = function(el) {
+  const answer = el.nextElementSibling;
+  const icon = el.querySelector('span');
+  const isOpen = answer.style.display !== 'none';
+  answer.style.display = isOpen ? 'none' : 'block';
+  icon.textContent = isOpen ? '+' : '−';
+  icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(45deg)';
+};
+
 // ── PEDIDOS ──
 const WA_NOTIF_NUMBER = "541162620304";
 
@@ -2278,6 +2499,49 @@ window.currentStockEdit = {};
 document.querySelectorAll('.talla-cb').forEach(cb => cb.addEventListener('change', renderStockFields));
 
 // ── BANNER ──
+// ── ENVÍOS CONFIG ──
+window._envioConfig = { caba:3500, gba:4500, interior:6000, sur:7000, gratisMin:80000, gratisActivo:false };
+
+function loadEnvioConfig() {
+  onValue(ref(db, 'config/envios'), (snap) => {
+    const data = snap.val();
+    if (data) {
+      window._envioConfig = data;
+      // Update policy page prices
+      const fmt = n => '$' + Number(n).toLocaleString('es-AR');
+      const polCaba = document.getElementById('pol-caba'); if (polCaba && data.caba) polCaba.textContent = fmt(data.caba);
+      const polGba = document.getElementById('pol-gba'); if (polGba && data.gba) polGba.textContent = fmt(data.gba);
+      const polInt = document.getElementById('pol-interior'); if (polInt && data.interior) polInt.textContent = fmt(data.interior);
+      const polSur = document.getElementById('pol-sur'); if (polSur && data.sur) polSur.textContent = fmt(data.sur);
+      // Update admin fields if open
+      const fields = ['caba','gba','interior','sur'];
+      fields.forEach(f => {
+        const el = document.getElementById('envio-' + f);
+        if (el && data[f]) el.value = data[f];
+      });
+      const gMin = document.getElementById('envio-gratis-min');
+      if (gMin && data.gratisMin) gMin.value = data.gratisMin;
+      const gActivo = document.getElementById('envio-gratis-activo');
+      if (gActivo) gActivo.checked = !!data.gratisActivo;
+    }
+  }, { onlyOnce: false });
+}
+
+window.saveEnvios = async function() {
+  const cfg = {
+    caba: parseInt(document.getElementById('envio-caba').value) || 3500,
+    gba: parseInt(document.getElementById('envio-gba').value) || 4500,
+    interior: parseInt(document.getElementById('envio-interior').value) || 6000,
+    sur: parseInt(document.getElementById('envio-sur').value) || 7000,
+    gratisMin: parseInt(document.getElementById('envio-gratis-min').value) || 80000,
+    gratisActivo: document.getElementById('envio-gratis-activo').checked
+  };
+  await set(ref(db, 'config/envios'), cfg);
+  window._envioConfig = cfg;
+  showToast('Configuración de envíos guardada ✦');
+  updateCartUI();
+};
+
 function loadBanner() {
   // Load from Firebase
   onValue(ref(db, 'config/banner'), (snap) => {
@@ -2581,6 +2845,7 @@ function loadUser() {
 }
 loadUser();
 loadBanner();
+loadEnvioConfig();
 loadFavs();
 updateFavUI();
 updateCartUI();
