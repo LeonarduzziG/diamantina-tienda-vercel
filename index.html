@@ -339,10 +339,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 
 /* RESPONSIVE */
 @media(max-width:768px){
-  nav{padding:0 0.5rem}
-  .nav-right{gap:0.4rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap;max-width:calc(100vw - 120px)}
-  .nav-right::-webkit-scrollbar{display:none}
-  .nav-link{font-size:11px;white-space:nowrap}
+  nav{padding:0 1rem}
   .hero{padding:3rem 1rem 2rem}
   .filters{padding:1rem}
   .catalog{padding:1rem;grid-template-columns:repeat(2,1fr);gap:12px}
@@ -373,7 +370,6 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
     <button class="nav-link active" id="nav-tienda" onclick="showPage('tienda')">Tienda</button>
     <button class="nav-link" id="nav-nosotras" onclick="showPage('nosotras')">Nosotras</button>
     <button class="nav-link" id="nav-politicas" onclick="showPage('politicas')">Políticas</button>
-    <a href="https://duzzistore2.mitiendanube.com/blog/" target="_blank" class="nav-link" style="text-decoration:none">Blog</a>
     <button class="nav-link" id="nav-pedidos" onclick="showPedidosPrompt()">Pedidos</button>
     <button class="nav-link" id="nav-admin" onclick="showAdminPrompt()">Admin</button>
     <button onclick="showPage('favoritos')" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px 8px;color:var(--ink-mid);transition:color var(--tr)" title="Mis favoritos" id="fav-nav-btn">♡ <span style="font-size:13px;font-family:DM Sans,sans-serif;vertical-align:middle" id="fav-nav-count"></span></button>
@@ -667,97 +663,36 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 
     <!-- CAMBIOS Y DEVOLUCIONES -->
     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
         <div style="width:40px;height:40px;border-radius:50%;background:var(--rose-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔄</div>
         <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink)">Cambios y devoluciones</div>
       </div>
       <div style="font-size:14px;color:var(--ink-mid);line-height:1.9">
-
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">🔄 CAMBIOS</div>
-        <p style="margin-bottom:10px">Podés solicitar un cambio dentro de los <strong>2 días corridos</strong> desde la recepción del pedido. Para iniciar el proceso, escribinos por WhatsApp, mail o chat indicando:</p>
-        <ul style="margin:0 0 12px 1.2rem;padding:0">
-          <li>Número de pedido</li>
-          <li>Motivo del cambio</li>
-          <li>Producto que querés cambiar</li>
-        </ul>
-        <p style="margin-bottom:12px">Los cambios pueden gestionarse en puntos de retiro o por correo.</p>
-
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">✔️ Condiciones para cambios</div>
-        <ul style="margin:0 0 14px 1.2rem;padding:0">
-          <li style="margin-bottom:6px">El producto debe estar sin uso, en perfectas condiciones, con etiquetas y empaque original.</li>
-          <li style="margin-bottom:6px">Por motivos de higiene, <strong>no se aceptan cambios ni devoluciones en prendas íntimas</strong> como bombachas, bodys o conjuntos que hayan sido usados o sin su protector higiénico.</li>
-          <li style="margin-bottom:6px">Los soutiens, conjuntos y pijamas pueden cambiarse solo por talle o color, respetando las condiciones anteriores.</li>
-          <li>Los costos de envío por cambio son responsabilidad del cliente, salvo error nuestro (producto o talle equivocado).</li>
-        </ul>
-
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">💰 DEVOLUCIONES</div>
-        <p style="margin-bottom:8px">Solo aceptamos devoluciones en los siguientes casos:</p>
-        <ul style="margin:0 0 10px 1.2rem;padding:0">
-          <li>Producto defectuoso o con falla de fábrica.</li>
-          <li>Envío de un artículo distinto al solicitado.</li>
-        </ul>
-        <p style="margin-bottom:8px">En estas situaciones, Diamantina se hace cargo de los costos de envío y ofrece:</p>
-        <ul style="margin:0 0 12px 1.2rem;padding:0">
-          <li>Reposición del producto, o</li>
-          <li>Reintegro total del dinero (según prefieras).</li>
-        </ul>
-        <p style="margin-bottom:14px">Tenés <strong>3 días desde la recepción</strong> para solicitar la devolución. Puede realizarse en puntos de retiro o por correo.</p>
-
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">⏳ Tiempo de procesamiento del reembolso</div>
-        <p style="margin-bottom:14px">Una vez recibido y verificado el producto, el reembolso se procesa dentro de los <strong>3 días</strong>.</p>
-
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">🚚 Proceso de cambio o devolución</div>
-        <ol style="margin:0 0 14px 1.2rem;padding:0">
-          <li style="margin-bottom:4px">Escribinos indicando tu número de pedido y el motivo.</li>
-          <li style="margin-bottom:4px">Te enviaremos las instrucciones y el método de envío correspondiente.</li>
-          <li>Al recibir y verificar el producto, realizaremos el cambio o el reembolso.</li>
-        </ol>
-
-        <div style="background:var(--rose-pale);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;line-height:1.7">
-          <strong style="color:var(--rose)">💌 Importante:</strong><br>
-          • No se realizan cambios en productos de liquidación, outlet o personalizados.<br>
-          • Las diferencias de precio se ajustarán según el valor vigente al momento del cambio.<br>
-          • Consultas: 📧 ventas@diamantinashop &nbsp;|&nbsp; 💬 <a href="https://wa.me/541162620304" target="_blank" style="color:var(--rose)">WhatsApp</a>
-        </div>
+        <p style="margin-bottom:10px">Aceptamos cambios dentro de los <strong>10 días corridos</strong> desde la recepción del pedido, siempre que el producto esté en perfectas condiciones: sin uso, con etiquetas originales y en su packaging original.</p>
+        <p style="margin-bottom:10px">📦 El costo del envío del cambio corre por cuenta del cliente.</p>
+        <p style="margin-bottom:10px">⚠️ Por razones de higiene, <strong>no se aceptan devoluciones en colaless, bodys ni bikinis</strong> salvo que el producto presente un defecto de fabricación.</p>
+        <p>Para iniciar un cambio, escribinos por WhatsApp con tu número de pedido y una foto del producto.</p>
       </div>
     </div>
 
     <!-- ENVÍOS -->
     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
         <div style="width:40px;height:40px;border-radius:50%;background:var(--rose-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📦</div>
         <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink)">Envíos</div>
       </div>
       <div style="font-size:14px;color:var(--ink-mid);line-height:1.9">
-
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">📦 Envíos a todo el país</div>
-        <p style="margin-bottom:10px">Trabajamos con <strong>Correo Argentino</strong> y <strong>Andreani</strong> para que puedas recibir tu compra en tu domicilio o sucursal. Tiempo estimado: <strong>2 a 6 días hábiles</strong>. Despachamos en <strong>24 a 48hs hábiles</strong>.</p>
-
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">📍 Retiro sin costo adicional</div>
-        <p style="margin-bottom:4px">Podés retirar tu pedido en nuestros puntos de entrega:</p>
-        <ul style="margin:0 0 12px 1.2rem;padding:0">
-          <li>Castelar</li>
-          <li>Quilmes <em>(coordinamos día y horario luego de tu compra)</em></li>
-        </ul>
-
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">⚡ Envío en el día (AMBA)</div>
-        <p style="margin-bottom:14px">Si necesitás recibir tu pedido rápido, ofrecemos envíos en el día a través de Uber, Cabify u otros servicios de mensajería. Disponible dentro de zonas habilitadas.</p>
-
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">💸 Costo de envío</div>
-        <p style="margin-bottom:8px">El costo se calcula según el código postal, peso y tamaño del paquete. Todos los envíos son a cargo del comprador, salvo en productos que indiquen <strong>"Envío Gratis"</strong>.</p>
-        <p style="margin-bottom:12px">🎉 <strong>Con una compra total de $80.000 o más, tenés envío gratis.</strong></p>
-
+        <p style="margin-bottom:10px">Realizamos envíos a <strong>todo el país</strong> a través de Andreani.</p>
         <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
           <div id="politica-precios-envio" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
-            <div><strong>CABA</strong><br><span style="color:var(--rose)" id="pol-caba">$3.500</span></div>
-            <div><strong>GBA</strong><br><span style="color:var(--rose)" id="pol-gba">$4.500</span></div>
-            <div><strong>Interior</strong><br><span style="color:var(--rose)" id="pol-interior">$6.000</span></div>
-            <div><strong>Zona Sur</strong><br><span style="color:var(--rose)" id="pol-sur">$7.000</span></div>
+            <div><strong>CABA</strong><br><span style="color:var(--rose)" id="pol-caba">$3.500</span> · 2-3 días hábiles</div>
+            <div><strong>GBA</strong><br><span style="color:var(--rose)" id="pol-gba">$4.500</span> · 3-5 días hábiles</div>
+            <div><strong>Interior</strong><br><span style="color:var(--rose)" id="pol-interior">$6.000</span> · 5-7 días hábiles</div>
+            <div><strong>Zona Sur</strong><br><span style="color:var(--rose)" id="pol-sur">$7.000</span> · 7-10 días hábiles</div>
           </div>
-          <div style="margin-top:10px;font-size:12px;color:var(--ink-light)">Tiempo estimado: 3 a 6 días hábiles según la ubicación</div>
         </div>
-
-        <p>📬 Una vez despachado tu pedido, te enviamos el número de seguimiento por WhatsApp.</p>
+        <p style="margin-bottom:10px">📬 Una vez despachado tu pedido, te enviamos el número de seguimiento por WhatsApp.</p>
+        <p>Los envíos se procesan de <strong>lunes a viernes</strong> en días hábiles. Pedidos realizados después de las 17hs se procesan el siguiente día hábil.</p>
       </div>
     </div>
 
@@ -910,12 +845,11 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 
   <!-- CONFIGURACIÓN DE ENVÍOS -->
   <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
-    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.envio-arrow').textContent=this.nextElementSibling.style.display==='none'?'▼':'▲'">
-      <div style="font-size:13px;font-weight:500;color:var(--ink)">⚙️ Configuración de envíos</div>
-      <span class="envio-arrow" style="font-size:11px;color:var(--ink-light)">▼</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:500;color:var(--ink)">Configuración de envíos</div>
+      <button onclick="saveEnvios()" style="padding:6px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer">Guardar</button>
     </div>
-    <div style="display:none;margin-top:12px">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">
       <div>
         <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">CABA ($)</label>
         <input type="number" id="envio-caba" placeholder="3500" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
@@ -932,16 +866,14 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
         <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Zona Sur ($)</label>
         <input type="number" id="envio-sur" placeholder="7000" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
       </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap">
-        <label style="font-size:12px;color:var(--ink-mid)">Envío gratis desde $</label>
-        <input type="number" id="envio-gratis-min" placeholder="80000" style="width:120px;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-          <input type="checkbox" id="envio-gratis-activo" style="width:16px;height:16px;cursor:pointer">
-          <span style="font-size:12px;color:var(--ink-mid)">Activar</span>
-        </label>
-        <button onclick="saveEnvios()" style="padding:7px 16px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;margin-left:auto">Guardar</button>
-      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border)">
+      <label style="font-size:12px;color:var(--ink-mid)">Envío gratis desde $</label>
+      <input type="number" id="envio-gratis-min" placeholder="80000" style="width:120px;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="envio-gratis-activo" style="width:16px;height:16px;cursor:pointer">
+        <span style="font-size:12px;color:var(--ink-mid)">Activar</span>
+      </label>
     </div>
   </div>
   <div class="admin-grid">
@@ -1308,8 +1240,6 @@ window.showPage = function(page) {
     const el = document.getElementById('page-pedidos');
     el.style.display = 'block'; el.classList.add('open');
     renderPedidos();
-  } else if (page === 'politicas') {
-    document.getElementById('page-politicas').style.display = 'block';
   } else if (page === 'nosotras') {
     const el = document.getElementById('page-nosotras');
     el.style.display = 'block';
@@ -1414,14 +1344,15 @@ window.renderCatalog = function() {
   const sort = document.getElementById('sort-select').value;
   const filtroTalla = document.getElementById('filtro-talla')?.value || '';
   const filtroColor = window.activeColorFilter || '';
+  const filtroColorGroup = window.activeColorGroup || '';
   let list = products.filter(p => {
     if (activeFilter !== 'Todas' && p.cat !== activeFilter) return false;
     if (searchQuery && !p.name.toLowerCase().includes(searchQuery) && !p.cat.toLowerCase().includes(searchQuery)) return false;
     if (filtroTalla && !(p.tallas||[]).includes(filtroTalla)) return false;
-    if (filtroColor) {
+    if (filtroColorGroup) {
       let pc = p.colores || [];
       if (!Array.isArray(pc)) pc = Object.values(pc);
-      if (!pc.some(c => c.hex === filtroColor)) return false;
+      if (!pc.some(c => normalizeColorName(c.nombre) === filtroColorGroup)) return false;
     }
     return true;
   });
@@ -2692,23 +2623,25 @@ window.selectColor = function(el, hex, nombre) {
 // Update filtro colores bar when products load
 // Color grouping by name similarity
 function normalizeColorName(name) {
+  if (!name) return 'Otro';
   const n = name.toLowerCase().trim()
     .replace(/[áà]/g,'a').replace(/[éè]/g,'e').replace(/[íì]/g,'i')
     .replace(/[óò]/g,'o').replace(/[úù]/g,'u').replace(/ñ/g,'n');
-  // Map name to canonical group
   if (/negro|black|oscur/.test(n)) return 'Negro';
   if (/blanco|white|crem|crema|marfil|ivory/.test(n)) return 'Blanco';
-  if (/rosa|rose|pink|fucsia|fucs|magenta|coral|salmon|salmón/.test(n)) return 'Rosa';
-  if (/rojo|red|bordo|burdeo|vino|granate|teja/.test(n)) return 'Rojo';
-  if (/naranja|orange|durazno/.test(n)) return 'Naranja';
-  if (/amarillo|yellow|dorado|gold|oro/.test(n)) return 'Amarillo';
-  if (/verde|green|oliva|militar|esmeralda|menta/.test(n)) return 'Verde';
-  if (/azul|blue|navy|celeste|turquesa|aqua/.test(n)) return 'Azul';
-  if (/violeta|morado|lila|lilac|purple|uva/.test(n)) return 'Violeta';
-  if (/marron|marrón|brown|camel|caramelo|chocolate|cafe|café/.test(n)) return 'Marrón';
-  if (/gris|gray|grey|plata|silver/.test(n)) return 'Gris';
-  if (/beige|arena|nude|piel|natural/.test(n)) return 'Beige';
-  return name; // keep original if no match
+  if (/rosa|rose|pink|fucsia|fucs|magenta|coral|salmon|salm/.test(n)) return 'Rosa';
+  if (/rojo|red|bordo|burdeo|vino|granate|teja|carmesi|cereza|scarlet/.test(n)) return 'Rojo';
+  if (/naranja|orange|durazno|melon/.test(n)) return 'Naranja';
+  if (/amarill|yellow|dorado|gold|oro|mostaza|limon|citric|amarilla/.test(n)) return 'Amarillo';
+  if (/verde|green|oliva|militar|esmeralda|menta|botella|lima|khaki|caqui/.test(n)) return 'Verde';
+  if (/azul|blue|navy|celeste|turquesa|aqua|petroleo|petróleo|marino/.test(n)) return 'Azul';
+  if (/violeta|morado|lila|lilac|purple|uva|lavanda|lavend/.test(n)) return 'Violeta';
+  if (/marron|marrón|brown|camel|caramelo|chocolate|cafe|café|avellana|canela|taupe|tierra|terra|tostado/.test(n)) return 'Marrón';
+  if (/gris|gray|grey|plata|silver|perla|pearl/.test(n)) return 'Gris';
+  if (/beige|arena|nude|piel|natural|crudo|manteca/.test(n)) return 'Beige';
+  // Catch hex codes and unknown → try to assign by hex range
+  if (/^#[0-9a-f]{6}$/i.test(name.trim())) return 'Otro';
+  return 'Otro';
 }
 
 function getGroupHex(colors) {
@@ -2720,68 +2653,51 @@ function renderColorFilters() {
   const el = document.getElementById('filtro-colores');
   if (!el) return;
 
-  // Collect all unique colors
-  const allColors = [];
-  const seen = new Set();
+  // Collect all unique colors grouped by canonical name
+  const groups = {};
   products.forEach(p => {
     let colores = p.colores || [];
     if (!Array.isArray(colores)) colores = Object.values(colores);
     colores.forEach(c => {
-      if (!seen.has(c.hex)) { seen.add(c.hex); allColors.push(c); }
+      const group = normalizeColorName(c.nombre);
+      if (!groups[group]) groups[group] = [];
+      if (!groups[group].find(x => x.hex === c.hex)) groups[group].push(c);
     });
   });
 
-  if (!allColors.length) {
+  if (!Object.keys(groups).length) {
     el.innerHTML = '<div style="font-size:12px;color:var(--ink-light);font-style:italic">No hay colores cargados aún</div>';
     updateColorBtn();
     return;
   }
 
-  // Group by normalized name
-  const groups = {};
-  allColors.forEach(c => {
-    const group = normalizeColorName(c.nombre);
-    if (!groups[group]) groups[group] = [];
-    groups[group].push(c);
-  });
+  // Sort groups alphabetically
+  const sorted = Object.entries(groups).sort((a,b) => a[0].localeCompare(b[0]));
 
-  // Render grouped colors
-  el.innerHTML = Object.entries(groups).map(([groupName, colors]) => {
-    // Use activeColorFilter to check if any hex in group is active
-    const activeHex = colors.find(c => c.hex === window.activeColorFilter);
-    const isActive = !!activeHex;
-    const displayHex = isActive ? activeHex.hex : colors[0].hex;
-    // If group has multiple colors, show small multi-dot
-    const multiDot = colors.length > 1
-      ? colors.slice(0,3).map(c => `<div style="width:10px;height:10px;border-radius:50%;background:${c.hex};border:1px solid rgba(255,255,255,0.6);margin-left:-4px"></div>`).join('')
-      : '';
-
+  el.innerHTML = sorted.map(([groupName, colors]) => {
+    const isActive = window.activeColorGroup === groupName;
+    // Pick most representative hex: average or first
+    const displayHex = colors[0].hex;
     return '<div data-group="' + groupName + '" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex-shrink:0">' +
-      '<div style="position:relative;width:40px;height:40px">' +
-        '<div style="width:40px;height:40px;border-radius:50%;background:' + displayHex + ';border:2px solid ' + (isActive?'var(--rose)':'var(--border)') + ';box-shadow:' + (isActive?'0 0 0 2px #fff,0 0 0 4px var(--rose)':'none') + ';transform:' + (isActive?'scale(1.1)':'scale(1)') + ';transition:all 0.2s"></div>' +
-        (colors.length > 1 ? '<div style="position:absolute;bottom:-2px;right:-2px;display:flex">' + multiDot + '</div>' : '') +
-      '</div>' +
-      '<span style="font-size:10px;color:' + (isActive?'var(--rose)':'var(--ink-mid)') + ';font-weight:' + (isActive?'600':'400') + ';white-space:nowrap;max-width:52px;text-align:center;line-height:1.2">' + groupName + (colors.length > 1 ? ' ('+colors.length+')' : '') + '</span>' +
+      '<div style="width:36px;height:36px;border-radius:50%;background:' + displayHex + ';border:2.5px solid ' + (isActive ? 'var(--rose)' : 'var(--border)') + ';box-shadow:' + (isActive ? '0 0 0 2px #fff,0 0 0 4px var(--rose)' : 'none') + ';transform:' + (isActive ? 'scale(1.12)' : 'scale(1)') + ';transition:all 0.2s"></div>' +
+      '<span style="font-size:10px;color:' + (isActive ? 'var(--rose)' : 'var(--ink-mid)') + ';font-weight:' + (isActive ? '600' : '400') + ';white-space:nowrap;text-align:center">' + groupName + '</span>' +
     '</div>';
   }).join('');
 
-  // Attach click listeners — cycle through hexes in group
+  // Click + touch: toggle group filter
   el.querySelectorAll('[data-group]').forEach(div => {
-    div.addEventListener('click', () => {
-      const groupName = div.dataset.group;
-      const colors = groups[groupName];
-      const currentIdx = colors.findIndex(c => c.hex === window.activeColorFilter);
-      if (currentIdx === -1) {
-        window.activeColorFilter = colors[0].hex;
-      } else if (currentIdx < colors.length - 1) {
-        window.activeColorFilter = colors[currentIdx + 1].hex;
-      } else {
-        window.activeColorFilter = '';
-      }
+    const handler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const g = div.dataset.group;
+      window.activeColorGroup = (window.activeColorGroup === g) ? '' : g;
+      window.activeColorFilter = window.activeColorGroup ? (groups[g][0]?.hex || '') : '';
       renderColorFilters();
       renderCatalog();
       updateColorBtn();
-    });
+    };
+    div.addEventListener('click', handler);
+    div.addEventListener('touchend', handler, { passive: false });
   });
 
   updateColorBtn();
@@ -2792,18 +2708,18 @@ function updateColorBtn() {
   const dot = document.getElementById('btn-color-dot');
   const label = document.getElementById('btn-color-label');
   if (!btn) return;
-  if (window.activeColorFilter) {
-    dot.style.background = window.activeColorFilter;
-    dot.style.border = '1px solid var(--border-strong)';
-    // Find color name
-    let nombre = '';
+  if (window.activeColorGroup) {
+    // Find a representative hex for the active group
+    let hex = '';
     products.forEach(p => {
       let cols = p.colores || [];
       if (!Array.isArray(cols)) cols = Object.values(cols);
-      const found = cols.find(c => c.hex === window.activeColorFilter);
-      if (found) nombre = normalizeColorName(found.nombre);
+      const found = cols.find(c => normalizeColorName(c.nombre) === window.activeColorGroup);
+      if (found && !hex) hex = found.hex;
     });
-    label.textContent = '· ' + nombre;
+    dot.style.background = hex || 'var(--rose)';
+    dot.style.border = '1px solid var(--border-strong)';
+    label.textContent = '· ' + window.activeColorGroup;
     label.style.color = 'var(--rose)';
     btn.style.borderColor = 'var(--rose)';
     btn.style.color = 'var(--rose)';
@@ -2818,6 +2734,7 @@ window.updateColorBtn = updateColorBtn;
 window.renderColorFilters = renderColorFilters;
 
 window.activeColorFilter = '';
+window.activeColorGroup = '';
 
 window.toggleFiltroColores = function() {
   const panel = document.getElementById('filtro-colores-panel');
@@ -2826,14 +2743,16 @@ window.toggleFiltroColores = function() {
   if (!isOpen) renderColorFilters();
 };
 
-// Close panel when clicking outside
-document.addEventListener('click', function(e) {
+// Close panel when clicking outside (desktop + mobile)
+function closeFiltroOutside(e) {
   const panel = document.getElementById('filtro-colores-panel');
   const btn = document.getElementById('btn-filtro-colores');
   if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
     panel.style.display = 'none';
   }
-});
+}
+document.addEventListener('click', closeFiltroOutside);
+document.addEventListener('touchstart', closeFiltroOutside, { passive: true });
 
 window.toggleColorFilter = function(hex) {
   window.activeColorFilter = window.activeColorFilter === hex ? '' : hex;
@@ -2842,6 +2761,7 @@ window.toggleColorFilter = function(hex) {
 };
 window.clearColorFilter = function() {
   window.activeColorFilter = '';
+  window.activeColorGroup = '';
   renderColorFilters();
   renderCatalog();
   updateColorBtn();
