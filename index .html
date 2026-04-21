@@ -1344,14 +1344,15 @@ window.renderCatalog = function() {
   const sort = document.getElementById('sort-select').value;
   const filtroTalla = document.getElementById('filtro-talla')?.value || '';
   const filtroColor = window.activeColorFilter || '';
+  const filtroColorGroup = window.activeColorGroup || '';
   let list = products.filter(p => {
     if (activeFilter !== 'Todas' && p.cat !== activeFilter) return false;
     if (searchQuery && !p.name.toLowerCase().includes(searchQuery) && !p.cat.toLowerCase().includes(searchQuery)) return false;
     if (filtroTalla && !(p.tallas||[]).includes(filtroTalla)) return false;
-    if (filtroColor) {
+    if (filtroColorGroup) {
       let pc = p.colores || [];
       if (!Array.isArray(pc)) pc = Object.values(pc);
-      if (!pc.some(c => c.hex === filtroColor)) return false;
+      if (!pc.some(c => normalizeColorName(c.nombre) === filtroColorGroup)) return false;
     }
     return true;
   });
@@ -2650,64 +2651,43 @@ function renderColorFilters() {
   const el = document.getElementById('filtro-colores');
   if (!el) return;
 
-  // Collect all unique colors
-  const allColors = [];
-  const seen = new Set();
+  // Collect all unique colors grouped by canonical name
+  const groups = {};
   products.forEach(p => {
     let colores = p.colores || [];
     if (!Array.isArray(colores)) colores = Object.values(colores);
     colores.forEach(c => {
-      if (!seen.has(c.hex)) { seen.add(c.hex); allColors.push(c); }
+      const group = normalizeColorName(c.nombre);
+      if (!groups[group]) groups[group] = [];
+      if (!groups[group].find(x => x.hex === c.hex)) groups[group].push(c);
     });
   });
 
-  if (!allColors.length) {
+  if (!Object.keys(groups).length) {
     el.innerHTML = '<div style="font-size:12px;color:var(--ink-light);font-style:italic">No hay colores cargados aún</div>';
     updateColorBtn();
     return;
   }
 
-  // Group by normalized name
-  const groups = {};
-  allColors.forEach(c => {
-    const group = normalizeColorName(c.nombre);
-    if (!groups[group]) groups[group] = [];
-    groups[group].push(c);
-  });
+  // Sort groups alphabetically
+  const sorted = Object.entries(groups).sort((a,b) => a[0].localeCompare(b[0]));
 
-  // Render grouped colors
-  el.innerHTML = Object.entries(groups).map(([groupName, colors]) => {
-    // Use activeColorFilter to check if any hex in group is active
-    const activeHex = colors.find(c => c.hex === window.activeColorFilter);
-    const isActive = !!activeHex;
-    const displayHex = isActive ? activeHex.hex : colors[0].hex;
-    // If group has multiple colors, show small multi-dot
-    const multiDot = colors.length > 1
-      ? colors.slice(0,3).map(c => `<div style="width:10px;height:10px;border-radius:50%;background:${c.hex};border:1px solid rgba(255,255,255,0.6);margin-left:-4px"></div>`).join('')
-      : '';
-
+  el.innerHTML = sorted.map(([groupName, colors]) => {
+    const isActive = window.activeColorGroup === groupName;
+    // Pick most representative hex: average or first
+    const displayHex = colors[0].hex;
     return '<div data-group="' + groupName + '" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex-shrink:0">' +
-      '<div style="position:relative;width:40px;height:40px">' +
-        '<div style="width:40px;height:40px;border-radius:50%;background:' + displayHex + ';border:2px solid ' + (isActive?'var(--rose)':'var(--border)') + ';box-shadow:' + (isActive?'0 0 0 2px #fff,0 0 0 4px var(--rose)':'none') + ';transform:' + (isActive?'scale(1.1)':'scale(1)') + ';transition:all 0.2s"></div>' +
-        (colors.length > 1 ? '<div style="position:absolute;bottom:-2px;right:-2px;display:flex">' + multiDot + '</div>' : '') +
-      '</div>' +
-      '<span style="font-size:10px;color:' + (isActive?'var(--rose)':'var(--ink-mid)') + ';font-weight:' + (isActive?'600':'400') + ';white-space:nowrap;max-width:52px;text-align:center;line-height:1.2">' + groupName + (colors.length > 1 ? ' ('+colors.length+')' : '') + '</span>' +
+      '<div style="width:36px;height:36px;border-radius:50%;background:' + displayHex + ';border:2.5px solid ' + (isActive ? 'var(--rose)' : 'var(--border)') + ';box-shadow:' + (isActive ? '0 0 0 2px #fff,0 0 0 4px var(--rose)' : 'none') + ';transform:' + (isActive ? 'scale(1.12)' : 'scale(1)') + ';transition:all 0.2s"></div>' +
+      '<span style="font-size:10px;color:' + (isActive ? 'var(--rose)' : 'var(--ink-mid)') + ';font-weight:' + (isActive ? '600' : '400') + ';white-space:nowrap;text-align:center">' + groupName + '</span>' +
     '</div>';
   }).join('');
 
-  // Attach click listeners — cycle through hexes in group
+  // Click: toggle group filter
   el.querySelectorAll('[data-group]').forEach(div => {
     div.addEventListener('click', () => {
-      const groupName = div.dataset.group;
-      const colors = groups[groupName];
-      const currentIdx = colors.findIndex(c => c.hex === window.activeColorFilter);
-      if (currentIdx === -1) {
-        window.activeColorFilter = colors[0].hex;
-      } else if (currentIdx < colors.length - 1) {
-        window.activeColorFilter = colors[currentIdx + 1].hex;
-      } else {
-        window.activeColorFilter = '';
-      }
+      const g = div.dataset.group;
+      window.activeColorGroup = (window.activeColorGroup === g) ? '' : g;
+      window.activeColorFilter = window.activeColorGroup ? (groups[g][0]?.hex || '') : '';
       renderColorFilters();
       renderCatalog();
       updateColorBtn();
@@ -2722,18 +2702,18 @@ function updateColorBtn() {
   const dot = document.getElementById('btn-color-dot');
   const label = document.getElementById('btn-color-label');
   if (!btn) return;
-  if (window.activeColorFilter) {
-    dot.style.background = window.activeColorFilter;
-    dot.style.border = '1px solid var(--border-strong)';
-    // Find color name
-    let nombre = '';
+  if (window.activeColorGroup) {
+    // Find a representative hex for the active group
+    let hex = '';
     products.forEach(p => {
       let cols = p.colores || [];
       if (!Array.isArray(cols)) cols = Object.values(cols);
-      const found = cols.find(c => c.hex === window.activeColorFilter);
-      if (found) nombre = normalizeColorName(found.nombre);
+      const found = cols.find(c => normalizeColorName(c.nombre) === window.activeColorGroup);
+      if (found && !hex) hex = found.hex;
     });
-    label.textContent = '· ' + nombre;
+    dot.style.background = hex || 'var(--rose)';
+    dot.style.border = '1px solid var(--border-strong)';
+    label.textContent = '· ' + window.activeColorGroup;
     label.style.color = 'var(--rose)';
     btn.style.borderColor = 'var(--rose)';
     btn.style.color = 'var(--rose)';
@@ -2748,6 +2728,7 @@ window.updateColorBtn = updateColorBtn;
 window.renderColorFilters = renderColorFilters;
 
 window.activeColorFilter = '';
+window.activeColorGroup = '';
 
 window.toggleFiltroColores = function() {
   const panel = document.getElementById('filtro-colores-panel');
@@ -2772,6 +2753,7 @@ window.toggleColorFilter = function(hex) {
 };
 window.clearColorFilter = function() {
   window.activeColorFilter = '';
+  window.activeColorGroup = '';
   renderColorFilters();
   renderCatalog();
   updateColorBtn();
