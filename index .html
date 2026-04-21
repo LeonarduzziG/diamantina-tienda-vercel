@@ -2682,16 +2682,20 @@ function renderColorFilters() {
     '</div>';
   }).join('');
 
-  // Click: toggle group filter
+  // Click + touch: toggle group filter
   el.querySelectorAll('[data-group]').forEach(div => {
-    div.addEventListener('click', () => {
+    const handler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const g = div.dataset.group;
       window.activeColorGroup = (window.activeColorGroup === g) ? '' : g;
       window.activeColorFilter = window.activeColorGroup ? (groups[g][0]?.hex || '') : '';
       renderColorFilters();
       renderCatalog();
       updateColorBtn();
-    });
+    };
+    div.addEventListener('click', handler);
+    div.addEventListener('touchend', handler, { passive: false });
   });
 
   updateColorBtn();
@@ -2737,14 +2741,16 @@ window.toggleFiltroColores = function() {
   if (!isOpen) renderColorFilters();
 };
 
-// Close panel when clicking outside
-document.addEventListener('click', function(e) {
+// Close panel when clicking outside (desktop + mobile)
+function closeFiltroOutside(e) {
   const panel = document.getElementById('filtro-colores-panel');
   const btn = document.getElementById('btn-filtro-colores');
   if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
     panel.style.display = 'none';
   }
-});
+}
+document.addEventListener('click', closeFiltroOutside);
+document.addEventListener('touchstart', closeFiltroOutside, { passive: true });
 
 window.toggleColorFilter = function(hex) {
   window.activeColorFilter = window.activeColorFilter === hex ? '' : hex;
