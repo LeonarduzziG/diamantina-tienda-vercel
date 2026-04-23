@@ -525,16 +525,21 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
     </div>
   </div>
 
-  <!-- INSTAGRAM REELS -->
-  <div id="reels-section" style="padding:2.5rem 2rem;max-width:1100px;margin:0 auto">
+
+  <!-- INSTAGRAM FEED (Behold.so) -->
+  <div style="padding:2.5rem 2rem;max-width:1100px;margin:0 auto">
     <div style="text-align:center;margin-bottom:1.75rem">
       <div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:300;font-style:italic;color:var(--ink)">En Instagram</div>
-      <a href="https://www.instagram.com/diamantinalenceria" target="_blank" style="font-size:13px;color:var(--rose);text-decoration:none;display:inline-flex;align-items:center;gap:5px;margin-top:4px">
+      <a href="https://www.instagram.com/diamantinalenceria" target="_blank" style="font-size:13px;color:var(--rose);text-decoration:none;display:inline-flex;align-items:center;gap:5px;margin-top:6px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
         @diamantinalenceria
       </a>
     </div>
-    <div id="reels-grid" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center"></div>
+    <!-- Reemplazá TU_FEED_ID con el ID que te da Behold.so -->
+    <div id="behold-feed">
+      <behold-widget feed-id="6F0Sd"></behold-widget>
+    </div>
+    <script src="https://w.behold.so/widget.js" type="module"></script>
   </div>
 
 </div>
@@ -2840,38 +2845,6 @@ if (params.get('pago') === 'aprobado') showPage('success');
 else if (params.get('pago') === 'fallido' || params.get('pago') === 'pendiente') showPage('error');
 else showPage('tienda');
 
-// ── INSTAGRAM REELS ──
-const REELS = [
-  'https://www.instagram.com/p/DWeXf7fkaKB/',
-];
-
-function renderReels() {
-  const grid = document.getElementById('reels-grid');
-  if (!grid) return;
-  grid.innerHTML = REELS.map(url => {
-    // Extract shortcode from URL
-    const match = url.match(/\/(p|reel)\/([A-Za-z0-9_-]+)/);
-    if (!match) return '';
-    const code = match[2];
-    return `<div style="flex:0 0 auto;width:min(320px,90vw);border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 20px rgba(26,17,24,0.08)">
-      <blockquote class="instagram-media"
-        data-instgrm-permalink="https://www.instagram.com/p/${code}/"
-        data-instgrm-version="14"
-        style="background:#fff;border:0;border-radius:var(--radius);margin:0;padding:0;width:100%">
-      </blockquote>
-    </div>`;
-  }).join('');
-  // Load Instagram embed script
-  if (window.instgrm) {
-    window.instgrm.Embeds.process();
-  } else {
-    const s = document.createElement('script');
-    s.src = 'https://www.instagram.com/embed.js';
-    s.async = true;
-    document.body.appendChild(s);
-  }
-}
-
 // ── INIT ──
 let myName = localStorage.getItem('diamantina_user') || '';
 function loadUser() {
@@ -2885,7 +2858,6 @@ loadFavs();
 updateFavUI();
 updateCartUI();
 updateCartUI();
-renderReels();
 </script>
 </body>
 </html>
