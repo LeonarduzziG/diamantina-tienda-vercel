@@ -2851,7 +2851,7 @@ async function loadIgFeed() {
   const grid = document.getElementById('ig-feed-grid');
   if (!grid) return;
   try {
-    const res = await fetch('https://feeds.behold.so/6F0Sd');
+    const res = await fetch('https://feeds.behold.so/oB5oP4KsjnNp9XPaaNnp');
     const data = await res.json();
     const posts = (data.posts || data).slice(0, 9);
     grid.innerHTML = posts.map(p => {
