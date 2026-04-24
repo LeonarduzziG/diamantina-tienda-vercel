@@ -1344,17 +1344,39 @@ loadVisitasAdmin();
   } else if (page === 'success') {
     document.getElementById('page-success').style.display = 'block';
     document.getElementById('page-success').classList.add('open');
+    // Restore cart from pending if redirected from MercadoPago (cart may be empty)
+    if (!cart.length) {
+      try { cart = JSON.parse(localStorage.getItem('diamantina_cart_pending') || '[]'); } catch(e) {}
+    }
     const pedidoId = new URLSearchParams(window.location.search).get('payment_id') || Date.now().toString();
-    const pedido = {
-      id: pedidoId, ts: Date.now(), estado: 'aprobado',
-      nombre: myName || 'Cliente',
-      items: cart.map(i => ({ title: i.name + ' T.' + i.talla, qty: i.qty, price: i.price })),
-      total: Math.max(0, cart.reduce((s,i) => s + i.price * i.qty, 0) - calcDescuento(cart.reduce((s,i) => s + i.price * i.qty, 0))) + (typeof envioSeleccionado !== 'undefined' && envioSeleccionado ? envioSeleccionado.precio : 0)
-    };
-    savePedido(pedido);
-    const msg = '✦ NUEVO PEDIDO DIAMANTINA%0A%0ACliente: ' + (myName||'—') + '%0ATotal: $' + pedido.total.toLocaleString('es-AR') + '%0AProductos: ' + pedido.items.map(i => i.title + 'x' + i.qty).join(', ');
-    setTimeout(() => { window.open('https://wa.me/' + WA_NOTIF_NUMBER + '?text=' + msg, '_blank'); }, 1500);
+    // Avoid saving same pedido twice
+    if (!localStorage.getItem('pedido_guardado_' + pedidoId)) {
+      localStorage.setItem('pedido_guardado_' + pedidoId, '1');
+      const subtotal = cart.reduce((s,i) => s + i.price * i.qty, 0);
+      const pedido = {
+        id: pedidoId, ts: Date.now(), estado: 'aprobado',
+        nombre: myName || 'Cliente',
+        items: cart.map(i => ({ title: i.name, talla: i.talla || '—', color: i.color || '', qty: i.qty, price: i.price })),
+        total: Math.max(0, subtotal - calcDescuento(subtotal)) + (typeof envioSeleccionado !== 'undefined' && envioSeleccionado ? envioSeleccionado.precio : 0),
+        cupon: cuponActivo ? cuponActivo.code : null,
+        envio: envioSeleccionado ? envioSeleccionado.zona : null
+      };
+      savePedido(pedido);
+      // ── BAJAR STOCK ──
+      cart.forEach(item => {
+        if (!item.prodId || !item.talla || item.talla === '—') return;
+        get(ref(db, 'productos/' + item.prodId + '/stock/' + item.talla)).then(snap => {
+          const actual = snap.val();
+          if (actual !== null && actual !== undefined && actual > 0) {
+            set(ref(db, 'productos/' + item.prodId + '/stock/' + item.talla), Math.max(0, actual - item.qty));
+          }
+        });
+      });
+      const msg = '✦ NUEVO PEDIDO DIAMANTINA%0A%0ACliente: ' + (myName||'—') + '%0ATotal: $' + pedido.total.toLocaleString('es-AR') + '%0AProductos: ' + pedido.items.map(i => i.title + ' T.' + i.talla + ' x' + i.qty).join(', ');
+      setTimeout(() => { window.open('https://wa.me/' + WA_NOTIF_NUMBER + '?text=' + msg, '_blank'); }, 1500);
+    }
     cart = []; saveCart(); updateCartUI();
+    localStorage.removeItem('diamantina_cart_pending');
   } else if (page === 'error') {
     document.getElementById('page-error').style.display = 'block';
     document.getElementById('page-error').classList.add('open');
@@ -1839,7 +1861,7 @@ function addToCart(p, talla, color) {
   const existing = cart.find(i => i.key === key);
   const precio = (p.descuento > 0 && p.precioFinal) ? p.precioFinal : p.price;
   if (existing) existing.qty++;
-  else cart.push({ key, id: p.id, name: p.name, price: precio, precioOriginal: p.price, descuento: p.descuento||0, img: p.img, cat: p.cat, talla, color: color || null, qty: 1 });
+  else cart.push({ key, id: p.id, prodId: p.id, name: p.name, price: precio, precioOriginal: p.price, descuento: p.descuento||0, img: p.img, cat: p.cat, talla, color: color || null, qty: 1 });
   saveCart(); updateCartUI();
   showToast(p.name + ' agregado al carrito ✦');
   toggleCart(true);
@@ -1976,6 +1998,7 @@ window.checkout = async function() {
     });
     const data = await res.json();
     if (data.init_point) {
+      localStorage.setItem('diamantina_cart_pending', JSON.stringify(cart));
       window.location.href = data.init_point;
     } else {
       throw new Error('No se recibió el link de pago');
@@ -2345,21 +2368,26 @@ window.toggleFaq = function(el) {
 // ── PEDIDOS ──
 const WA_NOTIF_NUMBER = "541162620304";
 
-function savePedido(pedidoData) {
+async function savePedido(pedidoData) {
   try {
-    const pedidos = JSON.parse(localStorage.getItem('diamantina_pedidos') || '[]');
-    pedidos.unshift(pedidoData);
-    localStorage.setItem('diamantina_pedidos', JSON.stringify(pedidos.slice(0, 500)));
-  } catch(e) {}
+    await push(ref(db, 'pedidos'), pedidoData);
+  } catch(e) { console.error('Error guardando pedido:', e); }
 }
 
-function getPedidos() {
-  try { return JSON.parse(localStorage.getItem('diamantina_pedidos') || '[]'); } catch(e) { return []; }
+async function getPedidos() {
+  try {
+    const snap = await get(ref(db, 'pedidos'));
+    const data = snap.val();
+    if (!data) return [];
+    const list = Object.entries(data).map(([id, v]) => ({ id, ...v }));
+    list.sort((a, b) => b.ts - a.ts);
+    return list;
+  } catch(e) { return []; }
 }
 
-window.renderPedidos = function() {
+window.renderPedidos = async function() {
   const filtro = document.getElementById('filtro-estado-pedido')?.value || 'todos';
-  let pedidos = getPedidos();
+  let pedidos = await getPedidos();
   if (filtro !== 'todos') pedidos = pedidos.filter(p => p.estado === filtro);
   const todos = getPedidos();
   const aprobados = todos.filter(p => p.estado === 'aprobado');
