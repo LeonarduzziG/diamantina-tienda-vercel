@@ -10,7 +10,7 @@
 <link rel="shortcut icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojRThBMEMwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojQzk0RjdDIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBvbHlnb24gcG9pbnRzPSIzMiw0IDU2LDIyIDMyLDYwIDgsMjIiIGZpbGw9InVybCgjZykiLz48cG9seWdvbiBwb2ludHM9IjMyLDQgNTYsMjIgMzIsMjYgOCwyMiIgZmlsbD0iI0Y1RDZFNiIgb3BhY2l0eT0iMC42Ii8+PHBvbHlnb24gcG9pbnRzPSI4LDIyIDMyLDI2IDMyLDYwIiBmaWxsPSIjOEMyRjU0IiBvcGFjaXR5PSIwLjQiLz48cG9seWdvbiBwb2ludHM9IjU2LDIyIDMyLDI2IDMyLDYwIiBmaWxsPSIjQzk0RjdDIiBvcGFjaXR5PSIwLjMiLz48bGluZSB4MT0iOCIgeTE9IjIyIiB4Mj0iNTYiIHkyPSIyMiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9IjAuNSIvPjxsaW5lIHgxPSIzMiIgeTE9IjQiIHgyPSI4IiB5Mj0iMjIiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIwLjgiIG9wYWNpdHk9IjAuNCIvPjxsaW5lIHgxPSIzMiIgeTE9IjQiIHgyPSI1NiIgeTI9IjIyIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMC44IiBvcGFjaXR5PSIwLjQiLz48L3N2Zz4=">
 
 <!-- SEO Básico -->
-<meta name="description" content="Diamantina Lencería — Tienda online de lencería de diseño en Argentina. Tops, conjuntos, bodys, babydoll, colaless y bikinis. Envío a todo el país. Comprá online con MercadoPago.">
+<meta name="description" content="Diamantina Lencería — Comprar lencería online en Argentina. Conjuntos, tops, bodys, babydoll, colaless y bikinis de diseño. Envío a todo el país. Talles 0 al XXL. Pagá con MercadoPago en cuotas.">
 <meta name="keywords" content="lencería argentina, lencería online, lencería de diseño, conjuntos de lencería, bodys, babydoll, colaless, bikinis, ropa interior mujer argentina, lencería Buenos Aires, Diamantina lencería">
 <meta name="author" content="Diamantina Lencería">
 <meta name="robots" content="index, follow">
@@ -18,6 +18,9 @@
 <meta name="geo.region" content="AR">
 <meta name="geo.placename" content="Buenos Aires, Argentina">
 <link rel="canonical" href="https://www.diamantina.shop/">
+<meta name="keywords" content="lencería online Argentina, comprar lencería, conjuntos de lencería, bodys, babydoll, colaless, bikinis, lencería diseño, lencería Castelar, lencería Buenos Aires, lencería femenina, lencería sexy, envío gratis lencería">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Diamantina Lencería">
 
 <!-- Open Graph (Facebook / Instagram / WhatsApp) -->
 <meta property="og:type" content="website">
@@ -862,7 +865,34 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
     <button onclick="hideBanner()" style="padding:7px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">Ocultar</button>
   </div>
 
-  <!-- CONFIGURACIÓN DE ENVÍOS -->
+  <!-- GESTIÓN DE CUPONES -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cupon-arrow').textContent=this.nextElementSibling.style.display==='none'?'▼':'▲'">
+      <div style="font-size:13px;font-weight:500;color:var(--ink)">🎟️ Cupones de descuento</div>
+      <span class="cupon-arrow" style="font-size:11px;color:var(--ink-light)">▼</span>
+    </div>
+    <div style="display:none;margin-top:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:10px;align-items:end">
+        <div>
+          <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Código</label>
+          <input type="text" id="new-cupon-code" placeholder="ej: VERANO20" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none;text-transform:uppercase">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Tipo</label>
+          <select id="new-cupon-tipo" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+            <option value="porcentaje">% Porcentaje</option>
+            <option value="fijo">$ Monto fijo</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Valor</label>
+          <input type="number" id="new-cupon-valor" placeholder="ej: 20" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+        </div>
+        <button onclick="crearCupon()" style="padding:7px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">Crear</button>
+      </div>
+      <div id="cupones-lista" style="font-size:12px;color:var(--ink-mid)">Cargando cupones...</div>
+    </div>
+  </div>
   <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
       <div style="font-size:13px;font-weight:500;color:var(--ink)">Configuración de envíos</div>
@@ -1157,6 +1187,11 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
         <button style="padding:13px 14px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;transition:all var(--tr)" onclick="compartirProducto()" title="Compartir por WhatsApp">↗ Compartir</button>
         <button class="pm-add-btn" id="pm-add-btn" onclick="addFromModal()">Agregar al carrito</button>
       </div>
+      <!-- PRODUCTOS RELACIONADOS -->
+      <div id="pm-relacionados" style="border-top:1px solid var(--border);padding:14px 0 4px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);margin-bottom:10px">También te puede gustar</div>
+        <div id="pm-relacionados-grid" style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1184,6 +1219,18 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       <div id="envio-gratis-banner" style="display:none;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:#3B6D11;font-weight:500;margin:4px 0">🎉 ¡Envío gratis!</div>
       <div id="envio-gratis-progreso" style="display:none;font-size:11px;color:var(--ink-light);padding:2px 0"></div>
       <div id="envio-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:var(--ink-mid)"><span id="envio-label">Envío</span><span id="subtotal-envio">$0</span></div>
+      <!-- CUPÓN -->
+      <div style="margin:8px 0">
+        <div style="display:flex;gap:6px">
+          <input type="text" id="cupon-input" placeholder="Código de descuento" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:var(--surface-2);outline:none;text-transform:uppercase">
+          <button onclick="aplicarCupon()" style="padding:7px 12px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap">Aplicar</button>
+        </div>
+        <div id="cupon-msg" style="font-size:11px;margin-top:4px;display:none"></div>
+      </div>
+      <div id="descuento-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:#2e7d32">
+        <span id="descuento-label">Descuento</span>
+        <span id="descuento-monto">-$0</span>
+      </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);margin-top:4px">
         <span style="font-size:15px;font-weight:500;color:var(--ink)">Total</span>
         <span style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:400;color:var(--ink)" id="cart-total">$0</span>
@@ -1206,7 +1253,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, update, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, remove, update, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCXo5jS4mvu4Gf5BtF4IBrup9DBf7CgEzQ",
@@ -1255,6 +1302,7 @@ window.showPage = function(page) {
     const el = document.getElementById('page-admin');
     el.style.display = 'block'; el.classList.add('open');
     renderAdminList();
+    loadCuponesAdmin();
   } else if (page === 'pedidos') {
     const el = document.getElementById('page-pedidos');
     el.style.display = 'block'; el.classList.add('open');
@@ -1276,7 +1324,7 @@ window.showPage = function(page) {
       id: pedidoId, ts: Date.now(), estado: 'aprobado',
       nombre: myName || 'Cliente',
       items: cart.map(i => ({ title: i.name + ' T.' + i.talla, qty: i.qty, price: i.price })),
-      total: cart.reduce((s,i) => s + i.price * i.qty, 0) + (typeof envioSeleccionado !== 'undefined' && envioSeleccionado ? envioSeleccionado.precio : 0)
+      total: Math.max(0, cart.reduce((s,i) => s + i.price * i.qty, 0) - calcDescuento(cart.reduce((s,i) => s + i.price * i.qty, 0))) + (typeof envioSeleccionado !== 'undefined' && envioSeleccionado ? envioSeleccionado.precio : 0)
     };
     savePedido(pedido);
     const msg = '✦ NUEVO PEDIDO DIAMANTINA%0A%0ACliente: ' + (myName||'—') + '%0ATotal: $' + pedido.total.toLocaleString('es-AR') + '%0AProductos: ' + pedido.items.map(i => i.title + 'x' + i.qty).join(', ');
@@ -1573,6 +1621,12 @@ window.openProdModal = function(id) {
   selectedTalla = null;
   carouselImgs = p.imgs && p.imgs.length > 0 ? p.imgs : (p.img ? [p.img] : []);
   carouselIdx = 0;
+  // Update meta for sharing
+  const img = carouselImgs[0] || '';
+  document.querySelector('meta[property="og:title"]').setAttribute('content', p.name + ' | Diamantina Lencería');
+  document.querySelector('meta[property="og:description"]').setAttribute('content', (p.desc || p.name) + ' — Envío a todo el país. Pagá con MercadoPago.');
+  if (img) document.querySelector('meta[property="og:image"]')?.setAttribute('content', img);
+  document.title = p.name + ' | Diamantina Lencería';
 
   // Setup carousel
   const pmImg = document.getElementById('pm-img');
@@ -1668,6 +1722,7 @@ window.openProdModal = function(id) {
   const nombreEl = document.getElementById('pm-resena-nombre');
   if (nombreEl) nombreEl.value = '';
   loadResenas(p.id);
+  renderRelacionados(p);
 
   // Attach listeners fresh each time modal opens
   document.querySelectorAll('.star-btn').forEach(s => {
@@ -1703,9 +1758,37 @@ window.selectTalla = function(t, btn, agotada) {
   btn.classList.add('selected');
 };
 
+// ── PRODUCTOS RELACIONADOS ──
+function renderRelacionados(prod) {
+  const grid = document.getElementById('pm-relacionados-grid');
+  if (!grid) return;
+  const relacionados = products
+    .filter(p => p.id !== prod.id && p.status !== 'agotado' && p.cat === prod.cat)
+    .slice(0, 6);
+  if (!relacionados.length) {
+    document.getElementById('pm-relacionados').style.display = 'none';
+    return;
+  }
+  document.getElementById('pm-relacionados').style.display = 'block';
+  grid.innerHTML = relacionados.map(p => {
+    const img = (p.imgs && p.imgs[0]) || p.img || '';
+    const precio = p.precioFinal || p.price || 0;
+    return `<div onclick="openProdModal('${p.id}')" style="flex:0 0 100px;cursor:pointer">
+      <div style="width:100px;height:120px;border-radius:6px;overflow:hidden;background:var(--surface-2);margin-bottom:5px">
+        <img src="${img}" alt="${p.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform 0.2s" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      </div>
+      <div style="font-size:10px;color:var(--ink);line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.name}</div>
+      <div style="font-size:11px;color:var(--rose);font-weight:500;margin-top:2px">$${Number(precio).toLocaleString('es-AR')}</div>
+    </div>`;
+  }).join('');
+}
+
 window.closeProdModal = function() {
   document.getElementById('prod-modal-bg').classList.remove('open');
   currentProd = null; selectedTalla = null;
+  document.querySelector('meta[property="og:title"]').setAttribute('content', 'Diamantina Lencería | Lencería de Diseño en Argentina');
+  document.querySelector('meta[property="og:description"]').setAttribute('content', 'Tienda online de lencería fina en Argentina. Conjuntos, tops, bodys, babydoll y más. Envío a todo el país.');
+  document.title = 'Diamantina Lencería | Lencería de Diseño en Argentina';
 };
 
 window.addFromModal = function() {
@@ -1746,8 +1829,20 @@ function updateCartUI() {
   const envio = (typeof envioSeleccionado !== 'undefined' && envioSeleccionado) ? envioSeleccionado.precio : 0;
   const totalConEnvio = total + envio;
   document.getElementById('subtotal-productos') && (document.getElementById('subtotal-productos').textContent = '$' + total.toLocaleString('es-AR'));
-  document.getElementById('cart-total').textContent = '$' + totalConEnvio.toLocaleString('es-AR');
+  const descuento = calcDescuento(total);
+  const totalFinal = totalConEnvio - descuento;
+  document.getElementById('cart-total').textContent = '$' + totalFinal.toLocaleString('es-AR');
   document.getElementById('checkout-btn').disabled = cart.length === 0;
+  const dRow = document.getElementById('descuento-row');
+  if (dRow) {
+    if (descuento > 0) {
+      dRow.style.display = 'flex';
+      document.getElementById('descuento-label').textContent = 'Descuento (' + cuponActivo.code + ')';
+      document.getElementById('descuento-monto').textContent = '-$' + descuento.toLocaleString('es-AR');
+    } else {
+      dRow.style.display = 'none';
+    }
+  }
   // Check free shipping
   const cfg = window._envioConfig || {};
   const minGratis = cfg.gratisMin || 80000;
@@ -2788,6 +2883,88 @@ window.clearColorFilter = function() {
   if (panel) panel.style.display = 'none';
 };
 
+// ── CUPONES ADMIN ──
+async function loadCuponesAdmin() {
+  const lista = document.getElementById('cupones-lista');
+  if (!lista) return;
+  const snap = await get(ref(db, 'config/cupones'));
+  const data = snap.val();
+  if (!data) { lista.textContent = 'No hay cupones creados.'; return; }
+  lista.innerHTML = Object.entries(data).map(([code, c]) => 
+    `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--surface-2);border-radius:var(--radius-sm);margin-bottom:4px">
+      <span style="font-weight:600;color:var(--ink)">${code}</span>
+      <span style="color:var(--ink-mid)">${c.tipo === 'porcentaje' ? c.valor + '%' : '$' + Number(c.valor).toLocaleString('es-AR')}</span>
+      <span style="padding:2px 8px;border-radius:999px;font-size:10px;background:${c.activo ? '#EAF3DE' : '#f5e6e6'};color:${c.activo ? '#2e7d32' : '#c62828'}">${c.activo ? 'Activo' : 'Inactivo'}</span>
+      <div style="display:flex;gap:4px">
+        <button onclick="toggleCupon('${code}',${!c.activo})" style="padding:3px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-size:11px;cursor:pointer;color:var(--ink-mid)">${c.activo ? 'Desactivar' : 'Activar'}</button>
+        <button onclick="borrarCupon('${code}')" style="padding:3px 8px;border:1px solid #E24B4A;border-radius:var(--radius-sm);background:transparent;font-size:11px;cursor:pointer;color:#E24B4A">✕</button>
+      </div>
+    </div>`
+  ).join('');
+}
+
+window.crearCupon = async function() {
+  const code = document.getElementById('new-cupon-code').value.trim().toUpperCase();
+  const tipo = document.getElementById('new-cupon-tipo').value;
+  const valor = parseFloat(document.getElementById('new-cupon-valor').value);
+  if (!code || !valor) { showToast('Completá todos los campos', 'error'); return; }
+  await set(ref(db, 'config/cupones/' + code), { tipo, valor, activo: true });
+  document.getElementById('new-cupon-code').value = '';
+  document.getElementById('new-cupon-valor').value = '';
+  loadCuponesAdmin();
+  showToast('Cupón ' + code + ' creado ✦');
+};
+
+window.toggleCupon = async function(code, activo) {
+  await update(ref(db, 'config/cupones/' + code), { activo });
+  loadCuponesAdmin();
+};
+
+window.borrarCupon = async function(code) {
+  if (!confirm('¿Borrar cupón ' + code + '?')) return;
+  await remove(ref(db, 'config/cupones/' + code));
+  loadCuponesAdmin();
+  showToast('Cupón eliminado');
+};
+
+// ── CUPONES ──
+let cuponActivo = null;
+
+window.aplicarCupon = async function() {
+  const code = document.getElementById('cupon-input').value.trim().toUpperCase();
+  const msg = document.getElementById('cupon-msg');
+  if (!code) return;
+  // Load coupons from Firebase
+  try {
+    const snap = await get(ref(db, 'config/cupones/' + code));
+    const data = snap.val();
+    if (!data || !data.activo) {
+      msg.style.color = '#E24B4A';
+      msg.textContent = '❌ Código inválido o vencido';
+      msg.style.display = 'block';
+      cuponActivo = null;
+      updateCartUI();
+      return;
+    }
+    cuponActivo = { code, tipo: data.tipo, valor: data.valor };
+    msg.style.color = '#2e7d32';
+    msg.textContent = '✓ Cupón aplicado: ' + (data.tipo === 'porcentaje' ? data.valor + '% de descuento' : '$' + Number(data.valor).toLocaleString('es-AR') + ' de descuento');
+    msg.style.display = 'block';
+    updateCartUI();
+    showToast('Cupón aplicado ✦');
+  } catch(e) {
+    msg.style.color = '#E24B4A';
+    msg.textContent = '❌ Error al verificar el cupón';
+    msg.style.display = 'block';
+  }
+};
+
+function calcDescuento(subtotal) {
+  if (!cuponActivo) return 0;
+  if (cuponActivo.tipo === 'porcentaje') return Math.round(subtotal * cuponActivo.valor / 100);
+  return Math.min(cuponActivo.valor, subtotal);
+}
+
 // ── ENVÍO POR ZONA ──
 const ZONAS_CABA = Array.from({length:500},(_,i)=>String(1000+i));
 const ZONAS_GBA = Array.from({length:300},(_,i)=>String(1600+i));
@@ -2845,6 +3022,41 @@ const params = new URLSearchParams(window.location.search);
 if (params.get('pago') === 'aprobado') showPage('success');
 else if (params.get('pago') === 'fallido' || params.get('pago') === 'pendiente') showPage('error');
 else showPage('tienda');
+
+// ── SEO: PRODUCT SCHEMA ──
+function injectProductSchema() {
+  // Remove old schema if exists
+  const old = document.getElementById('products-schema');
+  if (old) old.remove();
+  // Take first 10 active products
+  const items = products.filter(p => p.status !== 'agotado').slice(0, 10);
+  if (!items.length) return;
+  const schemaList = items.map(p => {
+    const imgs = Array.isArray(p.imagenes) ? p.imagenes : Object.values(p.imagenes || {});
+    const precio = p.precioFinal || p.price || 0;
+    return {
+      "@type": "Product",
+      "name": p.name,
+      "description": p.desc || p.name,
+      "image": imgs[0] || '',
+      "brand": { "@type": "Brand", "name": "Diamantina Lencería" },
+      "offers": {
+        "@type": "Offer",
+        "price": precio,
+        "priceCurrency": "ARS",
+        "availability": p.status === 'agotado' ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+        "seller": { "@type": "Organization", "name": "Diamantina Lencería" },
+        "url": "https://www.diamantina.shop/"
+      },
+      "category": p.cat || ''
+    };
+  });
+  const script = document.createElement('script');
+  script.id = 'products-schema';
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify({ "@context": "https://schema.org", "@graph": schemaList });
+  document.head.appendChild(script);
+}
 
 // ── INSTAGRAM FEED ──
 async function loadIgFeed() {
