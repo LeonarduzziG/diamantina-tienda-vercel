@@ -858,6 +858,30 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 
 <div class="admin-panel" id="page-admin">
   <div class="admin-title">Panel de administración</div>
+  <!-- CONTADOR DE VISITAS -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">
+      <div style="font-size:11px;color:var(--ink-light);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Hoy</div>
+      <div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:300;color:var(--rose)" id="visits-hoy">—</div>
+      <div style="font-size:11px;color:var(--ink-light)">visitas</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">
+      <div style="font-size:11px;color:var(--ink-light);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Esta semana</div>
+      <div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:300;color:var(--rose)" id="visits-semana">—</div>
+      <div style="font-size:11px;color:var(--ink-light)">visitas</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">
+      <div style="font-size:11px;color:var(--ink-light);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Este mes</div>
+      <div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:300;color:var(--rose)" id="visits-mes">—</div>
+      <div style="font-size:11px;color:var(--ink-light)">visitas</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">
+      <div style="font-size:11px;color:var(--ink-light);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Total</div>
+      <div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:300;color:var(--rose)" id="visits-total">—</div>
+      <div style="font-size:11px;color:var(--ink-light)">visitas</div>
+    </div>
+  </div>
+
   <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
     <div style="font-size:13px;font-weight:500;color:var(--ink);flex-shrink:0">Banner de promoción:</div>
     <input type="text" id="banner-text" placeholder="ej: Envío gratis en compras mayores a $20.000" style="flex:1;min-width:200px;padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
@@ -1303,6 +1327,7 @@ window.showPage = function(page) {
     el.style.display = 'block'; el.classList.add('open');
     renderAdminList();
     loadCuponesAdmin();
+loadVisitasAdmin();
   } else if (page === 'pedidos') {
     const el = document.getElementById('page-pedidos');
     el.style.display = 'block'; el.classList.add('open');
@@ -2657,6 +2682,65 @@ window.saveEnvios = async function() {
   updateCartUI();
 };
 
+// ── VISITAS ──
+function registrarVisita() {
+  // Don't count admin visits
+  if (sessionStorage.getItem('is_admin')) return;
+  const now = new Date();
+  const hoy = now.toISOString().slice(0, 10); // YYYY-MM-DD
+  const mes = now.toISOString().slice(0, 7);  // YYYY-MM
+  const semana = (() => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - d.getDay());
+    return d.toISOString().slice(0, 10);
+  })();
+  // Avoid counting same session twice
+  if (sessionStorage.getItem('visita_registrada')) return;
+  sessionStorage.setItem('visita_registrada', '1');
+  // Increment counters in Firebase
+  const updates = {};
+  updates['visitas/dias/' + hoy] = null; // will use transaction
+  // Use set with increment simulation
+  Promise.all([
+    get(ref(db, 'visitas/dias/' + hoy)),
+    get(ref(db, 'visitas/semanas/' + semana)),
+    get(ref(db, 'visitas/meses/' + mes)),
+    get(ref(db, 'visitas/total'))
+  ]).then(([dSnap, sSnap, mSnap, tSnap]) => {
+    set(ref(db, 'visitas/dias/' + hoy), (dSnap.val() || 0) + 1);
+    set(ref(db, 'visitas/semanas/' + semana), (sSnap.val() || 0) + 1);
+    set(ref(db, 'visitas/meses/' + mes), (mSnap.val() || 0) + 1);
+    set(ref(db, 'visitas/total'), (tSnap.val() || 0) + 1);
+  }).catch(() => {});
+}
+
+function loadVisitasAdmin() {
+  const now = new Date();
+  const hoy = now.toISOString().slice(0, 10);
+  const mes = now.toISOString().slice(0, 7);
+  const semana = (() => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - d.getDay());
+    return d.toISOString().slice(0, 10);
+  })();
+  get(ref(db, 'visitas/dias/' + hoy)).then(s => {
+    const el = document.getElementById('visits-hoy');
+    if (el) el.textContent = (s.val() || 0).toLocaleString('es-AR');
+  });
+  get(ref(db, 'visitas/semanas/' + semana)).then(s => {
+    const el = document.getElementById('visits-semana');
+    if (el) el.textContent = (s.val() || 0).toLocaleString('es-AR');
+  });
+  get(ref(db, 'visitas/meses/' + mes)).then(s => {
+    const el = document.getElementById('visits-mes');
+    if (el) el.textContent = (s.val() || 0).toLocaleString('es-AR');
+  });
+  get(ref(db, 'visitas/total')).then(s => {
+    const el = document.getElementById('visits-total');
+    if (el) el.textContent = (s.val() || 0).toLocaleString('es-AR');
+  });
+}
+
 function loadBanner() {
   // Load from Firebase
   onValue(ref(db, 'config/banner'), (snap) => {
@@ -2935,18 +3019,21 @@ window.crearCupon = async function() {
   document.getElementById('new-cupon-code').value = '';
   document.getElementById('new-cupon-valor').value = '';
   loadCuponesAdmin();
+loadVisitasAdmin();
   showToast('Cupón ' + code + ' creado ✦');
 };
 
 window.toggleCupon = async function(code, activo) {
   await update(ref(db, 'config/cupones/' + code), { activo });
   loadCuponesAdmin();
+loadVisitasAdmin();
 };
 
 window.borrarCupon = async function(code) {
   if (!confirm('¿Borrar cupón ' + code + '?')) return;
   await remove(ref(db, 'config/cupones/' + code));
   loadCuponesAdmin();
+loadVisitasAdmin();
   showToast('Cupón eliminado');
 };
 
@@ -3111,6 +3198,7 @@ function loadUser() {
 }
 loadUser();
 loadBanner();
+registrarVisita();
 loadEnvioConfig();
 loadFavs();
 updateFavUI();
