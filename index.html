@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!-- build:20260425-204956 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -1392,13 +1392,23 @@ loadVisitasAdmin();
           .catch(e => { console.error('Error actualizando pedido:', e); });
         localStorage.removeItem('diamantina_pedido_pendiente');
       } else {
+        const _sanNum = v => (isNaN(v) || v === null || v === undefined) ? 0 : Number(v);
+        const _sanStr = v => (v === null || v === undefined || v !== v) ? '' : String(v);
         const pedidoNuevo = {
-          payment_id: pedidoId, ts: Date.now(), estado: 'aprobado',
-          nombre: myName || 'Cliente',
-          items: cart.map(i => ({ title: i.name, talla: i.talla || '—', color: i.color || '', qty: i.qty, price: i.price })),
-          total: (() => { try { return Math.max(0, subtotal - (typeof calcDescuento === 'function' ? calcDescuento(subtotal) : 0)); } catch(e) { return subtotal || 0; } })(),
-          cupon: cuponActivo ? cuponActivo.code : null,
-          envio: envioSeleccionado ? envioSeleccionado.zona : null
+          payment_id: _sanStr(pedidoId),
+          ts: Date.now(),
+          estado: 'aprobado',
+          nombre: _sanStr(myName || 'Cliente'),
+          items: cart.map(i => ({
+            title: _sanStr(i.name),
+            talla: _sanStr(i.talla || '—'),
+            color: _sanStr(i.color || ''),
+            qty: _sanNum(i.qty),
+            price: _sanNum(i.price)
+          })),
+          total: _sanNum(subtotal),
+          cupon: cuponActivo ? _sanStr(cuponActivo.code) : null,
+          envio: envioSeleccionado ? _sanStr(envioSeleccionado.zona) : null
         };
         console.log('Guardando pedido nuevo en Firebase:', pedidoNuevo);
         db.ref('pedidos').push(pedidoNuevo)
@@ -1442,12 +1452,15 @@ window.showPedidosPrompt = function() {
 
 window.toggleMobileMenu = function() {
   const menu = document.getElementById('nav-mobile-menu');
-  if (!menu) return;
-  menu.classList.toggle('open');
+  if (!menu) { console.error('nav-mobile-menu not found'); return; }
+  const isOpen = menu.style.display === 'flex';
+  menu.style.display = isOpen ? 'none' : 'flex';
+  menu.style.flexDirection = 'column';
+  console.log('hamburger toggled, now:', menu.style.display);
 };
 window.closeMobileMenu = function() {
   const menu = document.getElementById('nav-mobile-menu');
-  if (menu) menu.classList.remove('open');
+  if (menu) menu.style.display = 'none';
 };
 
 // ── FIREBASE ──
