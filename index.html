@@ -1986,15 +1986,24 @@ window.checkout = async function() {
   btn.disabled = true; btn.textContent = 'Procesando...';
   try {
     const items = cart.map(i => ({
-      title: i.name + ' (Talla ' + i.talla + ')',
-      quantity: i.qty,
-      unit_price: Number(i.price),
+      title: i.name + (i.talla && i.talla !== '—' ? ' (Talla ' + i.talla + ')' : ''),
+      quantity: parseInt(i.qty),
+      unit_price: Math.round(Number(i.price)),
       currency_id: 'ARS'
     }));
     const res = await fetch(BACKEND + '/crear-preferencia', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items })
+      body: JSON.stringify({
+        items,
+        back_urls: {
+          success: 'https://www.diamantina.shop/?page=success',
+          failure: 'https://www.diamantina.shop/?page=error',
+          pending: 'https://www.diamantina.shop/?page=success'
+        },
+        auto_return: 'approved',
+        statement_descriptor: 'DIAMANTINA'
+      })
     });
     const data = await res.json();
     if (data.init_point) {
@@ -2387,17 +2396,18 @@ async function getPedidos() {
 
 window.renderPedidos = async function() {
   const filtro = document.getElementById('filtro-estado-pedido')?.value || 'todos';
-  let pedidos = await getPedidos();
+  const el = document.getElementById('pedidos-list');
+  el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">Cargando pedidos...</div>';
+  const todosPedidos = await getPedidos();
+  let pedidos = todosPedidos;
   if (filtro !== 'todos') pedidos = pedidos.filter(p => p.estado === filtro);
-  const todos = getPedidos();
-  const aprobados = todos.filter(p => p.estado === 'aprobado');
-  const pendientes = todos.filter(p => p.estado === 'pendiente');
+  const aprobados = todosPedidos.filter(p => p.estado === 'aprobado');
+  const pendientes = todosPedidos.filter(p => p.estado === 'pendiente');
   const totalVentas = aprobados.reduce((s, p) => s + (p.total || 0), 0);
-  document.getElementById('stat-total-pedidos').textContent = todos.length;
+  document.getElementById('stat-total-pedidos').textContent = todosPedidos.length;
   document.getElementById('stat-aprobados').textContent = aprobados.length;
   document.getElementById('stat-pendientes').textContent = pendientes.length;
   document.getElementById('stat-total-ventas').textContent = '$' + totalVentas.toLocaleString('es-AR');
-  const el = document.getElementById('pedidos-list');
   if (!pedidos.length) { el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">No hay pedidos todavía</div>'; return; }
   const estadoColor = { aprobado:'#3B6D11', pendiente:'#BA7517', fallido:'#A32D2D' };
   const estadoBg = { aprobado:'#EAF3DE', pendiente:'#FAEEDA', fallido:'#FCEBEB' };
@@ -2413,16 +2423,18 @@ window.renderPedidos = async function() {
           <span style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--rose)">$${(p.total||0).toLocaleString('es-AR')}</span>
         </div>
       </div>
-      <div style="font-size:12px;color:var(--ink-mid);border-top:1px solid var(--border);padding-top:8px">${(p.items||[]).map(i=>i.title+'x'+i.qty).join(' · ')}</div>
+      <div style="font-size:12px;color:var(--ink-mid);border-top:1px solid var(--border);padding-top:8px">${(p.items||[]).map(i=>(i.title||i.name||'—')+' T.'+(i.talla||'—')+' x'+(i.qty||1)).join(' · ')}</div>
+      ${p.cupon ? '<div style="font-size:11px;color:#2e7d32;margin-top:4px">🎟️ Cupón: '+p.cupon+'</div>' : ''}
+      ${p.envio ? '<div style="font-size:11px;color:var(--ink-light);margin-top:2px">📦 Envío: '+p.envio+'</div>' : ''}
     </div>
   `).join('');
 };
 
-window.exportarPedidosExcel = function() {
-  const pedidos = getPedidos();
+window.exportarPedidosExcel = async function() {
+  const pedidos = await getPedidos();
   if (!pedidos.length) { showToast('No hay pedidos para exportar', 'error'); return; }
-  const rows = [['Fecha','Estado','Cliente','Total','Productos']];
-  pedidos.forEach(p => rows.push([new Date(p.ts).toLocaleString('es-AR'), p.estado||'—', p.nombre||'—', p.total||0, (p.items||[]).map(i=>i.title+'x'+i.qty).join('; ')]));
+  const rows = [['Fecha','Estado','Cliente','Total','Productos','Cupón','Envío']];
+  pedidos.forEach(p => rows.push([new Date(p.ts).toLocaleString('es-AR'), p.estado||'—', p.nombre||'—', p.total||0, (p.items||[]).map(i=>(i.title||i.name)+'x'+(i.qty||1)).join('; '), p.cupon||'', p.envio||'']));
   const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'}));
