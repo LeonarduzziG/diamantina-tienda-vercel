@@ -1346,7 +1346,7 @@ window.showPage = function(page) {
   if (hero) hero.style.display = page === 'tienda' ? '' : 'none';
   if (filters) filters.style.display = 'none';
   if (catsVisual) catsVisual.style.display = page === 'tienda' ? '' : 'none';
-  if (buscadorBar) buscadorBar.style.display = 'none';
+  if (buscadorBar) buscadorBar.style.display = page === 'tienda' ? 'block' : 'none';
 
   if (page === 'tienda') {
     document.getElementById('page-tienda').style.display = 'block';
@@ -1417,7 +1417,8 @@ loadVisitasAdmin();
       const msg = '✦ NUEVO PEDIDO DIAMANTINA%0A%0ACliente: ' + (myName||'—') + '%0ATotal: $' + subtotal.toLocaleString('es-AR') + '%0AProductos: ' + cart.map(i => i.name + ' T.' + (i.talla||'—') + ' x' + i.qty).join(', ');
       setTimeout(() => { window.open('https://wa.me/' + WA_NOTIF_NUMBER + '?text=' + msg, '_blank'); }, 1500);
     } else {
-      console.log('Pedido ya procesado:', pedidoId);
+      console.log('Pedido ya procesado (localStorage tiene flag):', pedidoId);
+      // Si el cart tiene items igual, mostrar éxito sin re-guardar
     }
     cart = []; saveCart(); updateCartUI();
     localStorage.removeItem('diamantina_cart_pending');
@@ -1441,10 +1442,12 @@ window.showPedidosPrompt = function() {
 
 window.toggleMobileMenu = function() {
   const menu = document.getElementById('nav-mobile-menu');
-  menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+  if (!menu) return;
+  menu.classList.toggle('open');
 };
 window.closeMobileMenu = function() {
-  document.getElementById('nav-mobile-menu').style.display = 'none';
+  const menu = document.getElementById('nav-mobile-menu');
+  if (menu) menu.classList.remove('open');
 };
 
 // ── FIREBASE ──
@@ -1525,7 +1528,13 @@ window.renderCatalog = function() {
   if (sort === 'precio-asc') list.sort((a,b) => (a.precioFinal||a.price) - (b.precioFinal||b.price));
   else if (sort === 'precio-desc') list.sort((a,b) => (b.precioFinal||b.price) - (a.precioFinal||a.price));
   else if (sort === 'nombre') list.sort((a,b) => a.name.localeCompare(b.name));
-  else list.sort((a,b) => b.ts - a.ts);
+  else {
+    // Shuffle aleatorio para mostrar variedad (cuando no hay ordenamiento específico)
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+  }
 
   const el = document.getElementById('catalog');
   if (!list.length) {
