@@ -1396,7 +1396,7 @@ loadVisitasAdmin();
           payment_id: pedidoId, ts: Date.now(), estado: 'aprobado',
           nombre: myName || 'Cliente',
           items: cart.map(i => ({ title: i.name, talla: i.talla || '—', color: i.color || '', qty: i.qty, price: i.price })),
-          total: Math.max(0, subtotal - calcDescuento(subtotal)) + (typeof envioSeleccionado !== 'undefined' && envioSeleccionado ? envioSeleccionado.precio : 0),
+          total: (() => { try { return Math.max(0, subtotal - (typeof calcDescuento === 'function' ? calcDescuento(subtotal) : 0)); } catch(e) { return subtotal || 0; } })(),
           cupon: cuponActivo ? cuponActivo.code : null,
           envio: envioSeleccionado ? envioSeleccionado.zona : null
         };
@@ -3345,17 +3345,7 @@ async function loadIgFeed() {
   }
 }
 
-// ── MOBILE MENU ──
-window.toggleMobileMenu = function() {
-  const menu = document.getElementById('mobile-menu');
-  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-  if (menu.style.display === 'block') document.body.style.overflow = 'hidden';
-  else document.body.style.overflow = '';
-};
-window.closeMobileMenu = function() {
-  document.getElementById('mobile-menu').style.display = 'none';
-  document.body.style.overflow = '';
-};
+// ── MOBILE MENU (defined earlier) ──
 
 // ── INIT ──
 let myName = localStorage.getItem('diamantina_user') || '';
