@@ -442,7 +442,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   </div>
 
   <!-- BUSCADOR COLAPSABLE -->
-  <div id="buscador-bar" style="display:none;padding:0.75rem 2rem;background:#fff;border-bottom:1px solid var(--border);animation:slideDown 0.2s ease">
+  <div id="buscador-bar" style="display:block;padding:0.75rem 2rem;background:#fff;border-bottom:1px solid var(--border)">
     <div style="display:flex;gap:8px;max-width:600px;margin:0 auto">
       <div style="position:relative;flex:1">
         <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-light);font-size:14px;pointer-events:none">⌕</span>
@@ -1935,7 +1935,10 @@ function saveCart() { localStorage.setItem('diamantina_cart', JSON.stringify(car
 function updateCartUI() {
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const count = cart.reduce((s, i) => s + i.qty, 0);
-  document.getElementById('cart-count').textContent = count;
+  const cartCountEl = document.getElementById('cart-count');
+  if (cartCountEl) cartCountEl.textContent = count;
+  const cartCountMEl = document.getElementById('cart-count-m');
+  if (cartCountMEl) cartCountMEl.textContent = count;
   const nav1 = document.getElementById('cart-count-nav');
   const nav2 = document.getElementById('cart-count-nav2');
   if (nav1) nav1.textContent = count;
@@ -1945,8 +1948,10 @@ function updateCartUI() {
   document.getElementById('subtotal-productos') && (document.getElementById('subtotal-productos').textContent = '$' + total.toLocaleString('es-AR'));
   const descuento = calcDescuento(total);
   const totalFinal = totalConEnvio - descuento;
-  document.getElementById('cart-total').textContent = '$' + totalFinal.toLocaleString('es-AR');
-  document.getElementById('checkout-btn').disabled = cart.length === 0;
+  const cartTotalEl = document.getElementById('cart-total');
+  if (cartTotalEl) cartTotalEl.textContent = '$' + totalFinal.toLocaleString('es-AR');
+  const checkoutBtn = document.getElementById('checkout-btn');
+  if (checkoutBtn) checkoutBtn.disabled = cart.length === 0;
   const dRow = document.getElementById('descuento-row');
   if (dRow) {
     if (descuento > 0) {
@@ -3261,10 +3266,12 @@ window.selectZona = function(el, precio, zona) {
 
 // ── URL PARAMS (retorno de MercadoPago) ──
 const params = new URLSearchParams(window.location.search);
-if (params.get('pago') === 'aprobado' || params.get('page') === 'success' || params.get('collection_status') === 'approved' || params.get('status') === 'approved') showPage('success');
-else if (params.get('pago') === 'fallido' || params.get('page') === 'error' || params.get('collection_status') === 'rejected') showPage('error');
-else if (params.get('pago') === 'fallido' || params.get('pago') === 'pendiente') showPage('error');
-else showPage('tienda');
+const _returnPage = (() => {
+  if (params.get('pago') === 'aprobado' || params.get('page') === 'success' || params.get('collection_status') === 'approved' || params.get('status') === 'approved') return 'success';
+  if (params.get('pago') === 'fallido' || params.get('page') === 'error' || params.get('collection_status') === 'rejected') return 'error';
+  return 'tienda';
+})();
+// showPage will be called after init() completes
 
 // ── SEO: PRODUCT SCHEMA ──
 function injectProductSchema() {
@@ -3304,10 +3311,12 @@ function injectProductSchema() {
 // ── INSTAGRAM FEED ──
 async function loadIgFeed() {
   const grid = document.getElementById('ig-feed-grid');
-  if (!grid) return;
+  if (!grid) { console.log('IG: grid not found'); return; }
   try {
+    console.log('IG: fetching feed...');
     const res = await fetch('https://feeds.behold.so/oB5oP4KsjnNp9XPaaNnp');
     const data = await res.json();
+    console.log('IG: data received, posts:', (data.posts || data).length);
     const posts = (data.posts || data).slice(0, 9);
     grid.innerHTML = posts.map(p => {
       const img = p.sizes?.medium?.mediaUrl || p.thumbnailUrl || p.mediaUrl;
@@ -3319,6 +3328,7 @@ async function loadIgFeed() {
       </a>`;
     }).join('');
   } catch(e) {
+    console.log('IG: error loading feed:', e.message);
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;font-size:13px;color:var(--ink-light)">Seguinos en <a href="https://www.instagram.com/diamantinalenceria" target="_blank" style="color:var(--rose)">@diamantinalenceria</a></div>';
   }
 }
@@ -3348,8 +3358,9 @@ loadEnvioConfig();
 loadFavs();
 updateFavUI();
 updateCartUI();
-updateCartUI();
 loadIgFeed();
+// Navigate to correct page after init
+showPage(_returnPage);
 </script>
 </body>
 </html>
