@@ -1366,6 +1366,8 @@ loadVisitasAdmin();
     const logoEl = document.getElementById('nosotras-logo');
     const navLogo = document.getElementById('nav-logo-img');
     if (logoEl && navLogo) logoEl.src = navLogo.src;
+  } else if (page === 'politicas') {
+    document.getElementById('page-politicas').style.display = 'block';
   } else if (page === 'favoritos') {
     document.getElementById('page-favoritos').style.display = 'block';
     renderFavoritos();
