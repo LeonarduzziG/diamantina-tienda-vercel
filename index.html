@@ -1402,7 +1402,7 @@ loadVisitasAdmin();
           items: cart.map(i => ({
             title: _sanStr(i.name),
             talla: _sanStr(i.talla || '—'),
-            color: _sanStr(i.color || ''),
+            color: _sanStr((i.color && typeof i.color === 'object') ? (i.color.nombre || i.color.hex || '') : (i.color || '')),
             qty: _sanNum(i.qty),
             price: _sanNum(i.price)
           })),
@@ -1416,11 +1416,15 @@ loadVisitasAdmin();
           .catch(e => console.error('Error guardando pedido:', e));
       }
       cart.forEach(item => {
-        if (!item.prodId || !item.talla || item.talla === '—') return;
-        db.ref('productos/' + item.prodId + '/stock/' + item.talla).get().then(snap => {
+        if (!item.prodId) return;
+        const _stockKeyDown = (item.talla && item.talla !== '—' && item.color)
+          ? (item.talla + '__' + item.color)
+          : (item.talla && item.talla !== '—' ? item.talla : null);
+        if (!_stockKeyDown) return;
+        db.ref('productos/' + item.prodId + '/stock/' + _stockKeyDown).get().then(snap => {
           const actual = snap.val();
           if (actual !== null && actual !== undefined && actual > 0) {
-            db.ref('productos/' + item.prodId + '/stock/' + item.talla).set(Math.max(0, actual - item.qty));
+            db.ref('productos/' + item.prodId + '/stock/' + _stockKeyDown).set(Math.max(0, actual - item.qty));
           }
         });
       });
@@ -1823,7 +1827,10 @@ window.openProdModal = function(id) {
   }
 
   tallasEl.innerHTML = (p.tallas||[]).map(t => {
-    const stock = p.stock ? (p.stock[t] !== undefined ? p.stock[t] : 99) : 99;
+    // Buscar stock por talla+color seleccionado, o solo por talla
+    const _selColor = window._selectedColor || '';
+    const _stockKey = _selColor ? (t + '__' + _selColor) : t;
+    const stock = p.stock ? (p.stock[_stockKey] !== undefined ? p.stock[_stockKey] : (p.stock[t] !== undefined ? p.stock[t] : 99)) : 99;
     const agotada = stock === 0;
     const ultimas = stock > 0 && stock <= 3;
     return `<button class="talla-btn${agotada?' agotada':''}" onclick="selectTalla('${t}',this,${agotada})" ${agotada?'disabled':''} style="${(agotada||ultimas)?'min-height:52px;height:auto;padding:5px 4px;flex-direction:column;gap:1px;':''}">
@@ -2226,11 +2233,25 @@ window.saveProduct = async function() {
   if (!name || !price) { showToast('Completá nombre y precio', 'error'); return; }
 
   const precioFinal = descuento > 0 ? Math.round(price * (1 - descuento/100)) : price;
+  // Leer stock desde la grilla (soporta talla×color y solo-talla)
   const stock = {};
-  tallas.forEach(t => {
-    const el = document.getElementById('stock-' + t);
-    stock[t] = el ? parseInt(el.value) || 0 : 10;
-  });
+  const _stockInputs = document.querySelectorAll('#stock-por-talla input[type=number]');
+  if (_stockInputs.length > 0) {
+    _stockInputs.forEach(inp => {
+      const t = inp.dataset.talla;
+      const c = inp.dataset.color;
+      if (t && c) {
+        // Stock por talla+color: clave "talla__color"
+        stock[t + '__' + c] = parseInt(inp.value) || 0;
+      } else {
+        // Stock solo por talla
+        const tKey = inp.id.replace('stock-', '');
+        stock[tKey] = parseInt(inp.value) || 0;
+      }
+    });
+  } else {
+    tallas.forEach(t => { stock[t] = 10; });
+  }
   const colores = window.adminColores || [];
   const cuotas = parseInt(document.getElementById('prod-cuotas').value) || 0;
   const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas, ts: Date.now() };
@@ -2289,6 +2310,7 @@ window.editProduct = function(id) {
   adminImgs = p.imgs ? [...p.imgs] : (p.img ? [p.img] : []);
   renderAdminThumbs();
   calcDescuento();
+  // stock puede tener claves "T__Color" o solo "T"
   window.currentStockEdit = p.stock || {};
   window.adminColores = p.colores ? [...p.colores] : [];
   setTimeout(() => {
@@ -2528,7 +2550,14 @@ window.renderPedidos = async function() {
           <span style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--rose)">$${(p.total||0).toLocaleString('es-AR')}</span>
         </div>
       </div>
-      <div style="font-size:12px;color:var(--ink-mid);border-top:1px solid var(--border);padding-top:8px">${(p.items||[]).map(i=>(i.title||i.name||'—')+' T.'+(i.talla||'—')+' x'+(i.qty||1)).join(' · ')}</div>
+      <div style="font-size:12px;color:var(--ink-mid);border-top:1px solid var(--border);padding-top:8px">
+        ${(p.items||[]).map(i => {
+          const nombre = i.title || i.name || '—';
+          const talla = i.talla && i.talla !== '—' ? ' T.' + i.talla : '';
+          const color = i.color && i.color !== '' ? ' · ' + i.color : '';
+          return `<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:var(--surface-2);border-radius:999px;border:1px solid var(--border)">${nombre}${talla}${color} ×${i.qty||1}</span>`;
+        }).join('')}
+      </div>
       ${p.cupon ? '<div style="font-size:11px;color:#2e7d32;margin-top:4px">🎟️ Cupón: '+p.cupon+'</div>' : ''}
       ${p.envio ? '<div style="font-size:11px;color:var(--ink-light);margin-top:2px">📦 Envío: '+p.envio+'</div>' : ''}
     </div>
@@ -2539,7 +2568,7 @@ window.exportarPedidosExcel = async function() {
   const pedidos = await getPedidos();
   if (!pedidos.length) { showToast('No hay pedidos para exportar', 'error'); return; }
   const rows = [['Fecha','Estado','Cliente','Total','Productos','Cupón','Envío']];
-  pedidos.forEach(p => rows.push([new Date(p.ts).toLocaleString('es-AR'), p.estado||'—', p.nombre||'—', p.total||0, (p.items||[]).map(i=>(i.title||i.name)+'x'+(i.qty||1)).join('; '), p.cupon||'', p.envio||'']));
+  pedidos.forEach(p => rows.push([new Date(p.ts).toLocaleString('es-AR'), p.estado||'—', p.nombre||'—', p.total||0, (p.items||[]).map(i => { const t = i.talla&&i.talla!=='—'?' T.'+i.talla:''; const c = i.color&&i.color!==''?' '+i.color:''; return (i.title||i.name||'—')+t+c+' x'+(i.qty||1); }).join('; '), p.cupon||'', p.envio||'']));
   const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'}));
@@ -2773,14 +2802,38 @@ window.autoSelectTallas = function(cat) {
 // ── STOCK ──
 function renderStockFields() {
   const tallas = Array.from(document.querySelectorAll('.talla-cb:checked')).map(c => c.value);
+  const colores = (window.adminColores || []).map(c => c.nombre || c).filter(Boolean);
   const el = document.getElementById('stock-por-talla');
   if (!el) return;
-  el.innerHTML = tallas.map(t => `
-    <div style="display:flex;align-items:center;gap:4px;background:var(--surface-2);padding:5px 8px;border-radius:var(--radius-sm);border:1px solid var(--border)">
-      <span style="font-size:12px;font-weight:500;color:var(--ink);min-width:22px">${t}</span>
-      <input type="number" id="stock-${t}" min="0" value="${window.currentStockEdit && window.currentStockEdit[t] !== undefined ? window.currentStockEdit[t] : 10}" style="width:52px;padding:3px 6px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;text-align:center;background:#fff">
-    </div>
-  `).join('');
+  if (!tallas.length) { el.innerHTML = '<div style="font-size:12px;color:var(--ink-light);padding:4px">Seleccioná al menos un talle</div>'; return; }
+
+  // Si hay colores, mostrar grilla talla x color
+  if (colores.length > 0) {
+    let html = '<div style="overflow-x:auto;margin-top:4px"><table style="border-collapse:collapse;font-size:12px">';
+    html += '<tr><th style="padding:4px 8px;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-mid);font-weight:500">Talle \ Color</th>';
+    colores.forEach(c => { html += `<th style="padding:4px 8px;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-mid);font-weight:500;min-width:60px">${c}</th>`; });
+    html += '</tr>';
+    tallas.forEach(t => {
+      html += `<tr><td style="padding:4px 8px;background:var(--surface-2);border:1px solid var(--border);font-weight:500;color:var(--ink)">${t}</td>`;
+      colores.forEach(c => {
+        const key = t + '__' + c;
+        const val = window.currentStockEdit && window.currentStockEdit[key] !== undefined ? window.currentStockEdit[key] : 10;
+        html += `<td style="padding:3px 4px;border:1px solid var(--border)"><input type="number" id="stock-${key.replace(/[^a-zA-Z0-9_]/g,'_')}" data-talla="${t}" data-color="${c}" min="0" value="${val}" style="width:52px;padding:3px 4px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;text-align:center;background:#fff"></td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</table></div>';
+    el.innerHTML = html;
+  } else {
+    // Sin colores: solo por talla
+    el.innerHTML = tallas.map(t => {
+      const val = window.currentStockEdit && window.currentStockEdit[t] !== undefined ? window.currentStockEdit[t] : 10;
+      return `<div style="display:flex;align-items:center;gap:4px;background:var(--surface-2);padding:5px 8px;border-radius:var(--radius-sm);border:1px solid var(--border)">
+        <span style="font-size:12px;font-weight:500;color:var(--ink);min-width:22px">${t}</span>
+        <input type="number" id="stock-${t}" min="0" value="${val}" style="width:52px;padding:3px 6px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;text-align:center;background:#fff">
+      </div>`;
+    }).join('');
+  }
 }
 window.currentStockEdit = {};
 document.querySelectorAll('.talla-cb').forEach(cb => cb.addEventListener('change', renderStockFields));
@@ -2963,6 +3016,7 @@ window.addColorAdmin = function() {
   if (!window.adminColores) window.adminColores = [];
   window.adminColores.push({ hex, nombre });
   renderColorSwatchesAdmin();
+  renderStockFields();
   document.getElementById('color-name').value = '';
 };
 
@@ -2984,6 +3038,7 @@ window.renderColorSwatchesAdmin = renderColorSwatchesAdmin;
 window.removeColorAdmin = function(i) {
   window.adminColores.splice(i, 1);
   renderColorSwatchesAdmin();
+  renderStockFields();
 };
 
 let selectedColor = null;
