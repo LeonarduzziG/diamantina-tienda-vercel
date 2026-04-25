@@ -1985,12 +1985,10 @@ window.checkout = async function() {
   const btn = document.getElementById('checkout-btn');
   btn.disabled = true; btn.textContent = 'Procesando...';
   try {
-    const subtotal = cart.reduce((s,i) => s + i.price * i.qty, 0);
-    const descuento = calcDescuento(subtotal);
     const items = cart.map(i => ({
       title: i.name + (i.talla && i.talla !== '—' ? ' (Talla ' + i.talla + ')' : ''),
       quantity: parseInt(i.qty) || 1,
-      unit_price: Math.max(1, Math.round(Number(i.price) * (1 - descuento / subtotal))),
+      unit_price: Math.max(1, Math.round(Number(i.price))),
       currency_id: 'ARS'
     }));
     const res = await fetch(BACKEND + '/crear-preferencia', {
