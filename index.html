@@ -1275,9 +1275,9 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   </svg>
 </a>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, update, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
 
 const firebaseConfig = {
   apiKey: "AIzaSyCXo5jS4mvu4Gf5BtF4IBrup9DBf7CgEzQ",
@@ -1292,8 +1292,8 @@ const firebaseConfig = {
 const BACKEND = "https://diamantina-backend.onrender.com";
 const ADMIN_PASS = "diamantina2024";
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 let products = [];
 let cart = JSON.parse(localStorage.getItem('diamantina_cart') || '[]');
@@ -1365,10 +1365,10 @@ loadVisitasAdmin();
       // ── BAJAR STOCK ──
       cart.forEach(item => {
         if (!item.prodId || !item.talla || item.talla === '—') return;
-        get(ref(db, 'productos/' + item.prodId + '/stock/' + item.talla)).then(snap => {
+        db.ref('productos/' + item.prodId + '/stock/' + item.talla).get().then(snap => {
           const actual = snap.val();
           if (actual !== null && actual !== undefined && actual > 0) {
-            set(ref(db, 'productos/' + item.prodId + '/stock/' + item.talla), Math.max(0, actual - item.qty));
+            db.ref('productos/' + item.prodId + '/stock/' + item.talla).set(Math.max(0, actual - item.qty));
           }
         });
       });
@@ -1396,7 +1396,7 @@ window.showPedidosPrompt = function() {
 };
 
 // ── FIREBASE ──
-onValue(ref(db, 'productos'), (snap) => {
+db.ref('productos').on('value', (snap) => {
   try {
     const data = snap.val();
     const allProds = data ? Object.entries(data).map(([id, val]) => ({ id, ...val })) : [];
@@ -1985,10 +1985,12 @@ window.checkout = async function() {
   const btn = document.getElementById('checkout-btn');
   btn.disabled = true; btn.textContent = 'Procesando...';
   try {
+    const subtotal = cart.reduce((s,i) => s + i.price * i.qty, 0);
+    const descuento = calcDescuento(subtotal);
     const items = cart.map(i => ({
       title: i.name + (i.talla && i.talla !== '—' ? ' (Talla ' + i.talla + ')' : ''),
-      quantity: parseInt(i.qty),
-      unit_price: Math.round(Number(i.price)),
+      quantity: parseInt(i.qty) || 1,
+      unit_price: Math.max(1, Math.round(Number(i.price) * (1 - descuento / subtotal))),
       currency_id: 'ARS'
     }));
     const res = await fetch(BACKEND + '/crear-preferencia', {
@@ -2136,10 +2138,10 @@ window.saveProduct = async function() {
 
   try {
     if (editId) {
-      await update(ref(db, 'productos/' + editId), data);
+      await db.ref('productos/' + editId).update(data);
       showToast('Producto actualizado ✦');
     } else {
-      await push(ref(db, 'productos'), data);
+      await db.ref('productos').push(data);
       showToast('Producto guardado ✦');
     }
     resetForm();
@@ -2199,7 +2201,7 @@ window.editProduct = function(id) {
 window.deleteProduct = async function(id) {
   const p = products.find(x => x.id === id);
   if (!p || !confirm('¿Eliminar "' + p.name + '"?')) return;
-  await remove(ref(db, 'productos/' + id));
+  await db.ref('productos/' + id).remove();
   showToast('Producto eliminado');
 };
 
@@ -2379,13 +2381,13 @@ const WA_NOTIF_NUMBER = "541162620304";
 
 async function savePedido(pedidoData) {
   try {
-    await push(ref(db, 'pedidos'), pedidoData);
+    await db.ref('pedidos').push(pedidoData);
   } catch(e) { console.error('Error guardando pedido:', e); }
 }
 
 async function getPedidos() {
   try {
-    const snap = await get(ref(db, 'pedidos'));
+    const snap = await db.ref('pedidos').get();
     const data = snap.val();
     if (!data) return [];
     const list = Object.entries(data).map(([id, v]) => ({ id, ...v }));
@@ -2469,11 +2471,11 @@ function isFav(id) { return _favs.includes(id); }
 
 function loadFavs() {
   const key = getFavSessionKey();
-  onValue(ref(db, 'favoritos/' + key), (snap) => {
+  db.ref('favoritos/' + key).on('value', (snap) => {
     _favs = snap.val() ? Object.values(snap.val()) : [];
     updateFavUI();
     renderCatalog();
-  }, { onlyOnce: false });
+  });
 }
 
 window.toggleFav = async function(id) {
@@ -2485,7 +2487,7 @@ window.toggleFav = async function(id) {
     _favs.push(id);
     showToast('♥ Guardado en favoritos');
   }
-  await set(ref(db, 'favoritos/' + key), _favs.length ? Object.fromEntries(_favs.map((v,i)=>[i,v])) : null);
+  await db.ref('favoritos/' + key).set(_favs.length ? Object.fromEntries(_favs.map((v,i)=>[i,v])) : null);
   updateFavUI();
   renderCatalog();
 };
@@ -2526,16 +2528,16 @@ let _resenasCache = {};
 function getResenas(prodId) { return _resenasCache[prodId] || []; }
 
 function loadResenas(prodId) {
-  onValue(ref(db, 'resenas/' + prodId), (snap) => {
+  db.ref('resenas/' + prodId).on('value', (snap) => {
     const data = snap.val();
     _resenasCache[prodId] = data ? Object.values(data).sort((a,b) => b.ts - a.ts) : [];
     renderResenas(prodId);
     renderCatalog();
-  }, { onlyOnce: false });
+  });
 }
 
 async function saveResena(prodId, resena) {
-  await push(ref(db, 'resenas/' + prodId), resena);
+  await db.ref('resenas/' + prodId).push(resena);
 }
 function getResenaStarsHTML(prodId) {
   const resenas = getResenas(prodId);
@@ -2683,7 +2685,7 @@ document.querySelectorAll('.talla-cb').forEach(cb => cb.addEventListener('change
 window._envioConfig = { caba:3500, gba:4500, interior:6000, sur:7000, gratisMin:80000, gratisActivo:false };
 
 function loadEnvioConfig() {
-  onValue(ref(db, 'config/envios'), (snap) => {
+  db.ref('config/envios').on('value', (snap) => {
     const data = snap.val();
     if (data) {
       window._envioConfig = data;
@@ -2704,7 +2706,7 @@ function loadEnvioConfig() {
       const gActivo = document.getElementById('envio-gratis-activo');
       if (gActivo) gActivo.checked = !!data.gratisActivo;
     }
-  }, { onlyOnce: false });
+  });
 }
 
 window.saveEnvios = async function() {
@@ -2716,7 +2718,7 @@ window.saveEnvios = async function() {
     gratisMin: parseInt(document.getElementById('envio-gratis-min').value) || 80000,
     gratisActivo: document.getElementById('envio-gratis-activo').checked
   };
-  await set(ref(db, 'config/envios'), cfg);
+  await db.ref('config/envios').set(cfg);
   window._envioConfig = cfg;
   showToast('Configuración de envíos guardada ✦');
   updateCartUI();
@@ -2742,15 +2744,15 @@ function registrarVisita() {
   updates['visitas/dias/' + hoy] = null; // will use transaction
   // Use set with increment simulation
   Promise.all([
-    get(ref(db, 'visitas/dias/' + hoy)),
-    get(ref(db, 'visitas/semanas/' + semana)),
-    get(ref(db, 'visitas/meses/' + mes)),
-    get(ref(db, 'visitas/total'))
+    db.ref('visitas/dias/' + hoy).get(),
+    db.ref('visitas/semanas/' + semana).get(),
+    db.ref('visitas/meses/' + mes).get(),
+    db.ref('visitas/total').get()
   ]).then(([dSnap, sSnap, mSnap, tSnap]) => {
-    set(ref(db, 'visitas/dias/' + hoy), (dSnap.val() || 0) + 1);
-    set(ref(db, 'visitas/semanas/' + semana), (sSnap.val() || 0) + 1);
-    set(ref(db, 'visitas/meses/' + mes), (mSnap.val() || 0) + 1);
-    set(ref(db, 'visitas/total'), (tSnap.val() || 0) + 1);
+    db.ref('visitas/dias/' + hoy).set((dSnap.val() || 0) + 1);
+    db.ref('visitas/semanas/' + semana).set((sSnap.val() || 0) + 1);
+    db.ref('visitas/meses/' + mes).set((mSnap.val() || 0) + 1);
+    db.ref('visitas/total').set((tSnap.val() || 0) + 1);
   }).catch(() => {});
 }
 
@@ -2763,19 +2765,19 @@ function loadVisitasAdmin() {
     d.setDate(d.getDate() - d.getDay());
     return d.toISOString().slice(0, 10);
   })();
-  get(ref(db, 'visitas/dias/' + hoy)).then(s => {
+  db.ref('visitas/dias/' + hoy).get().then(s => {
     const el = document.getElementById('visits-hoy');
     if (el) el.textContent = (s.val() || 0).toLocaleString('es-AR');
   });
-  get(ref(db, 'visitas/semanas/' + semana)).then(s => {
+  db.ref('visitas/semanas/' + semana).get().then(s => {
     const el = document.getElementById('visits-semana');
     if (el) el.textContent = (s.val() || 0).toLocaleString('es-AR');
   });
-  get(ref(db, 'visitas/meses/' + mes)).then(s => {
+  db.ref('visitas/meses/' + mes).get().then(s => {
     const el = document.getElementById('visits-mes');
     if (el) el.textContent = (s.val() || 0).toLocaleString('es-AR');
   });
-  get(ref(db, 'visitas/total')).then(s => {
+  db.ref('visitas/total').get().then(s => {
     const el = document.getElementById('visits-total');
     if (el) el.textContent = (s.val() || 0).toLocaleString('es-AR');
   });
@@ -2783,7 +2785,7 @@ function loadVisitasAdmin() {
 
 function loadBanner() {
   // Load from Firebase
-  onValue(ref(db, 'config/banner'), (snap) => {
+  db.ref('config/banner').on('value', (snap) => {
     const data = snap.val();
     if (data && data.activo && data.texto) {
       document.getElementById('promo-banner-text').textContent = data.texto;
@@ -2793,16 +2795,16 @@ function loadBanner() {
     } else {
       document.getElementById('promo-banner').style.display = 'none';
     }
-  }, { onlyOnce: false });
+  });
 }
 window.saveBanner = async function() {
   const text = document.getElementById('banner-text').value.trim();
   if (!text) { showToast('Escribí el texto del banner', 'error'); return; }
-  await set(ref(db, 'config/banner'), { texto: text, activo: true });
+  await db.ref('config/banner').set({ texto: text, activo: true });
   showToast('Banner activado ✦');
 };
 window.hideBanner = async function() {
-  await set(ref(db, 'config/banner'), { activo: false, texto: '' });
+  await db.ref('config/banner').set({ activo: false, texto: '' });
   document.getElementById('promo-banner').style.display = 'none';
   showToast('Banner ocultado');
 };
@@ -3034,7 +3036,7 @@ window.clearColorFilter = function() {
 async function loadCuponesAdmin() {
   const lista = document.getElementById('cupones-lista');
   if (!lista) return;
-  const snap = await get(ref(db, 'config/cupones'));
+  const snap = await db.ref('config/cupones').get();
   const data = snap.val();
   if (!data) { lista.textContent = 'No hay cupones creados.'; return; }
   lista.innerHTML = Object.entries(data).map(([code, c]) => 
@@ -3055,7 +3057,7 @@ window.crearCupon = async function() {
   const tipo = document.getElementById('new-cupon-tipo').value;
   const valor = parseFloat(document.getElementById('new-cupon-valor').value);
   if (!code || !valor) { showToast('Completá todos los campos', 'error'); return; }
-  await set(ref(db, 'config/cupones/' + code), { tipo, valor, activo: true });
+  await db.ref('config/cupones/' + code).set({ tipo, valor, activo: true });
   document.getElementById('new-cupon-code').value = '';
   document.getElementById('new-cupon-valor').value = '';
   loadCuponesAdmin();
@@ -3064,14 +3066,14 @@ loadVisitasAdmin();
 };
 
 window.toggleCupon = async function(code, activo) {
-  await update(ref(db, 'config/cupones/' + code), { activo });
+  await db.ref('config/cupones/' + code).update({ activo });
   loadCuponesAdmin();
 loadVisitasAdmin();
 };
 
 window.borrarCupon = async function(code) {
   if (!confirm('¿Borrar cupón ' + code + '?')) return;
-  await remove(ref(db, 'config/cupones/' + code));
+  await db.ref('config/cupones/' + code).remove();
   loadCuponesAdmin();
 loadVisitasAdmin();
   showToast('Cupón eliminado');
@@ -3086,7 +3088,7 @@ window.aplicarCupon = async function() {
   if (!code) return;
   // Load coupons from Firebase
   try {
-    const snap = await get(ref(db, 'config/cupones/' + code));
+    const snap = await db.ref('config/cupones/' + code).get();
     const data = snap.val();
     if (!data || !data.activo) {
       msg.style.color = '#E24B4A';
