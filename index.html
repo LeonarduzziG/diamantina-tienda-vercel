@@ -385,7 +385,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
     <button onclick="showPage('tienda')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Tienda</button>
     <button onclick="showPage('nosotras')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Nosotras</button>
     <button onclick="showPage('politicas')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Políticas</button>
-    <button onclick="showPedidosPrompt()" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Pedidos</button>
+
     <button onclick="showAdminPrompt()" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Admin</button>
     <button onclick="showPage('favoritos')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:18px;color:var(--ink-mid);cursor:pointer;line-height:1" title="Favoritos">♡</button>
     <button onclick="toggleCart()" style="display:flex;align-items:center;gap:6px;background:var(--ink);border:none;border-radius:999px;padding:8px 16px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer">
@@ -406,7 +406,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   <button onclick="showPage('tienda');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Tienda</button>
   <button onclick="showPage('nosotras');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Nosotras</button>
   <button onclick="showPage('politicas');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Políticas</button>
-  <button onclick="showPedidosPrompt();closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Pedidos</button>
+
   <button onclick="showAdminPrompt();closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;text-align:left;width:100%;background:none;border:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Admin</button>
 </div>
 
@@ -1440,12 +1440,6 @@ loadVisitasAdmin();
 window.showAdminPrompt = function() {
   const pass = prompt('Contraseña de administrador:');
   if (pass === ADMIN_PASS) showPage('admin');
-  else if (pass !== null) showToast('Contraseña incorrecta', 'error');
-};
-
-window.showPedidosPrompt = function() {
-  const pass = prompt('Contraseña:');
-  if (pass === ADMIN_PASS) showPage('pedidos');
   else if (pass !== null) showToast('Contraseña incorrecta', 'error');
 };
 
@@ -2524,25 +2518,27 @@ async function savePedido(pedidoData) {
 
 async function notificarPedidoPorMail(pedido) {
   try {
-    emailjs.init('aIVvakD_ibBlrMGTF');
     const items = (pedido.items || []).map(i => {
       const t = i.talla && i.talla !== '—' ? ' T.' + i.talla : '';
       const c = i.color ? ' ' + i.color : '';
       return (i.title || i.name || '—') + t + c + ' x' + (i.qty || 1);
-    }).join(', ');
-    await emailjs.send('service_thw68fg', 'template_4tth7pc', {
+    }).join(' | ');
+    const templateParams = {
       to_email: 'gel340@gmail.com',
+      order_id: pedido.payment_id || String(Date.now()),
       cliente: pedido.nombre || 'Cliente',
-      total: '$' + (pedido.total || 0).toLocaleString('es-AR'),
+      total: '$' + (Number(pedido.total) || 0).toLocaleString('es-AR'),
       items: items,
       estado: pedido.estado || 'aprobado',
-      envio: pedido.envio || '—',
+      envio: pedido.envio || 'Sin especificar',
       payment_id: pedido.payment_id || '—',
       fecha: new Date(pedido.ts || Date.now()).toLocaleString('es-AR')
-    });
-    console.log('Email de notificación enviado');
+    };
+    console.log('Enviando email con params:', templateParams);
+    const result = await emailjs.send('service_thw68fg', 'template_4tth7pc', templateParams);
+    console.log('Email enviado OK:', result.status, result.text);
   } catch(e) {
-    console.warn('Email no enviado (EmailJS no configurado):', e.message || e);
+    console.error('Error enviando email:', e);
   }
 }
 
