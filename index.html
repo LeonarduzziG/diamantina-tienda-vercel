@@ -848,6 +848,75 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   </div>
 </div>
 
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-header">
+    <div class="cart-title">Tu carrito</div>
+    <button class="cart-close-btn" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-footer">
+    <div style="margin-bottom:14px;padding:12px;background:var(--rose-pale);border-radius:var(--radius-sm);border:1px solid var(--border)">
+      <!-- TABS ENVÍO -->
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button id="tab-andreani" onclick="switchEnvioTab('andreani')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s">🚚 Andreani</button>
+        <button id="tab-coordinar" onclick="switchEnvioTab('coordinar')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s">📍 Coordinar entrega</button>
+      </div>
+      <!-- TAB ANDREANI -->
+      <div id="panel-andreani">
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="cp-input" placeholder="Código postal" maxlength="8" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none">
+          <button onclick="calcularEnvio()" style="padding:7px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">Calcular</button>
+        </div>
+        <div id="envio-zonas" style="display:none;flex-direction:column;gap:4px;margin-top:8px"></div>
+        <div id="envio-result" style="display:none;font-size:12px;color:var(--ink-mid);margin-top:6px;padding:6px 8px;background:#fff;border-radius:var(--radius-sm);border:1px solid var(--border)"></div>
+      </div>
+      <!-- TAB COORDINAR -->
+      <div id="panel-coordinar" style="display:none">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
+          <div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">📍 Coordinar entrega personal</div>
+          <div style="font-size:12px;color:var(--ink-mid);line-height:1.6;margin-bottom:10px">Coordinamos día y lugar por WhatsApp. Sin costo de envío.</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:8px">
+              <button id="zona-castelar" onclick="seleccionarZonaCoordinar('Castelar')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Castelar</button>
+              <button id="zona-quilmes" onclick="seleccionarZonaCoordinar('Quilmes')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Quilmes</button>
+            </div>
+          </div>
+          <div id="coord-ok" style="display:none;margin-top:8px;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Entrega coordinada — te contactamos por WhatsApp para acordar el día</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;color:var(--ink-mid)"><span>Productos</span><span id="subtotal-productos">$0</span></div>
+      <div id="envio-gratis-banner" style="display:none;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:#3B6D11;font-weight:500;margin:4px 0">🎉 ¡Envío gratis!</div>
+      <div id="envio-gratis-progreso" style="display:none;font-size:11px;color:var(--ink-light);padding:2px 0"></div>
+      <div id="envio-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:var(--ink-mid)"><span id="envio-label">Envío</span><span id="subtotal-envio">$0</span></div>
+      <!-- CUPÓN -->
+      <div style="margin:8px 0">
+        <div style="display:flex;gap:6px">
+          <input type="text" id="cupon-input" placeholder="Código de descuento" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:var(--surface-2);outline:none;text-transform:uppercase">
+          <button onclick="aplicarCupon()" style="padding:7px 12px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap">Aplicar</button>
+        </div>
+        <div id="cupon-msg" style="font-size:11px;margin-top:4px;display:none"></div>
+      </div>
+      <div id="descuento-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:#2e7d32">
+        <span id="descuento-label">Descuento</span>
+        <span id="descuento-monto">-$0</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);margin-top:4px">
+        <span style="font-size:15px;font-weight:500;color:var(--ink)">Total</span>
+        <span style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:400;color:var(--ink)" id="cart-total">$0</span>
+      </div>
+    </div>
+    <button class="checkout-btn" id="checkout-btn" onclick="checkout()">
+      Pagar con MercadoPago
+    </button>
+    <div class="mp-badge">Pagá con <span>tarjeta, débito o efectivo</span> — 100% seguro</div>
+  </div>
+</div>
+
+
 <div class="admin-panel" id="page-admin">
   <div style="display:flex;gap:8px;margin-bottom:1.5rem;border-bottom:2px solid var(--border);padding-bottom:0">
     <button id="atab-admin" onclick="switchAdminTab('admin')" style="padding:10px 18px;border:none;border-bottom:3px solid var(--rose);background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--rose);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">⚙️ Administración</button>
@@ -1217,75 +1286,6 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
     </div>
   </div>
 </div>
-
-<!-- CART DRAWER -->
-<div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
-<div class="cart-drawer" id="cart-drawer">
-  <div class="cart-header">
-    <div class="cart-title">Tu carrito</div>
-    <button class="cart-close-btn" onclick="toggleCart()">✕</button>
-  </div>
-  <div class="cart-items" id="cart-items"></div>
-  <div class="cart-footer">
-    <div style="margin-bottom:14px;padding:12px;background:var(--rose-pale);border-radius:var(--radius-sm);border:1px solid var(--border)">
-      <!-- TABS ENVÍO -->
-      <div style="display:flex;gap:6px;margin-bottom:10px">
-        <button id="tab-andreani" onclick="switchEnvioTab('andreani')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s">🚚 Andreani</button>
-        <button id="tab-coordinar" onclick="switchEnvioTab('coordinar')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s">📍 Coordinar entrega</button>
-      </div>
-      <!-- TAB ANDREANI -->
-      <div id="panel-andreani">
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="text" id="cp-input" placeholder="Código postal" maxlength="8" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none">
-          <button onclick="calcularEnvio()" style="padding:7px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">Calcular</button>
-        </div>
-        <div id="envio-zonas" style="display:none;flex-direction:column;gap:4px;margin-top:8px"></div>
-        <div id="envio-result" style="display:none;font-size:12px;color:var(--ink-mid);margin-top:6px;padding:6px 8px;background:#fff;border-radius:var(--radius-sm);border:1px solid var(--border)"></div>
-      </div>
-      <!-- TAB COORDINAR -->
-      <div id="panel-coordinar" style="display:none">
-        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
-          <div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">📍 Coordinar entrega personal</div>
-          <div style="font-size:12px;color:var(--ink-mid);line-height:1.6;margin-bottom:10px">Coordinamos día y lugar por WhatsApp. Sin costo de envío.</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;gap:8px">
-              <button id="zona-castelar" onclick="seleccionarZonaCoordinar('Castelar')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Castelar</button>
-              <button id="zona-quilmes" onclick="seleccionarZonaCoordinar('Quilmes')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Quilmes</button>
-            </div>
-          </div>
-          <div id="coord-ok" style="display:none;margin-top:8px;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Entrega coordinada — te contactamos por WhatsApp para acordar el día</div>
-        </div>
-      </div>
-    </div>
-    <div style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;color:var(--ink-mid)"><span>Productos</span><span id="subtotal-productos">$0</span></div>
-      <div id="envio-gratis-banner" style="display:none;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:#3B6D11;font-weight:500;margin:4px 0">🎉 ¡Envío gratis!</div>
-      <div id="envio-gratis-progreso" style="display:none;font-size:11px;color:var(--ink-light);padding:2px 0"></div>
-      <div id="envio-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:var(--ink-mid)"><span id="envio-label">Envío</span><span id="subtotal-envio">$0</span></div>
-      <!-- CUPÓN -->
-      <div style="margin:8px 0">
-        <div style="display:flex;gap:6px">
-          <input type="text" id="cupon-input" placeholder="Código de descuento" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:var(--surface-2);outline:none;text-transform:uppercase">
-          <button onclick="aplicarCupon()" style="padding:7px 12px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer;white-space:nowrap">Aplicar</button>
-        </div>
-        <div id="cupon-msg" style="font-size:11px;margin-top:4px;display:none"></div>
-      </div>
-      <div id="descuento-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:#2e7d32">
-        <span id="descuento-label">Descuento</span>
-        <span id="descuento-monto">-$0</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);margin-top:4px">
-        <span style="font-size:15px;font-weight:500;color:var(--ink)">Total</span>
-        <span style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:400;color:var(--ink)" id="cart-total">$0</span>
-      </div>
-    </div>
-    <button class="checkout-btn" id="checkout-btn" onclick="checkout()">
-      Pagar con MercadoPago
-    </button>
-    <div class="mp-badge">Pagá con <span>tarjeta, débito o efectivo</span> — 100% seguro</div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <a href="https://wa.me/541162620304?text=Hola!%20Vi%20su%20tienda%20y%20quisiera%20consultar%20sobre%20sus%20productos%20%F0%9F%8C�" target="_blank" style="position:fixed;bottom:2rem;right:2rem;z-index:9998;width:56px;height:56px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,211,102,0.4);transition:transform 0.2s ease;text-decoration:none" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
@@ -3551,4 +3551,5 @@ loadIgFeed();
 // Navigate to correct page after init
 showPage(_returnPage);
 </script>
+</div><!-- close page-admin -->
 </body>
