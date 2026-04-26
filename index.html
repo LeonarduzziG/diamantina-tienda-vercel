@@ -848,43 +848,13 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   </div>
 </div>
 
-<div class="admin-panel" id="page-pedidos">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
-    <div class="admin-title" style="margin-bottom:0">Panel de pedidos</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button onclick="exportarPedidosExcel()" style="padding:8px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;transition:all var(--tr)">↓ Exportar Excel</button>
-      <select id="filtro-estado-pedido" onchange="renderPedidos()" style="padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer">
-        <option value="todos">Todos los estados</option>
-        <option value="aprobado">Aprobados</option>
-        <option value="pendiente">Pendientes</option>
-        <option value="fallido">Fallidos</option>
-      </select>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem">
-    <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:1rem;text-align:center">
-      <div style="font-size:22px;font-weight:500;color:var(--ink)" id="stat-total-pedidos">0</div>
-      <div style="font-size:12px;color:var(--ink-light)">Total pedidos</div>
-    </div>
-    <div style="background:#EAF3DE;border-radius:var(--radius-sm);padding:1rem;text-align:center">
-      <div style="font-size:22px;font-weight:500;color:#3B6D11" id="stat-aprobados">0</div>
-      <div style="font-size:12px;color:#3B6D11">Aprobados</div>
-    </div>
-    <div style="background:var(--rose-pale);border-radius:var(--radius-sm);padding:1rem;text-align:center">
-      <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:400;color:var(--rose)" id="stat-total-ventas">$0</div>
-      <div style="font-size:12px;color:var(--ink-light)">Total vendido</div>
-    </div>
-    <div style="background:#FFF5F5;border-radius:var(--radius-sm);padding:1rem;text-align:center">
-      <div style="font-size:22px;font-weight:500;color:#E24B4A" id="stat-pendientes">0</div>
-      <div style="font-size:12px;color:#E24B4A">Pendientes</div>
-    </div>
-  </div>
-  <div id="pedidos-list" style="display:flex;flex-direction:column;gap:10px">
-    <div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">Cargando pedidos...</div>
-  </div>
-</div>
-
 <div class="admin-panel" id="page-admin">
+  <div style="display:flex;gap:8px;margin-bottom:1.5rem;border-bottom:2px solid var(--border);padding-bottom:0">
+    <button id="atab-admin" onclick="switchAdminTab('admin')" style="padding:10px 18px;border:none;border-bottom:3px solid var(--rose);background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--rose);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">⚙️ Administración</button>
+    <button id="atab-pedidos" onclick="switchAdminTab('pedidos')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">📦 Pedidos</button>
+  </div>
+  <!-- TAB ADMIN -->
+  <div id="admin-tab-admin">
   <div class="admin-title">Panel de administración</div>
   <!-- CONTADOR DE VISITAS -->
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem">
@@ -1378,9 +1348,10 @@ window.showPage = function(page) {
     loadCuponesAdmin();
 loadVisitasAdmin();
   } else if (page === 'pedidos') {
-    const el = document.getElementById('page-pedidos');
+    // Pedidos now inside admin
+    const el = document.getElementById('page-admin');
     el.style.display = 'block'; el.classList.add('open');
-    renderPedidos();
+    switchAdminTab('pedidos');
   } else if (page === 'nosotras') {
     const el = document.getElementById('page-nosotras');
     el.style.display = 'block';
@@ -1411,7 +1382,7 @@ loadVisitasAdmin();
       console.log('Pedido pendiente firebaseKey:', pedidoPendiente ? pedidoPendiente.firebaseKey : 'ninguno');
       if (pedidoPendiente && pedidoPendiente.firebaseKey) {
         db.ref('pedidos/' + pedidoPendiente.firebaseKey).update({ estado: 'aprobado', payment_id: pedidoId })
-          .then(() => console.log('Pedido actualizado OK:', pedidoPendiente.firebaseKey))
+          .then(() => { console.log('Pedido actualizado OK:', pedidoPendiente.firebaseKey); notificarPedidoPorMail({...pedidoPendiente, estado:'aprobado', payment_id: pedidoId}); })
           .catch(e => { console.error('Error actualizando pedido:', e); });
         localStorage.removeItem('diamantina_pedido_pendiente');
       } else {
@@ -1435,7 +1406,7 @@ loadVisitasAdmin();
         };
         console.log('Guardando pedido nuevo en Firebase:', pedidoNuevo);
         db.ref('pedidos').push(pedidoNuevo)
-          .then(ref => console.log('Pedido guardado OK, key:', ref.key))
+          .then(ref => { console.log('Pedido guardado OK, key:', ref.key); notificarPedidoPorMail(pedidoNuevo); })
           .catch(e => console.error('Error guardando pedido:', e));
       }
       cart.forEach(item => {
@@ -1476,6 +1447,17 @@ window.showPedidosPrompt = function() {
   const pass = prompt('Contraseña:');
   if (pass === ADMIN_PASS) showPage('pedidos');
   else if (pass !== null) showToast('Contraseña incorrecta', 'error');
+};
+
+window.switchAdminTab = function(tab) {
+  const tabs = ['admin','pedidos'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('atab-' + t);
+    const panel = document.getElementById('admin-tab-' + t);
+    if (btn) { btn.style.borderBottomColor = t === tab ? 'var(--rose)' : 'transparent'; btn.style.color = t === tab ? 'var(--rose)' : 'var(--ink-mid)'; }
+    if (panel) panel.style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'pedidos') renderPedidos();
 };
 
 window.toggleMobileMenu = function() {
@@ -2540,6 +2522,30 @@ async function savePedido(pedidoData) {
   } catch(e) { console.error('Error guardando pedido:', e); }
 }
 
+async function notificarPedidoPorMail(pedido) {
+  try {
+    emailjs.init('aIVvakD_ibBlrMGTF');
+    const items = (pedido.items || []).map(i => {
+      const t = i.talla && i.talla !== '—' ? ' T.' + i.talla : '';
+      const c = i.color ? ' ' + i.color : '';
+      return (i.title || i.name || '—') + t + c + ' x' + (i.qty || 1);
+    }).join(', ');
+    await emailjs.send('service_thw68fg', 'template_4tth7pc', {
+      to_email: 'gel340@gmail.com',
+      cliente: pedido.nombre || 'Cliente',
+      total: '$' + (pedido.total || 0).toLocaleString('es-AR'),
+      items: items,
+      estado: pedido.estado || 'aprobado',
+      envio: pedido.envio || '—',
+      payment_id: pedido.payment_id || '—',
+      fecha: new Date(pedido.ts || Date.now()).toLocaleString('es-AR')
+    });
+    console.log('Email de notificación enviado');
+  } catch(e) {
+    console.warn('Email no enviado (EmailJS no configurado):', e.message || e);
+  }
+}
+
 async function getPedidos() {
   try {
     const snap = await db.ref('pedidos').get();
@@ -3509,4 +3515,43 @@ loadIgFeed();
 showPage(_returnPage);
 </script>
 </body>
-</html>
+<
+  </div><!-- end admin-tab-admin -->
+  <!-- TAB PEDIDOS -->
+  <div id="admin-tab-pedidos" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
+      <div class="admin-title" style="margin-bottom:0">📦 Pedidos</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="exportarPedidosExcel()" style="padding:8px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">↓ Exportar Excel</button>
+        <select id="filtro-estado-pedido" onchange="renderPedidos()" style="padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer">
+          <option value="todos">Todos los estados</option>
+          <option value="aprobado">Aprobados</option>
+          <option value="pendiente">Pendientes</option>
+          <option value="fallido">Fallidos</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem">
+      <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-size:22px;font-weight:500;color:var(--ink)" id="stat-total-pedidos">0</div>
+        <div style="font-size:12px;color:var(--ink-light)">Total pedidos</div>
+      </div>
+      <div style="background:#EAF3DE;border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-size:22px;font-weight:500;color:#3B6D11" id="stat-aprobados">0</div>
+        <div style="font-size:12px;color:#3B6D11">Aprobados</div>
+      </div>
+      <div style="background:var(--rose-pale);border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:400;color:var(--rose)" id="stat-total-ventas">$0</div>
+        <div style="font-size:12px;color:var(--ink-light)">Total vendido</div>
+      </div>
+      <div style="background:#FFF5F5;border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-size:22px;font-weight:500;color:#E24B4A" id="stat-pendientes">0</div>
+        <div style="font-size:12px;color:#E24B4A">Pendientes</div>
+      </div>
+    </div>
+    <div id="pedidos-list" style="display:flex;flex-direction:column;gap:10px">
+      <div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">Cargando pedidos...</div>
+    </div>
+  </div>
+  </div><!-- end admin-tab-admin -->
+
