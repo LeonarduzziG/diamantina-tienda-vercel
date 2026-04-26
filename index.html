@@ -326,7 +326,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 .admin-empty{text-align:center;padding:2rem;color:var(--ink-light);font-size:13px;font-style:italic}
 
 /* SUCCESS/ERROR PAGES */
-.result-page{display:none;text-align:center;padding:6rem 2rem}
+.result-page{display:none;text-align:center;padding:6rem 2rem;min-height:60vh;background:#fff;position:relative;z-index:1}
 .result-page.open{display:block}
 .result-icon{font-size:64px;margin-bottom:1.5rem}
 .result-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--ink);margin-bottom:1rem}
@@ -366,6 +366,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 </style>
 </head>
 <body>
+<div id="page-loader" style="position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px">
+  <img src="" id="loader-logo" style="width:64px;height:64px;object-fit:contain;border-radius:50%;opacity:0.8">
+  <div style="font-family:'DM Sans',sans-serif;font-size:14px;color:#b8839a;letter-spacing:2px;text-transform:uppercase">Cargando...</div>
+</div>
 
 <!-- NAV -->
 <div id="promo-banner" style="background:var(--rose);color:#fff;text-align:center;padding:6px 2.5rem;font-size:12px;font-weight:500;letter-spacing:0.3px;display:none;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
@@ -3493,7 +3497,10 @@ const _returnPage = (() => {
   if (pago === 'fallido' || page === 'error' || colStatus === 'rejected' || colStatus === 'cancelled') return 'error';
   return 'tienda';
 })();
-// showPage will be called after init() completes
+// Clean URL if coming from MercadoPago
+if (_returnPage !== 'tienda' && window.location.search) {
+  window.history.replaceState({}, '', window.location.pathname);
+}
 
 // ── SEO: PRODUCT SCHEMA ──
 function injectProductSchema() {
@@ -3573,6 +3580,13 @@ updateCartUI();
 loadIgFeed();
 // Navigate to correct page after init
 showPage(_returnPage);
+// Hide loader
+const _loader = document.getElementById('page-loader');
+if (_loader) { _loader.style.opacity = '0'; _loader.style.transition = 'opacity 0.4s'; setTimeout(() => _loader.remove(), 400); }
+// Set loader logo
+const _navLogo = document.getElementById('nav-logo-img');
+const _loaderLogo = document.getElementById('loader-logo');
+if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
 </script>
 </div><!-- close page-admin -->
 </body>
