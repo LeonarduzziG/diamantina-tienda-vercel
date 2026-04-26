@@ -1258,13 +1258,34 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   <div class="cart-items" id="cart-items"></div>
   <div class="cart-footer">
     <div style="margin-bottom:14px;padding:12px;background:var(--rose-pale);border-radius:var(--radius-sm);border:1px solid var(--border)">
-      <div style="font-size:11px;font-weight:500;color:var(--ink-mid);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Calcular envío con Andreani</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="text" id="cp-input" placeholder="Código postal" maxlength="8" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none">
-        <button onclick="calcularEnvio()" style="padding:7px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">Calcular</button>
+      <!-- TABS ENVÍO -->
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button id="tab-andreani" onclick="switchEnvioTab('andreani')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s">🚚 Andreani</button>
+        <button id="tab-coordinar" onclick="switchEnvioTab('coordinar')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s">📍 Coordinar entrega</button>
       </div>
-      <div id="envio-zonas" style="display:none;flex-direction:column;gap:4px;margin-top:8px"></div>
-      <div id="envio-result" style="display:none;font-size:12px;color:var(--ink-mid);margin-top:6px;padding:6px 8px;background:#fff;border-radius:var(--radius-sm);border:1px solid var(--border)"></div>
+      <!-- TAB ANDREANI -->
+      <div id="panel-andreani">
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="cp-input" placeholder="Código postal" maxlength="8" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none">
+          <button onclick="calcularEnvio()" style="padding:7px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">Calcular</button>
+        </div>
+        <div id="envio-zonas" style="display:none;flex-direction:column;gap:4px;margin-top:8px"></div>
+        <div id="envio-result" style="display:none;font-size:12px;color:var(--ink-mid);margin-top:6px;padding:6px 8px;background:#fff;border-radius:var(--radius-sm);border:1px solid var(--border)"></div>
+      </div>
+      <!-- TAB COORDINAR -->
+      <div id="panel-coordinar" style="display:none">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
+          <div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">📍 Coordinar entrega personal</div>
+          <div style="font-size:12px;color:var(--ink-mid);line-height:1.6;margin-bottom:10px">Coordinamos día y lugar por WhatsApp. Sin costo de envío.</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:8px">
+              <button id="zona-castelar" onclick="seleccionarZonaCoordinar('Castelar')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Castelar</button>
+              <button id="zona-quilmes" onclick="seleccionarZonaCoordinar('Quilmes')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Quilmes</button>
+            </div>
+          </div>
+          <div id="coord-ok" style="display:none;margin-top:8px;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Entrega coordinada — te contactamos por WhatsApp para acordar el día</div>
+        </div>
+      </div>
     </div>
     <div style="margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;color:var(--ink-mid)"><span>Productos</span><span id="subtotal-productos">$0</span></div>
@@ -1430,7 +1451,8 @@ loadVisitasAdmin();
           }
         });
       });
-      const msg = '✦ NUEVO PEDIDO DIAMANTINA%0A%0ACliente: ' + (myName||'—') + '%0ATotal: $' + subtotal.toLocaleString('es-AR') + '%0AProductos: ' + cart.map(i => i.name + ' T.' + (i.talla||'—') + ' x' + i.qty).join(', ');
+      const _envioInfo = envioSeleccionado ? (envioSeleccionado.tipo === 'coordinar' ? '%0AEntrega: ' + envioSeleccionado.zona : '%0AEnvío: ' + envioSeleccionado.zona) : '';
+      const msg = '✦ NUEVO PEDIDO DIAMANTINA%0A%0ACliente: ' + (myName||'—') + '%0ATotal: $' + subtotal.toLocaleString('es-AR') + '%0AProductos: ' + cart.map(i => i.name + ' T.' + (i.talla||'—') + ' x' + i.qty).join(', ') + _envioInfo;
       setTimeout(() => { window.open('https://wa.me/' + WA_NOTIF_NUMBER + '?text=' + msg, '_blank'); }, 1500);
     } else {
       console.log('Pedido ya procesado (localStorage tiene flag):', pedidoId);
@@ -1953,7 +1975,7 @@ function addToCart(p, talla, color) {
 function saveCart() { localStorage.setItem('diamantina_cart', JSON.stringify(cart)); }
 
 function updateCartUI() {
-  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const total = cart.reduce((s, i) => s + (Number(i.price) || 0) * (Number(i.qty) || 1), 0);
   const count = cart.reduce((s, i) => s + i.qty, 0);
   const cartCountEl = document.getElementById('cart-count');
   if (cartCountEl) cartCountEl.textContent = count;
@@ -1963,10 +1985,11 @@ function updateCartUI() {
   const nav2 = document.getElementById('cart-count-nav2');
   if (nav1) nav1.textContent = count;
   if (nav2) nav2.textContent = count;
-  const envio = (typeof envioSeleccionado !== 'undefined' && envioSeleccionado) ? envioSeleccionado.precio : 0;
-  const totalConEnvio = total + envio;
+  const _envioPrecio = (typeof envioSeleccionado !== 'undefined' && envioSeleccionado && !isNaN(envioSeleccionado.precio)) ? Number(envioSeleccionado.precio) : 0;
+  const totalConEnvio = total + _envioPrecio;
   document.getElementById('subtotal-productos') && (document.getElementById('subtotal-productos').textContent = '$' + total.toLocaleString('es-AR'));
-  const descuento = calcDescuento(total);
+  const _desc = calcDescuento(total);
+  const descuento = isNaN(_desc) ? 0 : _desc;
   const totalFinal = totalConEnvio - descuento;
   const cartTotalEl = document.getElementById('cart-total');
   if (cartTotalEl) cartTotalEl.textContent = '$' + totalFinal.toLocaleString('es-AR');
@@ -2013,7 +2036,12 @@ function updateCartUI() {
 
   if (typeof envioSeleccionado !== 'undefined' && envioSeleccionado) {
     const er = document.getElementById('envio-row');
-    if (er) { er.style.display='flex'; document.getElementById('envio-label').textContent='Envío ('+envioSeleccionado.zona+')'; document.getElementById('subtotal-envio').textContent='$'+envio.toLocaleString('es-AR'); }
+    if (er) {
+      er.style.display='flex';
+      const _esCoordinar = envioSeleccionado && envioSeleccionado.tipo === 'coordinar';
+      document.getElementById('envio-label').textContent = _esCoordinar ? '📍 ' + envioSeleccionado.zona : 'Envío (' + envioSeleccionado.zona + ')';
+      document.getElementById('subtotal-envio').textContent = _esCoordinar ? 'Gratis' : '$' + _envioPrecio.toLocaleString('es-AR');
+    }
   } else {
     const er = document.getElementById('envio-row');
     if (er) er.style.display='none';
@@ -3326,6 +3354,52 @@ window.calcularEnvio = function() {
   // Auto-select detected zone
   const autoItem = zonasEl.querySelectorAll('.envio-zona-item')[zonas.indexOf(zona)];
   if (autoItem) selectZona(autoItem, precios[zona], zona);
+};
+
+window.switchEnvioTab = function(tab) {
+  const tabAndreani = document.getElementById('tab-andreani');
+  const tabCoordinar = document.getElementById('tab-coordinar');
+  const panelAndreani = document.getElementById('panel-andreani');
+  const panelCoordinar = document.getElementById('panel-coordinar');
+  if (tab === 'andreani') {
+    tabAndreani.style.background = 'var(--rose)';
+    tabAndreani.style.color = '#fff';
+    tabAndreani.style.borderColor = 'var(--rose)';
+    tabCoordinar.style.background = 'transparent';
+    tabCoordinar.style.color = 'var(--ink-mid)';
+    tabCoordinar.style.borderColor = 'var(--border-strong)';
+    panelAndreani.style.display = 'block';
+    panelCoordinar.style.display = 'none';
+    // Si había coordinar seleccionado, limpiar
+    if (envioSeleccionado && envioSeleccionado.tipo === 'coordinar') {
+      envioSeleccionado = null;
+      updateCartUI();
+    }
+  } else {
+    tabCoordinar.style.background = 'var(--rose)';
+    tabCoordinar.style.color = '#fff';
+    tabCoordinar.style.borderColor = 'var(--rose)';
+    tabAndreani.style.background = 'transparent';
+    tabAndreani.style.color = 'var(--ink-mid)';
+    tabAndreani.style.borderColor = 'var(--border-strong)';
+    panelAndreani.style.display = 'none';
+    panelCoordinar.style.display = 'block';
+  }
+};
+
+window.seleccionarZonaCoordinar = function(zona) {
+  // Reset buttons
+  ['castelar','quilmes'].forEach(z => {
+    const btn = document.getElementById('zona-' + z);
+    if (btn) { btn.style.borderColor = 'var(--border-strong)'; btn.style.background = '#fff'; btn.style.color = 'var(--ink-mid)'; }
+  });
+  // Highlight selected
+  const sel = document.getElementById('zona-' + zona.toLowerCase());
+  if (sel) { sel.style.borderColor = 'var(--rose)'; sel.style.background = 'var(--rose-pale)'; sel.style.color = 'var(--rose)'; }
+  envioSeleccionado = { precio: 0, zona: 'Entrega en ' + zona, tipo: 'coordinar' };
+  document.getElementById('coord-ok').style.display = 'block';
+  updateCartUI();
+  showToast('Entrega en ' + zona + ' ✦ Sin costo de envío');
 };
 
 window.selectZona = function(el, precio, zona) {
