@@ -2557,6 +2557,29 @@ async function savePedido(pedidoData) {
   } catch(e) { console.error('Error guardando pedido:', e); }
 }
 
+// TEST: llamar desde consola: testEmail()
+window.testEmail = async function() {
+  try {
+    console.log('Iniciando test email...');
+    const r = await emailjs.send('service_thw68fg', 'template_4tth7pc', {
+      to_email: 'gel340@gmail.com',
+      order_id: 'TEST-001',
+      cliente: 'Test Cliente',
+      total: '$10.000',
+      items: 'Producto test x1',
+      estado: 'aprobado',
+      envio: 'Test envio',
+      payment_id: 'TEST-001',
+      fecha: new Date().toLocaleString('es-AR')
+    });
+    console.log('TEST EMAIL OK:', r.status, r.text);
+    alert('Email enviado! Revisá ' + 'gel340@gmail.com');
+  } catch(e) {
+    console.error('TEST EMAIL ERROR:', e);
+    alert('Error: ' + (e.text || e.message || JSON.stringify(e)));
+  }
+};
+
 async function notificarPedidoPorMail(pedido) {
   try {
     const items = (pedido.items || []).map(i => {
