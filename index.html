@@ -154,6 +154,16 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 .ofertas-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;font-style:italic;color:var(--ink)}
 .ofertas-count{font-size:13px;color:#E24B4A;font-weight:500}
 .ofertas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.ofertas-carousel-wrap{position:relative}
+.ofertas-carousel-btn{display:none;position:absolute;top:50%;transform:translateY(-50%);z-index:10;background:#fff;border:1px solid var(--border);border-radius:50%;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:16px;color:var(--ink)}
+@media(max-width:768px){
+  .ofertas-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .ofertas-grid::-webkit-scrollbar{display:none}
+  .ofertas-grid .prod-card{min-width:200px;max-width:200px;scroll-snap-align:start;flex-shrink:0}
+  .ofertas-carousel-btn{display:flex}
+  .ofertas-carousel-btn.left{left:-12px}
+  .ofertas-carousel-btn.right{right:-12px}
+}
 .color-dot{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all var(--tr);flex-shrink:0}
 .color-dot:hover{transform:scale(1.15)}
 .color-dot.selected{border-color:var(--ink);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}
@@ -430,7 +440,11 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       <div class="ofertas-title">Ofertas especiales</div>
       <div class="ofertas-count" id="ofertas-count"></div>
     </div>
-    <div class="ofertas-grid" id="ofertas-grid"></div>
+    <div class="ofertas-carousel-wrap">
+      <button class="ofertas-carousel-btn left" onclick="ofertasScroll(-1)" aria-label="Anterior">‹</button>
+      <div class="ofertas-grid" id="ofertas-grid"></div>
+      <button class="ofertas-carousel-btn right" onclick="ofertasScroll(1)" aria-label="Siguiente">›</button>
+    </div>
   </div>
 
   <!-- BUSCADOR COLAPSABLE -->
@@ -1724,6 +1738,10 @@ function renderPage(list, el, reset) {
 
 
 // ── OFERTAS ──
+window.ofertasScroll = function(dir) {
+  const el = document.getElementById('ofertas-grid');
+  if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
+};
 window.renderOfertas = function() {
   const ofertasList = products.filter(p => p.descuento > 0 && p.estado !== 'agotado' && (!searchQuery || p.name.toLowerCase().includes(searchQuery) || p.cat.toLowerCase().includes(searchQuery)));
   const el = document.getElementById('ofertas-grid');
