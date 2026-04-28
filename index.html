@@ -376,7 +376,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 </style>
 </head>
 <body>
-<div id="page-loader" style="position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px">
+<div id="page-loader" style="position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity 0.4s;pointer-events:none">
   <img src="" id="loader-logo" style="width:64px;height:64px;object-fit:contain;border-radius:50%;opacity:0.8">
   <div style="font-family:'DM Sans',sans-serif;font-size:14px;color:#b8839a;letter-spacing:2px;text-transform:uppercase">Cargando...</div>
 </div>
@@ -3458,11 +3458,11 @@ showPage(_returnPage);
 // Hide loader
 function hideLoader() {
   const _loader = document.getElementById('page-loader');
-  if (_loader) { _loader.style.opacity = '0'; _loader.style.transition = 'opacity 0.3s'; setTimeout(() => { if(_loader.parentNode) _loader.remove(); }, 350); }
+  if (_loader) { _loader.style.opacity = '0'; setTimeout(() => { if(_loader && _loader.parentNode) _loader.parentNode.removeChild(_loader); }, 350); }
 }
 hideLoader();
-// Failsafe: force remove loader after 3s no matter what
-setTimeout(hideLoader, 3000);
+setTimeout(hideLoader, 2000);
+setTimeout(() => { const l = document.getElementById('page-loader'); if(l) l.parentNode && l.parentNode.removeChild(l); }, 4000);
 // Set loader logo
 const _navLogo = document.getElementById('nav-logo-img');
 const _loaderLogo = document.getElementById('loader-logo');
