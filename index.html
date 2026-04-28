@@ -1201,6 +1201,16 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
+// Global variables needed before main script
+var searchQuery = '';
+var products = [];
+var cart = [];
+var currentProd = null;
+var selectedTalla = null;
+var cuponActivo = null;
+var envioSeleccionado = null;
+</script>
+<script>
 // EmailJS init
 try { emailjs.init('aIVvakD_ibBlrMGTF'); } catch(e) { console.warn('EmailJS not loaded'); }
 
@@ -1220,8 +1230,8 @@ const ADMIN_PASS = "diamantina2024";
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let products = [];
-let cart = JSON.parse(localStorage.getItem('diamantina_cart') || '[]');
+products = [];
+cart = JSON.parse(localStorage.getItem('diamantina_cart') || '[]');
 let activeFilter = 'Todas';
 let currentProd = null;
 let selectedTalla = null;
@@ -2403,7 +2413,8 @@ window.calcularTalle = function() {
 };
 
 // Close on background click
-document.getElementById('guia-modal-bg').addEventListener('click', function(e) {
+const _guiaBg = document.getElementById('guia-modal-bg');
+if (_guiaBg) _guiaBg.addEventListener('click', function(e) {
   if (e.target === this) closeGuiaModal();
 });
 
@@ -2691,7 +2702,6 @@ window.submitResena = async function() {
 };
 
 // ── BUSCADOR ──
-let searchQuery = '';
 window.buscarProductos = function(q) { searchQuery = q.toLowerCase().trim(); renderCatalog(); renderOfertas(); };
 window.limpiarBusqueda = function() {
   const el = document.getElementById('buscador-tienda');
@@ -3213,7 +3223,7 @@ loadVisitasAdmin();
 };
 
 // ── CUPONES ──
-let cuponActivo = null;
+cuponActivo = null;
 
 window.aplicarCupon = async function() {
   const code = document.getElementById('cupon-input').value.trim().toUpperCase();
@@ -3261,7 +3271,7 @@ function detectarZona(cp) {
   return 'Interior';
 }
 
-let envioSeleccionado = null;
+envioSeleccionado = null;
 
 window.calcularEnvio = function() {
   const cp = document.getElementById('cp-input').value.trim();
