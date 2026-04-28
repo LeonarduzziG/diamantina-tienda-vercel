@@ -1200,17 +1200,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
 <script>
-// Global variables needed before main script
-var searchQuery = '';
-var products = [];
-var cart = [];
-var currentProd = null;
-var selectedTalla = null;
-var cuponActivo = null;
-var envioSeleccionado = null;
-</script>
-<script>
+var searchQuery = ''; // declared early to avoid hoisting issues
+
 // EmailJS init
 try { emailjs.init('aIVvakD_ibBlrMGTF'); } catch(e) { console.warn('EmailJS not loaded'); }
 
