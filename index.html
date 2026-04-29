@@ -1720,6 +1720,24 @@ window.openProdModal = function(id) {
       pmCuotasEl.style.display = 'none';
     }
   }
+  // Show pack selector if product has pack option
+  const pmPackSelector = document.getElementById('pm-pack-selector');
+  if (pmPackSelector) {
+    if (p.packQty >= 2 && p.packPrice > 0) {
+      const precioUnit = (p.descuento > 0 && p.precioFinal) ? p.precioFinal : p.price;
+      const packSaving = Math.round((precioUnit * p.packQty - p.packPrice) / (precioUnit * p.packQty) * 100);
+      pmPackSelector.style.display = 'block';
+      document.getElementById('pm-pack-individual-price').textContent = '$' + Number(precioUnit).toLocaleString('es-AR');
+      document.getElementById('pm-pack-label').textContent = 'Pack x' + p.packQty;
+      document.getElementById('pm-pack-price').textContent = '$' + Number(p.packPrice).toLocaleString('es-AR');
+      document.getElementById('pm-pack-saving').textContent = packSaving > 0 ? '-' + packSaving + '% ahorrás' : '';
+      document.getElementById('pm-pack-saving').style.display = packSaving > 0 ? 'inline-block' : 'none';
+      window._packOption = 'individual'; // default
+    } else {
+      pmPackSelector.style.display = 'none';
+      window._packOption = 'individual';
+    }
+  }
   document.getElementById('pm-desc').textContent = p.desc || '';
   const tallasEl = document.getElementById('pm-tallas');
 
@@ -1848,12 +1866,32 @@ window.closeProdModal = function() {
   document.title = 'Diamantina Lencería | Lencería de Diseño en Argentina';
 };
 
+window.selectPackOption = function(option) {
+  window._packOption = option;
+  const btnInd = document.getElementById('pm-pack-individual');
+  const btnPack = document.getElementById('pm-pack-pack');
+  if (option === 'individual') {
+    if (btnInd) { btnInd.style.background = 'var(--rose)'; btnInd.style.borderColor = 'var(--rose)'; btnInd.style.color = '#fff'; }
+    if (btnPack) { btnPack.style.background = 'transparent'; btnPack.style.borderColor = 'var(--border-strong)'; btnPack.style.color = 'var(--ink-mid)'; }
+  } else {
+    if (btnPack) { btnPack.style.background = 'var(--rose)'; btnPack.style.borderColor = 'var(--rose)'; btnPack.style.color = '#fff';
+      document.getElementById('pm-pack-price').style.color = '#fff'; }
+    if (btnInd) { btnInd.style.background = 'transparent'; btnInd.style.borderColor = 'var(--border-strong)'; btnInd.style.color = 'var(--ink-mid)'; }
+  }
+};
+
 window.addFromModal = function() {
   if (!currentProd) return;
   if ((currentProd.tallas||[]).length > 0 && !selectedTalla) { showToast('Elegí una talla primero', 'error'); return; }
   const prodColores = Array.isArray(currentProd.colores) ? currentProd.colores : Object.values(currentProd.colores||{});
   if (prodColores.length > 0 && !window.selectedColor) { showToast('Elegí un color primero', 'error'); return; }
-  addToCart(currentProd, selectedTalla || 'Única', window.selectedColor);
+  if (window._packOption === 'pack' && currentProd.packQty >= 2 && currentProd.packPrice > 0) {
+    // Add pack: use pack price, qty = packQty
+    const packItem = { ...currentProd, price: Math.round(currentProd.packPrice / currentProd.packQty), _packLabel: 'Pack x' + currentProd.packQty };
+    addToCart(packItem, selectedTalla || 'Única', window.selectedColor, currentProd.packQty);
+  } else {
+    addToCart(currentProd, selectedTalla || 'Única', window.selectedColor);
+  }
   closeProdModal();
 };
 
@@ -1865,15 +1903,20 @@ window.quickAdd = function(id) {
 };
 
 // ── CART ──
-function addToCart(p, talla, color) {
-  const colorKey = color ? '_' + color.hex : '';
-  const key = p.id + '_' + talla + colorKey;
+function addToCart(p, talla, color, forceQty) {
+  const qty = forceQty || 1;
+  const colorKey = color ? '_' + (color.hex||color) : '';
+  const packKey = p._packLabel ? '_pack' + (p.packQty||'') : '';
+  const key = p.id + '_' + talla + colorKey + packKey;
   const existing = cart.find(i => i.key === key);
-  const precio = (p.descuento > 0 && p.precioFinal) ? p.precioFinal : p.price;
-  if (existing) existing.qty++;
-  else cart.push({ key, id: p.id, prodId: p.id, name: p.name, price: precio, precioOriginal: p.price, descuento: p.descuento||0, img: p.img, cat: p.cat, talla, color: color || null, qty: 1 });
+  const precio = p._packLabel
+    ? Math.round((p.packPrice || p.price) / (p.packQty || 1))
+    : ((p.descuento > 0 && p.precioFinal) ? p.precioFinal : p.price);
+  const displayName = p._packLabel ? p.name + ' (' + p._packLabel + ')' : p.name;
+  if (existing) { existing.qty += qty; }
+  else cart.push({ key, id: p.id, prodId: p.id, name: displayName, price: precio, precioOriginal: p.price, descuento: p.descuento||0, img: p.img, cat: p.cat, talla, color: color || null, qty });
   saveCart(); updateCartUI();
-  showToast(p.name + ' agregado al carrito ✦');
+  showToast(displayName + ' agregado al carrito ✦');
   toggleCart(true);
 }
 
@@ -3523,6 +3566,21 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
       <div class="pm-price" id="pm-price"></div>
       <div class="pm-desc" id="pm-desc"></div>
       <div id="pm-cuotas-info" style="display:none;font-size:13px;color:var(--rose);font-weight:500;background:var(--rose-pale);padding:7px 12px;border-radius:var(--radius-sm);border:1px solid var(--rose-light)"></div>
+      <!-- PACK SELECTOR -->
+      <div id="pm-pack-selector" style="display:none;margin-top:8px">
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);margin-bottom:6px;text-transform:uppercase">Cantidad</div>
+        <div style="display:flex;gap:8px">
+          <button id="pm-pack-individual" onclick="selectPackOption('individual')" style="flex:1;padding:10px 8px;border:2px solid var(--rose);border-radius:var(--radius-sm);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;text-align:center">
+            <div>1 unidad</div>
+            <div id="pm-pack-individual-price" style="font-size:12px;opacity:0.9;margin-top:2px"></div>
+          </button>
+          <button id="pm-pack-pack" onclick="selectPackOption('pack')" style="flex:1;padding:10px 8px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;text-align:center;position:relative">
+            <div id="pm-pack-label">Pack</div>
+            <div id="pm-pack-price" style="font-size:12px;margin-top:2px;color:var(--rose);font-weight:600"></div>
+            <div id="pm-pack-saving" style="font-size:10px;background:#3B6D11;color:#fff;border-radius:999px;padding:1px 6px;display:inline-block;margin-top:3px"></div>
+          </button>
+        </div>
+      </div>
       <div id="pm-colores-section" style="display:none">
         <div class="pm-section-label" style="margin-bottom:8px">Elegí el color</div>
         <div id="pm-colores" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px"></div>
