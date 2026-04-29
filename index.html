@@ -1054,7 +1054,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       </div>
       <div class="form-field">
         <label class="form-label">Categoría</label>
-        <select class="form-select" id="prod-cat" onchange="autoSelectTallas(this.value)">
+        <select class="form-select" id="prod-cat" onchange="autoSelectTallas(this.value);precargarKeywords(this.value)">
           <option value="Conjuntos">Conjuntos</option>
           <option value="Tops">Tops</option>
           <option value="Bodys">Bodys</option>
@@ -1101,6 +1101,11 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       <div class="form-field">
         <label class="form-label">Descripción</label>
         <textarea class="form-textarea" id="prod-desc" placeholder="Material, detalles, cuidados..."></textarea>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Palabras clave (para búsqueda)</label>
+        <input type="text" class="form-input" id="prod-keywords" placeholder="ej: colaless, bombacha, tanga, bombis">
+        <div style="font-size:11px;color:var(--ink-light);margin-top:4px">Separadas por coma. Ayudan a que el producto aparezca en búsquedas.</div>
       </div>
       <div class="form-field">
         <label class="form-label">Tallas disponibles</label>
@@ -1447,7 +1452,8 @@ window.renderCatalog = function() {
   const filtroColorGroup = window.activeColorGroup || '';
   let list = products.filter(p => {
     if (activeFilter !== 'Todas' && p.cat !== activeFilter) return false;
-    if (searchQuery && !p.name.toLowerCase().includes(searchQuery) && !p.cat.toLowerCase().includes(searchQuery)) return false;
+    const _kw = ((p.keywords || '') + ',' + (_CAT_KEYWORDS[p.cat] || '')).toLowerCase();
+    if (searchQuery && !p.name.toLowerCase().includes(searchQuery) && !p.cat.toLowerCase().includes(searchQuery) && !_kw.includes(searchQuery) && !(p.desc||'').toLowerCase().includes(searchQuery)) return false;
     if (filtroTalla && !(p.tallas||[]).includes(filtroTalla)) return false;
     if (filtroColorGroup) {
       let pc = p.colores || [];
@@ -1597,7 +1603,7 @@ window.ofertasScroll = function(dir) {
   if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
 };
 window.renderOfertas = function() {
-  const ofertasList = products.filter(p => p.descuento > 0 && p.estado !== 'agotado' && (!searchQuery || p.name.toLowerCase().includes(searchQuery) || p.cat.toLowerCase().includes(searchQuery)));
+  const ofertasList = products.filter(p => p.descuento > 0 && p.estado !== 'agotado' && (!searchQuery || p.name.toLowerCase().includes(searchQuery) || p.cat.toLowerCase().includes(searchQuery) || ((p.keywords||'')+','+(_CAT_KEYWORDS[p.cat]||'')).toLowerCase().includes(searchQuery)));
   const el = document.getElementById('ofertas-grid');
   const countEl = document.getElementById('ofertas-count');
   const section = document.getElementById('ofertas-section');
@@ -2174,6 +2180,24 @@ window.removeImg = i => {
   renderAdminThumbs();
 };
 
+const _CAT_KEYWORDS = {
+  'Colaless': 'colaless, less, bombacha, tanga, bombis, ropa interior, calza, culotte',
+  'Conjuntos': 'conjunto, set, lencería, ropa interior, juego',
+  'Tops': 'top, corpiño, sujetador, bralette, corset, bustier, sostén',
+  'Bodys': 'body, enterito, bodysuit, malla, mono, catsuit',
+  'Babydoll': 'babydoll, camisón, vestido, negligé, lencería sexy, pijama',
+  'Bikinis': 'bikini, malla, traje de baño, bañador, trikini, verano'
+};
+
+window.precargarKeywords = function(cat) {
+  const kw = document.getElementById('prod-keywords');
+  if (!kw) return;
+  // Only prefill if field is empty
+  if (!kw.value.trim()) {
+    kw.value = _CAT_KEYWORDS[cat] || '';
+  }
+};
+
 window.updatePackPreview = function() {
   const qty = parseInt(document.getElementById('prod-pack-qty')?.value) || 0;
   const price = parseInt(document.getElementById('prod-pack-price')?.value) || 0;
@@ -2206,6 +2230,7 @@ window.saveProduct = async function() {
   const descuento = parseFloat(document.getElementById('prod-descuento').value) || 0;
   const cat = document.getElementById('prod-cat').value;
   const desc = document.getElementById('prod-desc').value.trim();
+  const keywords = document.getElementById('prod-keywords').value.trim().toLowerCase();
   const estado = document.getElementById('prod-estado').value;
   const tallas = Array.from(document.querySelectorAll('.talla-cb:checked')).map(c => c.value);
   const editId = document.getElementById('edit-id').value;
@@ -2239,6 +2264,7 @@ window.saveProduct = async function() {
   const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas,
     packQty: packQty >= 2 ? packQty : null,
     packPrice: packPrice > 0 && packQty >= 2 ? packPrice : null,
+    keywords: keywords || null,
     ts: Date.now() };
   if (adminImgs.length > 0) {
     data.img = adminImgs[0];
@@ -2266,6 +2292,7 @@ window.resetForm = function() {
   document.getElementById('prod-descuento').value = '';
   document.getElementById('discount-preview').style.display = 'none';
   document.getElementById('prod-desc').value = '';
+  if (document.getElementById('prod-keywords')) document.getElementById('prod-keywords').value = '';
   document.getElementById('prod-cat').value = 'Conjuntos';
   document.getElementById('prod-estado').value = 'activo';
   document.querySelectorAll('.talla-cb').forEach(c => c.checked = false);
