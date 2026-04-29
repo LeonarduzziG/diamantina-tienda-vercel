@@ -154,16 +154,6 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 .ofertas-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;font-style:italic;color:var(--ink)}
 .ofertas-count{font-size:13px;color:#E24B4A;font-weight:500}
 .ofertas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
-.ofertas-carousel-wrap{position:relative}
-.ofertas-carousel-btn{display:none;position:absolute;top:50%;transform:translateY(-50%);z-index:10;background:#fff;border:1px solid var(--border);border-radius:50%;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:16px;color:var(--ink)}
-@media(max-width:768px){
-  .ofertas-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-  .ofertas-grid::-webkit-scrollbar{display:none}
-  .ofertas-grid .prod-card{min-width:200px;max-width:200px;scroll-snap-align:start;flex-shrink:0}
-  .ofertas-carousel-btn{display:flex}
-  .ofertas-carousel-btn.left{left:-12px}
-  .ofertas-carousel-btn.right{right:-12px}
-}
 .color-dot{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all var(--tr);flex-shrink:0}
 .color-dot:hover{transform:scale(1.15)}
 .color-dot.selected{border-color:var(--ink);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}
@@ -224,7 +214,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 .carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.5);cursor:pointer;transition:background var(--tr)}
 .carousel-dot.active{background:#fff}
 /* PRODUCT MODAL */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(12,8,11,0.7);z-index:9998;align-items:center;justify-content:center;padding:1rem}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(12,8,11,0.7);z-index:400;align-items:center;justify-content:center;padding:1rem}
 .modal-bg.open{display:flex}
 .prod-modal{background:#fff;border-radius:var(--radius);max-width:780px;width:100%;max-height:90vh;overflow-y:auto;display:flex;animation:slideUp 0.25s ease}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -376,7 +366,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 </style>
 </head>
 <body>
-<div id="page-loader" style="position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity 0.4s;pointer-events:none">
+<div id="page-loader" style="position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px">
   <img src="" id="loader-logo" style="width:64px;height:64px;object-fit:contain;border-radius:50%;opacity:0.8">
   <div style="font-family:'DM Sans',sans-serif;font-size:14px;color:#b8839a;letter-spacing:2px;text-transform:uppercase">Cargando...</div>
 </div>
@@ -440,11 +430,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       <div class="ofertas-title">Ofertas especiales</div>
       <div class="ofertas-count" id="ofertas-count"></div>
     </div>
-    <div class="ofertas-carousel-wrap">
-      <button class="ofertas-carousel-btn left" onclick="ofertasScroll(-1)" aria-label="Anterior">‹</button>
-      <div class="ofertas-grid" id="ofertas-grid"></div>
-      <button class="ofertas-carousel-btn right" onclick="ofertasScroll(1)" aria-label="Siguiente">›</button>
-    </div>
+    <div class="ofertas-grid" id="ofertas-grid"></div>
   </div>
 
   <!-- BUSCADOR COLAPSABLE -->
@@ -1180,6 +1166,55 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   </div>
 </div>
 
+<!-- GUÍA DE TALLES INTELIGENTE -->
+<div id="guia-modal-bg" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(26,17,24,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:var(--radius);max-width:480px;width:90%;max-height:90vh;overflow-y:auto;padding:2rem;position:relative;box-shadow:0 24px 80px rgba(26,17,24,0.2)">
+    <button onclick="closeGuiaModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:20px;color:var(--ink-light);cursor:pointer">✕</button>
+    <div style="font-family:Cormorant Garamond,serif;font-size:26px;font-weight:300;font-style:italic;color:var(--ink);margin-bottom:4px">Encontrá tu talle</div>
+    <div style="font-size:13px;color:var(--ink-light);margin-bottom:1.5rem">Ingresá tus medidas en centímetros</div>
+
+    <div style="background:var(--rose-pale);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem;font-size:12px;color:var(--ink-mid);line-height:1.7">
+      📏 <strong>¿Cómo medirte?</strong><br>
+      • <strong>Busto:</strong> pasá la cinta por la parte más ancha del pecho<br>
+      • <strong>Cintura:</strong> medí en la parte más angosta del torso<br>
+      • <strong>Cadera:</strong> pasá la cinta por la parte más ancha de las caderas
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:1.5rem">
+      <div>
+        <label style="font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink-mid);display:block;margin-bottom:6px">Busto (cm)</label>
+        <input type="number" id="guia-busto" min="60" max="140" placeholder="ej: 88" oninput="calcularTalle()" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:16px;text-align:center;color:var(--ink);outline:none;transition:border-color 0.2s">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink-mid);display:block;margin-bottom:6px">Cintura (cm)</label>
+        <input type="number" id="guia-cintura" min="50" max="130" placeholder="ej: 70" oninput="calcularTalle()" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:16px;text-align:center;color:var(--ink);outline:none;transition:border-color 0.2s">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink-mid);display:block;margin-bottom:6px">Cadera (cm)</label>
+        <input type="number" id="guia-cadera" min="60" max="150" placeholder="ej: 96" oninput="calcularTalle()" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:16px;text-align:center;color:var(--ink);outline:none;transition:border-color 0.2s">
+      </div>
+    </div>
+
+    <div id="guia-resultado" style="display:none">
+      <div style="font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-mid);margin-bottom:12px">Tu talle recomendado</div>
+      <div id="guia-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem"></div>
+      <div id="guia-tip" style="background:var(--surface-2);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--ink-mid);line-height:1.6"></div>
+    </div>
+
+    <div id="guia-placeholder" style="text-align:center;padding:1.5rem;color:var(--ink-light)">
+      <div style="font-size:32px;margin-bottom:8px;opacity:0.3">📐</div>
+      <div style="font-size:13px">Ingresá tus medidas para ver tu talle</div>
+    </div>
+
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:center">
+      <a href="https://wa.me/541162620304?text=Hola!%20Necesito%20ayuda%20para%20elegir%20mi%20talle" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:#25D366;border-radius:999px;color:#fff;font-size:13px;font-weight:500;text-decoration:none">
+        <svg viewBox="0 0 24 24" fill="#fff" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Consultar por WhatsApp
+      </a>
+      <button onclick="closeGuiaModal()" style="padding:9px 18px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">Cerrar</button>
+    </div>
+  </div>
+</div>
 
 <!-- RESULT PAGES -->
 <div class="result-page" id="page-success">
@@ -1196,14 +1231,116 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   <button class="result-btn" onclick="showPage('tienda')">Volver a la tienda</button>
 </div>
 
+<!-- PRODUCT MODAL -->
+<div class="modal-bg" id="prod-modal-bg" onclick="if(event.target===this)closeProdModal()">
+  <div class="prod-modal">
+    <div class="prod-modal-img">
+      <div class="carousel-wrap" id="pm-carousel">
+        <img class="carousel-img active" id="pm-img" src="" alt="" style="transition:opacity 0.2s ease">
+        <button class="carousel-btn prev" id="pm-prev" onclick="carouselMove(-1)" style="display:none">&#8249;</button>
+        <button class="carousel-btn next" id="pm-next" onclick="carouselMove(1)" style="display:none">&#8250;</button>
+        <div class="carousel-dots" id="pm-dots"></div>
+      </div>
+    </div>
+    <div class="prod-modal-info">
+      <div class="pm-cat" id="pm-cat"></div>
+      <div class="pm-name" id="pm-name"></div>
+      <div class="pm-price" id="pm-price"></div>
+      <div class="pm-desc" id="pm-desc"></div>
+      <div id="pm-cuotas-info" style="display:none;font-size:13px;color:var(--rose);font-weight:500;background:var(--rose-pale);padding:7px 12px;border-radius:var(--radius-sm);border:1px solid var(--rose-light)"></div>
+      <div id="pm-colores-section" style="display:none">
+        <div class="pm-section-label" style="margin-bottom:8px">Elegí el color</div>
+        <div id="pm-colores" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px"></div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="pm-section-label">Elegí tu talla</div>
+        <button onclick="openGuiaModal()" style="font-size:11px;color:var(--rose);background:none;border:none;cursor:pointer;text-decoration:underline">🔍 Encontrá tu talle</button>
+      </div>
+        <div class="tallas-grid" id="pm-tallas"></div>
+      </div>
+      <div id="pm-resenas-section" style="border-top:1px solid var(--border);padding-top:12px">
+        <div style="font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-mid);margin-bottom:8px">Reseñas</div>
+        <div id="pm-resenas-list" style="max-height:120px;overflow-y:auto;margin-bottom:8px"></div>
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <input type="text" id="pm-resena-nombre" placeholder="Tu nombre (opcional)" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:var(--surface-2);outline:none">
+        </div>
+        <div style="display:flex;gap:6px">
+          <input type="text" id="pm-resena-input" placeholder="Dejá tu opinión..." style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:var(--surface-2);outline:none">
+          <div style="display:flex;gap:2px" id="pm-stars">
+            <span class="star-btn" data-v="1" style="cursor:pointer;font-size:22px;color:var(--border-strong)">★</span>
+            <span class="star-btn" data-v="2" style="cursor:pointer;font-size:22px;color:var(--border-strong)">★</span>
+            <span class="star-btn" data-v="3" style="cursor:pointer;font-size:22px;color:var(--border-strong)">★</span>
+            <span class="star-btn" data-v="4" style="cursor:pointer;font-size:22px;color:var(--border-strong)">★</span>
+            <span class="star-btn" data-v="5" style="cursor:pointer;font-size:22px;color:var(--border-strong)">★</span>
+          </div>
+          <input type="hidden" id="pm-stars-val" value="0">
+          <button id="pm-resena-submit" style="padding:7px 12px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">Enviar</button>
+        </div>
+      </div>
+      <div class="pm-actions">
+        <button class="pm-close" onclick="closeProdModal()">Cerrar</button>
+        <button style="padding:13px 14px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;transition:all var(--tr)" onclick="compartirProducto()" title="Compartir por WhatsApp">↗ Compartir</button>
+        <button class="pm-add-btn" id="pm-add-btn" onclick="addFromModal()">Agregar al carrito</button>
+      </div>
+      <!-- PRODUCTOS RELACIONADOS -->
+      <div id="pm-relacionados" style="border-top:1px solid var(--border);padding:14px 0 4px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);margin-bottom:10px">También te puede gustar</div>
+        <div id="pm-relacionados-grid" style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<a href="https://wa.me/541162620304?text=Hola!%20Vi%20su%20tienda%20y%20quisiera%20consultar%20sobre%20sus%20productos%20%F0%9F%8C�" target="_blank" style="position:fixed;bottom:2rem;right:2rem;z-index:9998;width:56px;height:56px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,211,102,0.4);transition:transform 0.2s ease;text-decoration:none" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#fff" width="30" height="30">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+<!-- end admin-tab-admin -->
+  <!-- TAB PEDIDOS -->
+  <div id="admin-tab-pedidos" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
+      <div class="admin-title" style="margin-bottom:0">📦 Pedidos</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="exportarPedidosExcel()" style="padding:8px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">↓ Exportar Excel</button>
+        <select id="filtro-estado-pedido" onchange="renderPedidos()" style="padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer">
+          <option value="todos">Todos los estados</option>
+          <option value="aprobado">Aprobados</option>
+          <option value="pendiente">Pendientes</option>
+          <option value="fallido">Fallidos</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem">
+      <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-size:22px;font-weight:500;color:var(--ink)" id="stat-total-pedidos">0</div>
+        <div style="font-size:12px;color:var(--ink-light)">Total pedidos</div>
+      </div>
+      <div style="background:#EAF3DE;border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-size:22px;font-weight:500;color:#3B6D11" id="stat-aprobados">0</div>
+        <div style="font-size:12px;color:#3B6D11">Aprobados</div>
+      </div>
+      <div style="background:var(--rose-pale);border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:400;color:var(--rose)" id="stat-total-ventas">$0</div>
+        <div style="font-size:12px;color:var(--ink-light)">Total vendido</div>
+      </div>
+      <div style="background:#FFF5F5;border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-size:22px;font-weight:500;color:#E24B4A" id="stat-pendientes">0</div>
+        <div style="font-size:12px;color:#E24B4A">Pendientes</div>
+      </div>
+    </div>
+    <div id="pedidos-list" style="display:flex;flex-direction:column;gap:10px">
+      <div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">Cargando pedidos...</div>
+    </div>
+  </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-
 <script>
-var searchQuery = ''; // declared early to avoid hoisting issues
-
 // EmailJS init
 try { emailjs.init('aIVvakD_ibBlrMGTF'); } catch(e) { console.warn('EmailJS not loaded'); }
 
@@ -1223,8 +1360,8 @@ const ADMIN_PASS = "diamantina2024";
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-products = [];
-cart = JSON.parse(localStorage.getItem('diamantina_cart') || '[]');
+let products = [];
+let cart = JSON.parse(localStorage.getItem('diamantina_cart') || '[]');
 let activeFilter = 'Todas';
 let currentProd = null;
 let selectedTalla = null;
@@ -1587,10 +1724,6 @@ function renderPage(list, el, reset) {
 
 
 // ── OFERTAS ──
-window.ofertasScroll = function(dir) {
-  const el = document.getElementById('ofertas-grid');
-  if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
-};
 window.renderOfertas = function() {
   const ofertasList = products.filter(p => p.descuento > 0 && p.estado !== 'agotado' && (!searchQuery || p.name.toLowerCase().includes(searchQuery) || p.cat.toLowerCase().includes(searchQuery)));
   const el = document.getElementById('ofertas-grid');
@@ -2406,8 +2539,7 @@ window.calcularTalle = function() {
 };
 
 // Close on background click
-const _guiaBg = document.getElementById('guia-modal-bg');
-if (_guiaBg) _guiaBg.addEventListener('click', function(e) {
+document.getElementById('guia-modal-bg').addEventListener('click', function(e) {
   if (e.target === this) closeGuiaModal();
 });
 
@@ -2695,6 +2827,7 @@ window.submitResena = async function() {
 };
 
 // ── BUSCADOR ──
+let searchQuery = '';
 window.buscarProductos = function(q) { searchQuery = q.toLowerCase().trim(); renderCatalog(); renderOfertas(); };
 window.limpiarBusqueda = function() {
   const el = document.getElementById('buscador-tienda');
@@ -3216,7 +3349,7 @@ loadVisitasAdmin();
 };
 
 // ── CUPONES ──
-cuponActivo = null;
+let cuponActivo = null;
 
 window.aplicarCupon = async function() {
   const code = document.getElementById('cupon-input').value.trim().toUpperCase();
@@ -3264,7 +3397,7 @@ function detectarZona(cp) {
   return 'Interior';
 }
 
-envioSeleccionado = null;
+let envioSeleccionado = null;
 
 window.calcularEnvio = function() {
   const cp = document.getElementById('cp-input').value.trim();
@@ -3449,174 +3582,12 @@ loadIgFeed();
 // Navigate to correct page after init
 showPage(_returnPage);
 // Hide loader
-function hideLoader() {
-  const _loader = document.getElementById('page-loader');
-  if (_loader) { _loader.style.opacity = '0'; setTimeout(() => { if(_loader && _loader.parentNode) _loader.parentNode.removeChild(_loader); }, 350); }
-}
-hideLoader();
-setTimeout(hideLoader, 2000);
-setTimeout(() => { const l = document.getElementById('page-loader'); if(l) l.parentNode && l.parentNode.removeChild(l); }, 4000);
+const _loader = document.getElementById('page-loader');
+if (_loader) { _loader.style.opacity = '0'; _loader.style.transition = 'opacity 0.4s'; setTimeout(() => _loader.remove(), 400); }
 // Set loader logo
 const _navLogo = document.getElementById('nav-logo-img');
 const _loaderLogo = document.getElementById('loader-logo');
 if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
 </script>
 </div><!-- close page-admin -->
-
-<!-- PRODUCT MODAL -->
-<div class="modal-bg" id="prod-modal-bg" onclick="if(event.target===this)closeProdModal()">
-  <div class="prod-modal">
-    <div class="prod-modal-img">
-      <div class="carousel-wrap" id="pm-carousel">
-        <img class="carousel-img active" id="pm-img" src="" alt="" style="transition:opacity 0.2s ease">
-        <button class="carousel-btn prev" id="pm-prev" onclick="carouselMove(-1)" style="display:none">&#8249;</button>
-        <button class="carousel-btn next" id="pm-next" onclick="carouselMove(1)" style="display:none">&#8250;</button>
-        <div class="carousel-dots" id="pm-dots"></div>
-      </div>
-    </div>
-    <div class="prod-modal-info">
-      <div class="pm-cat" id="pm-cat"></div>
-      <div class="pm-name" id="pm-name"></div>
-      <div class="pm-price" id="pm-price"></div>
-      <div class="pm-desc" id="pm-desc"></div>
-      <div id="pm-cuotas-info" style="display:none;font-size:13px;color:var(--rose);font-weight:500;background:var(--rose-pale);padding:7px 12px;border-radius:var(--radius-sm);border:1px solid var(--rose-light)"></div>
-      <div id="pm-colores-section" style="display:none">
-        <div class="pm-section-label" style="margin-bottom:8px">Elegí el color</div>
-        <div id="pm-colores" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px"></div>
-      </div>
-      <div>
-        <div style="display:flex;align-items:center;justify-content:space-between">
-        <div class="pm-section-label">Elegí tu talla</div>
-        <button onclick="openGuiaModal()" style="font-size:11px;color:var(--rose);background:none;border:none;cursor:pointer;text-decoration:underline">🔍 Encontrá tu talle</button>
-      </div>
-        <div class="tallas-grid" id="pm-tallas"></div>
-      </div>
-      <div id="pm-resenas-section" style="border-top:1px solid var(--border);padding-top:12px">
-        <div style="font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-mid);margin-bottom:8px">Reseñas</div>
-        <div id="pm-resenas-list" style="max-height:120px;overflow-y:auto;margin-bottom:8px"></div>
-        <div style="display:flex;gap:6px;margin-bottom:6px">
-          <input type="text" id="pm-resena-nombre" placeholder="Tu nombre (opcional)" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:var(--surface-2);outline:none">
-        </div>
-        <div style="display:flex;gap:6px">
-          <input type="text" id="pm-resena-input" placeholder="Dejá tu opinión..." style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:var(--surface-2);outline:none">
-          <div style="display:flex;gap:2px" id="pm-stars">
-            <span class="star-btn" data-v="1" style="cursor:pointer;font-size:22px;color:var(--border-strong)">★</span>
-            <span class="star-btn" data-v="2" style="cursor:pointer;font-size:22px;color:var(--border-strong)">★</span>
-            <span class="star-btn" data-v="3" style="cursor:pointer;font-size:22px;color:var(--border-strong)">★</span>
-            <span class="star-btn" data-v="4" style="cursor:pointer;font-size:22px;color:var(--border-strong)">★</span>
-            <span class="star-btn" data-v="5" style="cursor:pointer;font-size:22px;color:var(--border-strong)">★</span>
-          </div>
-          <input type="hidden" id="pm-stars-val" value="0">
-          <button id="pm-resena-submit" style="padding:7px 12px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">Enviar</button>
-        </div>
-      </div>
-      <div class="pm-actions">
-        <button class="pm-close" onclick="closeProdModal()">Cerrar</button>
-        <button style="padding:13px 14px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;transition:all var(--tr)" onclick="compartirProducto()" title="Compartir por WhatsApp">↗ Compartir</button>
-        <button class="pm-add-btn" id="pm-add-btn" onclick="addFromModal()">Agregar al carrito</button>
-      </div>
-      <!-- PRODUCTOS RELACIONADOS -->
-      <div id="pm-relacionados" style="border-top:1px solid var(--border);padding:14px 0 4px">
-        <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);margin-bottom:10px">También te puede gustar</div>
-        <div id="pm-relacionados-grid" style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-
-<a href="https://wa.me/541162620304?text=Hola!%20Vi%20su%20tienda%20y%20quisiera%20consultar%20sobre%20sus%20productos%20%F0%9F%8C�" target="_blank" style="position:fixed;bottom:2rem;right:2rem;z-index:9998;width:56px;height:56px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,211,102,0.4);transition:transform 0.2s ease;text-decoration:none" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#fff" width="30" height="30">
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-  </svg>
-</a>
-<!-- end admin-tab-admin -->
-  <!-- TAB PEDIDOS -->
-  <div id="admin-tab-pedidos" style="display:none">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
-      <div class="admin-title" style="margin-bottom:0">📦 Pedidos</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="exportarPedidosExcel()" style="padding:8px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">↓ Exportar Excel</button>
-        <select id="filtro-estado-pedido" onchange="renderPedidos()" style="padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer">
-          <option value="todos">Todos los estados</option>
-          <option value="aprobado">Aprobados</option>
-          <option value="pendiente">Pendientes</option>
-          <option value="fallido">Fallidos</option>
-        </select>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem">
-      <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:1rem;text-align:center">
-        <div style="font-size:22px;font-weight:500;color:var(--ink)" id="stat-total-pedidos">0</div>
-        <div style="font-size:12px;color:var(--ink-light)">Total pedidos</div>
-      </div>
-      <div style="background:#EAF3DE;border-radius:var(--radius-sm);padding:1rem;text-align:center">
-        <div style="font-size:22px;font-weight:500;color:#3B6D11" id="stat-aprobados">0</div>
-        <div style="font-size:12px;color:#3B6D11">Aprobados</div>
-      </div>
-      <div style="background:var(--rose-pale);border-radius:var(--radius-sm);padding:1rem;text-align:center">
-        <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:400;color:var(--rose)" id="stat-total-ventas">$0</div>
-        <div style="font-size:12px;color:var(--ink-light)">Total vendido</div>
-      </div>
-      <div style="background:#FFF5F5;border-radius:var(--radius-sm);padding:1rem;text-align:center">
-        <div style="font-size:22px;font-weight:500;color:#E24B4A" id="stat-pendientes">0</div>
-        <div style="font-size:12px;color:#E24B4A">Pendientes</div>
-      </div>
-    </div>
-    <div id="pedidos-list" style="display:flex;flex-direction:column;gap:10px">
-      <div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">Cargando pedidos...</div>
-    </div>
-  </div>
-
-
-<!-- GUÍA DE TALLES INTELIGENTE -->
-<div id="guia-modal-bg" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(26,17,24,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:var(--radius);max-width:480px;width:90%;max-height:90vh;overflow-y:auto;padding:2rem;position:relative;box-shadow:0 24px 80px rgba(26,17,24,0.2)">
-    <button onclick="closeGuiaModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:20px;color:var(--ink-light);cursor:pointer">✕</button>
-    <div style="font-family:Cormorant Garamond,serif;font-size:26px;font-weight:300;font-style:italic;color:var(--ink);margin-bottom:4px">Encontrá tu talle</div>
-    <div style="font-size:13px;color:var(--ink-light);margin-bottom:1.5rem">Ingresá tus medidas en centímetros</div>
-
-    <div style="background:var(--rose-pale);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem;font-size:12px;color:var(--ink-mid);line-height:1.7">
-      📏 <strong>¿Cómo medirte?</strong><br>
-      • <strong>Busto:</strong> pasá la cinta por la parte más ancha del pecho<br>
-      • <strong>Cintura:</strong> medí en la parte más angosta del torso<br>
-      • <strong>Cadera:</strong> pasá la cinta por la parte más ancha de las caderas
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:1.5rem">
-      <div>
-        <label style="font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink-mid);display:block;margin-bottom:6px">Busto (cm)</label>
-        <input type="number" id="guia-busto" min="60" max="140" placeholder="ej: 88" oninput="calcularTalle()" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:16px;text-align:center;color:var(--ink);outline:none;transition:border-color 0.2s">
-      </div>
-      <div>
-        <label style="font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink-mid);display:block;margin-bottom:6px">Cintura (cm)</label>
-        <input type="number" id="guia-cintura" min="50" max="130" placeholder="ej: 70" oninput="calcularTalle()" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:16px;text-align:center;color:var(--ink);outline:none;transition:border-color 0.2s">
-      </div>
-      <div>
-        <label style="font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink-mid);display:block;margin-bottom:6px">Cadera (cm)</label>
-        <input type="number" id="guia-cadera" min="60" max="150" placeholder="ej: 96" oninput="calcularTalle()" style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:16px;text-align:center;color:var(--ink);outline:none;transition:border-color 0.2s">
-      </div>
-    </div>
-
-    <div id="guia-resultado" style="display:none">
-      <div style="font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-mid);margin-bottom:12px">Tu talle recomendado</div>
-      <div id="guia-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem"></div>
-      <div id="guia-tip" style="background:var(--surface-2);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--ink-mid);line-height:1.6"></div>
-    </div>
-
-    <div id="guia-placeholder" style="text-align:center;padding:1.5rem;color:var(--ink-light)">
-      <div style="font-size:32px;margin-bottom:8px;opacity:0.3">📐</div>
-      <div style="font-size:13px">Ingresá tus medidas para ver tu talle</div>
-    </div>
-
-    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:center">
-      <a href="https://wa.me/541162620304?text=Hola!%20Necesito%20ayuda%20para%20elegir%20mi%20talle" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:#25D366;border-radius:999px;color:#fff;font-size:13px;font-weight:500;text-decoration:none">
-        <svg viewBox="0 0 24 24" fill="#fff" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Consultar por WhatsApp
-      </a>
-      <button onclick="closeGuiaModal()" style="padding:9px 18px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">Cerrar</button>
-    </div>
-  </div>
-</div>
-
 </body>
