@@ -1330,8 +1330,9 @@ loadVisitasAdmin();
       }
       cart.forEach(item => {
         if (!item.prodId) return;
-        const _stockKeyDown = (item.talla && item.talla !== '—' && item.color)
-          ? (item.talla + '__' + item.color)
+        const _colorName = item.color && typeof item.color === 'object' ? (item.color.nombre || item.color.hex || '') : (item.color || '');
+        const _stockKeyDown = (item.talla && item.talla !== '—' && _colorName)
+          ? (item.talla + '__' + _colorName)
           : (item.talla && item.talla !== '—' ? item.talla : null);
         if (!_stockKeyDown) return;
         db.ref('productos/' + item.prodId + '/stock/' + _stockKeyDown).get().then(snap => {
@@ -2591,8 +2592,8 @@ window.renderPedidos = async function() {
   document.getElementById('stat-pendientes').textContent = pendientes.length;
   document.getElementById('stat-total-ventas').textContent = '$' + totalVentas.toLocaleString('es-AR');
   if (!pedidos.length) { el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">No hay pedidos todavía</div>'; return; }
-  const estadoColor = { aprobado:'#3B6D11', pendiente:'#BA7517', fallido:'#A32D2D' };
-  const estadoBg = { aprobado:'#EAF3DE', pendiente:'#FAEEDA', fallido:'#FCEBEB' };
+  const estadoColor = { aprobado:'#3B6D11', pendiente:'#BA7517', fallido:'#A32D2D', enviado:'#1565C0', entregado:'#1B5E20', cancelado:'#888780' };
+  const estadoBg = { aprobado:'#EAF3DE', pendiente:'#FAEEDA', fallido:'#FCEBEB', enviado:'#E3F0FB', entregado:'#EAF3DE', cancelado:'#F5F5F5' };
   el.innerHTML = pedidos.map(p => `
     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
@@ -2600,9 +2601,17 @@ window.renderPedidos = async function() {
           <div style="font-size:13px;font-weight:500;color:var(--ink)">${p.nombre||'Cliente'}</div>
           <div style="font-size:11px;color:var(--ink-light)">${new Date(p.ts).toLocaleString('es-AR')}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="background:${estadoBg[p.estado]||'#F7F0F5'};color:${estadoColor[p.estado]||'var(--ink-mid)'};font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px">${p.estado||'—'}</span>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <select onchange="cambiarEstadoPedido('${p.id}',this.value)" style="font-size:11px;font-weight:500;padding:3px 8px;border-radius:999px;border:1px solid var(--border-strong);background:${estadoBg[p.estado]||'#F7F0F5'};color:${estadoColor[p.estado]||'var(--ink-mid)'};cursor:pointer;font-family:DM Sans,sans-serif;outline:none">
+            <option value="aprobado" ${p.estado==='aprobado'?'selected':''}>aprobado</option>
+            <option value="pendiente" ${p.estado==='pendiente'?'selected':''}>pendiente</option>
+            <option value="enviado" ${p.estado==='enviado'?'selected':''}>enviado</option>
+            <option value="entregado" ${p.estado==='entregado'?'selected':''}>entregado</option>
+            <option value="fallido" ${p.estado==='fallido'?'selected':''}>fallido</option>
+            <option value="cancelado" ${p.estado==='cancelado'?'selected':''}>cancelado</option>
+          </select>
           <span style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--rose)">$${(p.total||0).toLocaleString('es-AR')}</span>
+          <button onclick="borrarPedido('${p.id}')" style="background:none;border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:3px 8px;font-size:11px;color:#A32D2D;cursor:pointer;font-family:DM Sans,sans-serif" title="Borrar pedido">✕ Borrar</button>
         </div>
       </div>
       <div style="font-size:12px;color:var(--ink-mid);border-top:1px solid var(--border);padding-top:8px">
@@ -2617,6 +2626,19 @@ window.renderPedidos = async function() {
       ${p.envio ? '<div style="font-size:11px;color:var(--ink-light);margin-top:2px">📦 Envío: '+p.envio+'</div>' : ''}
     </div>
   `).join('');
+};
+
+window.cambiarEstadoPedido = async function(id, nuevoEstado) {
+  await db.ref('pedidos/' + id).update({ estado: nuevoEstado });
+  showToast('Estado actualizado: ' + nuevoEstado);
+  renderPedidos();
+};
+
+window.borrarPedido = async function(id) {
+  if (!confirm('¿Borrar este pedido? No se puede deshacer.')) return;
+  await db.ref('pedidos/' + id).remove();
+  showToast('Pedido borrado');
+  renderPedidos();
 };
 
 window.exportarPedidosExcel = async function() {
