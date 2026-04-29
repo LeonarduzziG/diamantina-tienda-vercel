@@ -1270,8 +1270,8 @@ loadVisitasAdmin();
     document.getElementById('page-favoritos').style.display = 'block';
     renderFavoritos();
   } else if (page === 'success') {
-    document.getElementById('page-success').style.display = 'block';
-    document.getElementById('page-success').classList.add('open');
+    const _sel = document.getElementById('page-success');
+    if (_sel) { _sel.style.display = 'block'; _sel.classList.add('open'); }
     console.log('SUCCESS PAGE triggered, URL:', window.location.href);
     if (!cart.length) {
       try { cart = JSON.parse(localStorage.getItem('diamantina_cart_pending') || '[]'); } catch(e) {}
@@ -1339,7 +1339,8 @@ loadVisitasAdmin();
     cart = []; saveCart(); updateCartUI();
     localStorage.removeItem('diamantina_cart_pending');
   } else if (page === 'error') {
-    document.getElementById('page-error').style.display = 'block';
+    const _eel = document.getElementById('page-error');
+    if (_eel) { _eel.style.display = 'block'; }
     document.getElementById('page-error').classList.add('open');
   }
 };
@@ -3542,7 +3543,12 @@ updateFavUI();
 updateCartUI();
 loadIgFeed();
 // Navigate to correct page after init
-showPage(_returnPage);
+// Navigate after DOM is fully ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => showPage(_returnPage));
+} else {
+  showPage(_returnPage);
+}
 // Hide loader
 function hideLoader() {
   const _loader = document.getElementById('page-loader');
