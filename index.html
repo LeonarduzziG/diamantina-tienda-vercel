@@ -1884,7 +1884,7 @@ window.addFromModal = function() {
   if (!currentProd) return;
   if ((currentProd.tallas||[]).length > 0 && !selectedTalla) { showToast('Elegí una talla primero', 'error'); return; }
   const prodColores = Array.isArray(currentProd.colores) ? currentProd.colores : Object.values(currentProd.colores||{});
-  if (prodColores.length > 0 && !window.selectedColor) { showToast('Elegí un color primero', 'error'); return; }
+  if (prodColores.length > 0 && !window.selectedColor && window._packOption !== 'pack') { showToast('Elegí un color primero', 'error'); return; }
   if (window._packOption === 'pack' && currentProd.packQty >= 2 && currentProd.packPrice > 0) {
     // Add pack: use pack price, qty = packQty
     const packItem = { ...currentProd, price: Math.round(currentProd.packPrice / currentProd.packQty), _packLabel: 'Pack x' + currentProd.packQty };
