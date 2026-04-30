@@ -939,6 +939,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   <div style="display:flex;gap:8px;margin-bottom:1.5rem;border-bottom:2px solid var(--border);padding-bottom:0">
     <button id="atab-admin" onclick="switchAdminTab('admin')" style="padding:10px 18px;border:none;border-bottom:3px solid var(--rose);background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--rose);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">⚙️ Administración</button>
     <button id="atab-pedidos" onclick="switchAdminTab('pedidos')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">📦 Pedidos</button>
+    <button id="atab-config" onclick="switchAdminTab('config')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">🎨 Tienda</button>
   </div>
   <!-- TAB ADMIN -->
   <div id="admin-tab-admin">
@@ -1356,8 +1357,49 @@ window.showAdminPrompt = function() {
   else if (pass !== null) showToast('Contraseña incorrecta', 'error');
 };
 
+window.loadConfig = function() {
+  db.ref('config/hero').once('value').then(snap => {
+    const d = snap.val() || {};
+    const titleRaw = d.title || 'Lencería [em]fina[/em]<br>para vos';
+    const sub = d.sub || 'Piezas únicas con el mejor confort y estilo para cada momento.';
+    const titleEl = document.getElementById('config-hero-title');
+    const subEl = document.getElementById('config-hero-sub');
+    if (titleEl) titleEl.value = titleRaw;
+    if (subEl) subEl.value = sub;
+    updateConfigPreview(titleRaw);
+    // Live preview on type
+    if (titleEl) titleEl.addEventListener('input', () => updateConfigPreview(titleEl.value));
+  });
+};
+
+function updateConfigPreview(raw) {
+  const el = document.getElementById('config-preview');
+  if (!el) return;
+  el.innerHTML = raw.replace(/\[em\](.*?)\[\/em\]/g, '<em style="font-style:italic;color:var(--rose)">$1</em>').replace(/<br>/g, '<br>');
+}
+
+window.guardarConfig = function() {
+  const titleRaw = document.getElementById('config-hero-title').value.trim();
+  const sub = document.getElementById('config-hero-sub').value.trim();
+  if (!titleRaw) return;
+  db.ref('config/hero').set({ title: titleRaw, sub }).then(() => {
+    // Apply to page immediately
+    applyHeroConfig({ title: titleRaw, sub });
+    const ok = document.getElementById('config-save-ok');
+    if (ok) { ok.style.display = 'block'; setTimeout(() => ok.style.display = 'none', 2000); }
+    showToast('Configuración guardada ✦');
+  });
+};
+
+function applyHeroConfig(d) {
+  const titleEl = document.querySelector('.hero-title');
+  const subEl = document.querySelector('.hero-sub');
+  if (titleEl && d.title) titleEl.innerHTML = d.title.replace(/\[em\](.*?)\[\/em\]/g, '<em>$1</em>').replace(/<br>/g, '<br>');
+  if (subEl && d.sub) subEl.textContent = d.sub;
+}
+
 window.switchAdminTab = function(tab) {
-  const tabs = ['admin','pedidos'];
+  const tabs = ['admin','pedidos','config'];
   tabs.forEach(t => {
     const btn = document.getElementById('atab-' + t);
     const panel = document.getElementById('admin-tab-' + t);
@@ -1365,6 +1407,7 @@ window.switchAdminTab = function(tab) {
     if (panel) panel.style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'pedidos') renderPedidos();
+  if (tab === 'config') loadConfig();
 };
 
 window.toggleMobileMenu = function() {
@@ -3563,6 +3606,8 @@ function loadUser() {
 }
 loadUser();
 loadBanner();
+// Load hero config from Firebase
+db.ref('config/hero').once('value').then(snap => { if (snap.val()) applyHeroConfig(snap.val()); });
 registrarVisita();
 loadEnvioConfig();
 loadFavs();
@@ -3698,6 +3743,35 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
   </svg>
 </a>
 <!-- end admin-tab-admin -->
+
+  <!-- TAB CONFIG -->
+  <div id="admin-tab-config" style="display:none">
+    <div class="admin-title" style="margin-bottom:1.5rem">🎨 Configuración de la tienda</div>
+
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.5rem;max-width:600px;display:flex;flex-direction:column;gap:1.2rem">
+
+      <div>
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:6px">Título principal (hero)</div>
+        <div style="font-size:11px;color:var(--ink-light);margin-bottom:8px">Usá [em]texto[/em] para la parte en cursiva rosada. Ej: Lencería [em]fina[/em]&lt;br&gt;para vos</div>
+        <textarea id="config-hero-title" rows="2" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;resize:vertical;box-sizing:border-box" placeholder="Ej: Lencería [em]fina[/em]&lt;br&gt;para vos"></textarea>
+      </div>
+
+      <div>
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:6px">Frase debajo del título</div>
+        <textarea id="config-hero-sub" rows="2" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;resize:vertical;box-sizing:border-box" placeholder="Ej: Piezas únicas con el mejor confort y estilo para cada momento."></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <button onclick="guardarConfig()" style="padding:10px 24px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;cursor:pointer">Guardar cambios ✦</button>
+        <div id="config-save-ok" style="display:none;font-size:13px;color:#3B6D11">✓ Guardado</div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:1rem">
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:8px">Vista previa del título</div>
+        <div id="config-preview" style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--ink);line-height:1.2;padding:12px 0"></div>
+      </div>
+    </div>
+  </div>
   <!-- TAB PEDIDOS -->
   <div id="admin-tab-pedidos" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
