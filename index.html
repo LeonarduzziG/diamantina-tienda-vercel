@@ -1357,36 +1357,55 @@ window.showAdminPrompt = function() {
   else if (pass !== null) showToast('Contraseña incorrecta', 'error');
 };
 
+window._waNumber = '541162620304';
+
 window.loadConfig = function() {
-  db.ref('config/hero').once('value').then(snap => {
-    const d = snap.val() || {};
-    const titleRaw = d.title || 'Lencería [em]fina[/em]<br>para vos';
-    const sub = d.sub || 'Piezas únicas con el mejor confort y estilo para cada momento.';
-    const titleEl = document.getElementById('config-hero-title');
-    const subEl = document.getElementById('config-hero-sub');
-    if (titleEl) titleEl.value = titleRaw;
-    if (subEl) subEl.value = sub;
+  db.ref('config').once('value').then(snap => {
+    const cfg = snap.val() || {};
+    const hero = cfg.hero || {};
+    const ap = cfg.apariencia || {};
+    const titleRaw = hero.title || 'Lencería [em]fina[/em]<br>para vos';
+    const sub = hero.sub || 'Piezas únicas con el mejor confort y estilo para cada momento.';
+    const t = document.getElementById('config-hero-title');
+    const s = document.getElementById('config-hero-sub');
+    const a = document.getElementById('config-aviso');
+    const c = document.getElementById('config-color');
+    const b = document.getElementById('config-hero-bg');
+    const w = document.getElementById('config-wa');
+    if (t) t.value = titleRaw;
+    if (s) s.value = sub;
+    if (a) a.value = hero.aviso || '';
+    if (c) { c.value = ap.color || '#C94F7C'; document.getElementById('config-color-label').textContent = ap.color || '#C94F7C'; }
+    if (b) b.value = ap.heroBg || '';
+    if (w) w.value = ap.wa || '541162620304';
     updateConfigPreview(titleRaw);
-    // Live preview on type
-    if (titleEl) titleEl.addEventListener('input', () => updateConfigPreview(titleEl.value));
   });
 };
 
 function updateConfigPreview(raw) {
   const el = document.getElementById('config-preview');
   if (!el) return;
-  el.innerHTML = raw.replace(/\[em\](.*?)\[\/em\]/g, '<em style="font-style:italic;color:var(--rose)">$1</em>').replace(/<br>/g, '<br>');
+  el.innerHTML = raw.replace(/\[em\](.*?)\[\/em\]/g, '<em style="font-style:italic;color:var(--rose)">$1</em>');
 }
 
+window.previewColor = function(val) {
+  document.getElementById('config-color-label').textContent = val;
+  document.getElementById('config-color-preview').style.background = val;
+  document.documentElement.style.setProperty('--rose', val);
+};
+
 window.guardarConfig = function() {
-  const titleRaw = document.getElementById('config-hero-title').value.trim();
-  const sub = document.getElementById('config-hero-sub').value.trim();
-  if (!titleRaw) return;
-  db.ref('config/hero').set({ title: titleRaw, sub }).then(() => {
-    // Apply to page immediately
-    applyHeroConfig({ title: titleRaw, sub });
+  const titleRaw = document.getElementById('config-hero-title')?.value.trim() || '';
+  const sub = document.getElementById('config-hero-sub')?.value.trim() || '';
+  const aviso = document.getElementById('config-aviso')?.value.trim() || '';
+  const color = document.getElementById('config-color')?.value || '#C94F7C';
+  const heroBg = document.getElementById('config-hero-bg')?.value.trim() || '';
+  const wa = document.getElementById('config-wa')?.value.trim() || '541162620304';
+  db.ref().update({ 'config/hero': { title: titleRaw, sub, aviso }, 'config/apariencia': { color, heroBg, wa } }).then(() => {
+    applyHeroConfig({ title: titleRaw, sub, aviso });
+    applyApariencia({ color, heroBg, wa });
     const ok = document.getElementById('config-save-ok');
-    if (ok) { ok.style.display = 'block'; setTimeout(() => ok.style.display = 'none', 2000); }
+    if (ok) { ok.style.display = 'block'; setTimeout(() => ok.style.display = 'none', 2500); }
     showToast('Configuración guardada ✦');
   });
 };
@@ -1394,8 +1413,19 @@ window.guardarConfig = function() {
 function applyHeroConfig(d) {
   const titleEl = document.querySelector('.hero-title');
   const subEl = document.querySelector('.hero-sub');
-  if (titleEl && d.title) titleEl.innerHTML = d.title.replace(/\[em\](.*?)\[\/em\]/g, '<em>$1</em>').replace(/<br>/g, '<br>');
+  if (titleEl && d.title) titleEl.innerHTML = d.title.replace(/\[em\](.*?)\[\/em\]/g, '<em>$1</em>');
   if (subEl && d.sub) subEl.textContent = d.sub;
+  let av = document.getElementById('aviso-temporal');
+  if (d.aviso) {
+    if (!av) { av = document.createElement('div'); av.id = 'aviso-temporal'; av.style.cssText = 'text-align:center;padding:10px 20px;background:var(--rose-pale);color:var(--rose);font-size:13px;font-weight:500'; const hero = document.querySelector('.hero'); if (hero) hero.after(av); }
+    av.textContent = d.aviso; av.style.display = 'block';
+  } else if (av) av.style.display = 'none';
+}
+
+function applyApariencia(d) {
+  if (d.color) document.documentElement.style.setProperty('--rose', d.color);
+  if (d.heroBg) { const hero = document.querySelector('.hero'); if (hero) { hero.style.backgroundImage = 'url(' + d.heroBg + ')'; hero.style.backgroundSize = 'cover'; hero.style.backgroundPosition = 'center'; } }
+  if (d.wa) window._waNumber = d.wa;
 }
 
 window.switchAdminTab = function(tab) {
@@ -3606,8 +3636,12 @@ function loadUser() {
 }
 loadUser();
 loadBanner();
-// Load hero config from Firebase
-db.ref('config/hero').once('value').then(snap => { if (snap.val()) applyHeroConfig(snap.val()); });
+// Load config from Firebase on init
+db.ref('config').once('value').then(snap => {
+  const cfg = snap.val() || {};
+  if (cfg.hero) applyHeroConfig(cfg.hero);
+  if (cfg.apariencia) applyApariencia(cfg.apariencia);
+});
 registrarVisita();
 loadEnvioConfig();
 loadFavs();
@@ -3747,29 +3781,65 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
   <!-- TAB CONFIG -->
   <div id="admin-tab-config" style="display:none">
     <div class="admin-title" style="margin-bottom:1.5rem">🎨 Configuración de la tienda</div>
+    <div style="max-width:640px;display:flex;flex-direction:column;gap:1.2rem">
 
-    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.5rem;max-width:600px;display:flex;flex-direction:column;gap:1.2rem">
-
-      <div>
-        <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:6px">Título principal (hero)</div>
-        <div style="font-size:11px;color:var(--ink-light);margin-bottom:8px">Usá [em]texto[/em] para la parte en cursiva rosada. Ej: Lencería [em]fina[/em]&lt;br&gt;para vos</div>
-        <textarea id="config-hero-title" rows="2" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;resize:vertical;box-sizing:border-box" placeholder="Ej: Lencería [em]fina[/em]&lt;br&gt;para vos"></textarea>
+      <!-- CONTENIDO -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.5rem">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:1.2rem;padding-bottom:8px;border-bottom:1px solid var(--border)">📝 Contenido</div>
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">Título principal</div>
+            <div style="font-size:11px;color:var(--ink-light);margin-bottom:6px">Usá [em]texto[/em] para la parte en cursiva rosada. Usá &lt;br&gt; para salto de línea.</div>
+            <textarea id="config-hero-title" rows="2" oninput="updateConfigPreview(this.value)" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;resize:vertical;box-sizing:border-box"></textarea>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">Frase debajo del título</div>
+            <textarea id="config-hero-sub" rows="2" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;resize:vertical;box-sizing:border-box"></textarea>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">Aviso temporal (aparece debajo del hero)</div>
+            <div style="font-size:11px;color:var(--ink-light);margin-bottom:6px">Dejá vacío para ocultarlo.</div>
+            <input type="text" id="config-aviso" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;box-sizing:border-box" placeholder="Ej: Cerrado por vacaciones del 15 al 20 🌴">
+          </div>
+          <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:12px 14px">
+            <div style="font-size:11px;color:var(--ink-mid);margin-bottom:6px">Vista previa del título:</div>
+            <div id="config-preview" style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--ink);line-height:1.2"></div>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:6px">Frase debajo del título</div>
-        <textarea id="config-hero-sub" rows="2" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;resize:vertical;box-sizing:border-box" placeholder="Ej: Piezas únicas con el mejor confort y estilo para cada momento."></textarea>
+      <!-- APARIENCIA -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.5rem">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:1.2rem;padding-bottom:8px;border-bottom:1px solid var(--border)">🎨 Apariencia</div>
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">Color principal</div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <input type="color" id="config-color" value="#C94F7C" oninput="previewColor(this.value)" style="width:48px;height:48px;border:none;border-radius:8px;cursor:pointer;background:none;padding:0">
+              <div>
+                <div style="font-size:13px;color:var(--ink)" id="config-color-label">#C94F7C</div>
+                <div style="font-size:11px;color:var(--ink-light)">Afecta botones, precios y acentos</div>
+              </div>
+              <div style="width:48px;height:48px;border-radius:8px;background:var(--rose)" id="config-color-preview"></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">Imagen de fondo del hero</div>
+            <div style="font-size:11px;color:var(--ink-light);margin-bottom:6px">URL de la imagen. Dejá vacío para usar el color de fondo.</div>
+            <input type="text" id="config-hero-bg" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;box-sizing:border-box" placeholder="https://...">
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">Número de WhatsApp</div>
+            <input type="text" id="config-wa" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;box-sizing:border-box" placeholder="541162620304 (sin + ni espacios)">
+          </div>
+        </div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:center">
-        <button onclick="guardarConfig()" style="padding:10px 24px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;cursor:pointer">Guardar cambios ✦</button>
-        <div id="config-save-ok" style="display:none;font-size:13px;color:#3B6D11">✓ Guardado</div>
+        <button onclick="guardarConfig()" style="padding:11px 28px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;cursor:pointer">Guardar todo ✦</button>
+        <div id="config-save-ok" style="display:none;font-size:13px;color:#3B6D11;font-weight:500">✓ Guardado correctamente</div>
       </div>
 
-      <div style="border-top:1px solid var(--border);padding-top:1rem">
-        <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:8px">Vista previa del título</div>
-        <div id="config-preview" style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--ink);line-height:1.2;padding:12px 0"></div>
-      </div>
     </div>
   </div>
   <!-- TAB PEDIDOS -->
