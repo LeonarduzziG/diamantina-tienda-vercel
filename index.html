@@ -155,6 +155,30 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 .ofertas-count{font-size:13px;color:#E24B4A;font-weight:500}
 .ofertas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
 .ofertas-carousel-wrap{position:relative}
+.nuevos-section{padding:0 2rem 2rem;background:linear-gradient(135deg,#1a0a12 0%,#2d1020 50%,#1a0a12 100%);border-bottom:none;position:relative;overflow:hidden}
+.nuevos-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(201,79,124,0.18) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(201,79,124,0.12) 0%,transparent 50%);pointer-events:none}
+.nuevos-section::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,79,124,0.6),transparent)}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}
+@keyframes pulse-glow{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:0.8;transform:scale(1.05)}}
+@keyframes float-up{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes sparkle{0%,100%{opacity:0;transform:scale(0) rotate(0deg)}50%{opacity:1;transform:scale(1) rotate(180deg)}}
+.nuevos-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(201,79,124,0.2);border:1px solid rgba(201,79,124,0.4);border-radius:999px;padding:4px 14px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(201,79,124,0.9);margin-bottom:8px;animation:float-up 0.6s ease forwards}
+.nuevos-title-wrap{animation:float-up 0.6s 0.1s ease both}
+.nuevos-section .ofertas-title{color:#fff !important;font-size:clamp(22px,4vw,36px) !important;text-shadow:0 0 40px rgba(201,79,124,0.4)}
+.nuevos-section .ofertas-count{color:rgba(255,255,255,0.5) !important}
+.nuevos-sparkle{position:absolute;pointer-events:none;animation:sparkle 2s infinite}
+.nuevos-section .prod-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(8px);transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;display:flex;flex-direction:column}
+.nuevos-section .prod-img-wrap{height:220px;overflow:hidden;flex-shrink:0}
+.nuevos-section .prod-img{width:100%;height:100%;object-fit:cover;object-position:top}
+.nuevos-section .prod-img-placeholder{height:100%;background:rgba(255,255,255,0.05)}
+.nuevos-section .prod-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,0.4),0 0 20px rgba(201,79,124,0.2);border-color:rgba(201,79,124,0.4)}
+.nuevos-section .card-name{color:#fff}
+.nuevos-section .prod-price,.nuevos-section .prod-price-discount{color:rgba(201,79,124,0.9) !important}
+.nuevos-section .prod-price-original{color:rgba(255,255,255,0.3) !important}
+.nuevos-section .prod-img{filter:brightness(0.92)}
+.nuevos-section .prod-card:hover .prod-img{filter:brightness(1)}
+.nuevos-section .ofertas-carousel-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff}
+.nuevos-section .ofertas-carousel-btn:hover{background:rgba(201,79,124,0.3)}
 .ofertas-carousel-btn{display:none;position:absolute;top:50%;transform:translateY(-50%);z-index:10;background:#fff;border:1px solid var(--border);border-radius:50%;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:16px;color:var(--ink)}
 @media(max-width:768px){
   .ofertas-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -444,6 +468,29 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
       <button class="ofertas-carousel-btn left" onclick="ofertasScroll(-1)" aria-label="Anterior">‹</button>
       <div class="ofertas-grid" id="ofertas-grid"></div>
       <button class="ofertas-carousel-btn right" onclick="ofertasScroll(1)" aria-label="Siguiente">›</button>
+    </div>
+  </div>
+
+  <!-- NUEVOS LANZAMIENTOS -->
+  <div class="nuevos-section" id="nuevos-section" style="display:none">
+    <!-- Sparkles decorativas -->
+    <div class="nuevos-sparkle" style="top:15%;left:5%;font-size:14px;animation-delay:0s">✦</div>
+    <div class="nuevos-sparkle" style="top:30%;right:8%;font-size:10px;animation-delay:0.7s">✦</div>
+    <div class="nuevos-sparkle" style="top:60%;left:12%;font-size:8px;animation-delay:1.4s">✦</div>
+    <div class="nuevos-sparkle" style="top:20%;right:15%;font-size:12px;animation-delay:0.3s">✦</div>
+    <div style="position:relative;z-index:1;padding-top:1.8rem">
+      <div class="ofertas-header" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <div class="nuevos-badge">⚡ Recién llegados</div>
+        <div class="nuevos-title-wrap" style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+          <div class="ofertas-title">Nuevos lanzamientos</div>
+          <div class="ofertas-count" id="nuevos-count"></div>
+        </div>
+      </div>
+      <div class="ofertas-carousel-wrap" style="margin-top:1rem">
+        <button class="ofertas-carousel-btn left" onclick="nuevosScroll(-1)" aria-label="Anterior">‹</button>
+        <div class="ofertas-grid" id="nuevos-grid"></div>
+        <button class="ofertas-carousel-btn right" onclick="nuevosScroll(1)" aria-label="Siguiente">›</button>
+      </div>
     </div>
   </div>
 
@@ -1064,6 +1111,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
           <option value="Bikinis">Bikinis</option>
         </select>
       </div>
+      <div class="form-field" style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="prod-es-nuevo" style="width:16px;height:16px;accent-color:var(--rose);cursor:pointer">
+        <label for="prod-es-nuevo" style="font-size:13px;color:var(--ink);cursor:pointer;font-weight:500">✨ Mostrar en "Nuevos lanzamientos"</label>
+      </div>
       <div class="form-field">
         <label class="form-label">Precio (ARS)</label>
         <input type="number" class="form-input" id="prod-price" placeholder="ej: 12500" oninput="calcDescuento();updateCuotasPreview()">
@@ -1466,6 +1517,7 @@ db.ref('productos').on('value', (snap) => {
   }
   renderCatalog();
   renderOfertas();
+  renderNuevos();
   renderColorFilters();
   renderAdminList();
 }, (err) => {
@@ -1671,6 +1723,36 @@ function renderPage(list, el, reset) {
 
 
 // ── OFERTAS ──
+window.nuevosScroll = function(dir) {
+  const el = document.getElementById('nuevos-grid');
+  if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
+};
+
+window.renderNuevos = function() {
+  const el = document.getElementById('nuevos-grid');
+  const section = document.getElementById('nuevos-section');
+  const countEl = document.getElementById('nuevos-count');
+  if (!el) return;
+  const nuevos = products.filter(p => p.esNuevo && p.estado !== 'oculto');
+  if (nuevos.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  if (countEl) countEl.textContent = nuevos.length + ' producto' + (nuevos.length !== 1 ? 's' : '');
+  el.innerHTML = nuevos.map(p => {
+    const precio = precioHTML(p);
+    const img = (p.imgs && p.imgs[0]) || p.img || '';
+    return `<div class="prod-card" data-prod-id="${p.id}" style="cursor:pointer">
+      <div class="prod-img-wrap" style="position:relative">
+        ${img ? `<img src="${img}" alt="${p.name}" class="prod-img" loading="lazy">` : '<div class="prod-img-placeholder"></div>'}
+        <div style="position:absolute;top:8px;left:8px;font-size:10px;padding:3px 10px;border-radius:999px;background:rgba(201,79,124,0.9);color:#fff;font-weight:600;letter-spacing:1px;backdrop-filter:blur(4px)">NUEVO ✦</div>
+      </div>
+      <div class="card-body"><div class="card-name">${p.name}</div><div class="prod-price-row">${precio}</div></div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.prod-card').forEach(card => {
+    card.addEventListener('click', () => openProdModal(card.dataset.prodId));
+  });
+};
+
 window.ofertasScroll = function(dir) {
   const el = document.getElementById('ofertas-grid');
   if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
@@ -2334,7 +2416,8 @@ window.saveProduct = async function() {
   const cuotas = parseInt(document.getElementById('prod-cuotas').value) || 0;
   const packQty = parseInt(document.getElementById('prod-pack-qty')?.value) || 0;
   const packPrice = parseInt(document.getElementById('prod-pack-price')?.value) || 0;
-  const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas,
+  const esNuevo = document.getElementById('prod-es-nuevo')?.checked || false;
+  const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas, esNuevo: esNuevo || null,
     packQty: packQty >= 2 ? packQty : null,
     packPrice: packPrice > 0 && packQty >= 2 ? packPrice : null,
     keywords: keywords || null,
@@ -2375,6 +2458,7 @@ window.resetForm = function() {
   window.adminColores = [];
   renderColorSwatchesAdmin();
   document.getElementById('prod-cuotas').value = '0';
+  if (document.getElementById('prod-es-nuevo')) document.getElementById('prod-es-nuevo').checked = false;
   if (document.getElementById('prod-pack-qty')) document.getElementById('prod-pack-qty').value = '';
   if (document.getElementById('prod-pack-price')) document.getElementById('prod-pack-price').value = '';
   if (document.getElementById('pack-preview')) document.getElementById('pack-preview').textContent = '';
@@ -2407,6 +2491,7 @@ window.editProduct = function(id) {
     renderStockFields();
     renderColorSwatchesAdmin();
     document.getElementById('prod-cuotas').value = p.cuotas || '0';
+    if (document.getElementById('prod-es-nuevo')) document.getElementById('prod-es-nuevo').checked = !!p.esNuevo;
     if (document.getElementById('prod-pack-qty')) document.getElementById('prod-pack-qty').value = p.packQty || '';
     if (document.getElementById('prod-pack-price')) document.getElementById('prod-pack-price').value = p.packPrice || '';
     updatePackPreview();
