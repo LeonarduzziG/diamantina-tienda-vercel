@@ -1536,6 +1536,11 @@ window.loadConfig = function() {
     if (b) b.value = ap.heroBg || '';
     if (w) w.value = ap.wa || '541162620304';
     updateConfigPreview(titleRaw);
+    // Load envio prices
+    const envio = cfg.envio || {};
+    if (document.getElementById('config-envio-caba')) document.getElementById('config-envio-caba').value = envio.CABA || '';
+    if (document.getElementById('config-envio-gba')) document.getElementById('config-envio-gba').value = envio.GBA || '';
+    if (document.getElementById('config-envio-interior')) document.getElementById('config-envio-interior').value = envio.Interior || '';
   });
 };
 
@@ -1558,7 +1563,14 @@ window.guardarConfig = function() {
   const color = document.getElementById('config-color')?.value || '#C94F7C';
   const heroBg = document.getElementById('config-hero-bg')?.value.trim() || '';
   const wa = document.getElementById('config-wa')?.value.trim() || '541162620304';
-  db.ref().update({ 'config/hero': { title: titleRaw, sub, aviso }, 'config/apariencia': { color, heroBg, wa } }).then(() => {
+  const envioCABA = parseInt(document.getElementById('config-envio-caba')?.value) || 3500;
+  const envioGBA = parseInt(document.getElementById('config-envio-gba')?.value) || 4500;
+  const envioInterior = parseInt(document.getElementById('config-envio-interior')?.value) || 6000;
+  db.ref().update({
+    'config/hero': { title: titleRaw, sub, aviso },
+    'config/apariencia': { color, heroBg, wa },
+    'config/envio': { CABA: envioCABA, GBA: envioGBA, Interior: envioInterior }
+  }).then(() => {
     applyHeroConfig({ title: titleRaw, sub, aviso });
     applyApariencia({ color, heroBg, wa });
     const ok = document.getElementById('config-save-ok');
@@ -3665,32 +3677,88 @@ function detectarZona(cp) {
 
 envioSeleccionado = null;
 
-window.calcularEnvio = function() {
+window.calcularEnvio = async function() {
   const cp = document.getElementById('cp-input').value.trim();
   if (!cp || cp.length < 4) { showToast('Ingresá un código postal válido','error'); return; }
-  const zona = detectarZona(cp);
-  const precios = {CABA:3500, GBA:4500, Interior:6000};
-  const dias = {CABA:'2-3 días hábiles', GBA:'3-5 días hábiles', Interior:'5-8 días hábiles'};
-  const zonas = ['CABA','GBA','Interior'];
+  
+  const btn = document.querySelector('#panel-andreani button[onclick="calcularEnvio()"]');
+  const resultEl = document.getElementById('envio-result');
   const zonasEl = document.getElementById('envio-zonas');
-  zonasEl.style.display = 'flex';
-  zonasEl.innerHTML = zonas.map(z => `
-    <div class="envio-zona-item" onclick="selectZona(this,${precios[z]},'${z}')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff;cursor:pointer;transition:all var(--tr);margin-bottom:4px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="zona-radio-${z}" style="width:14px;height:14px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;transition:all var(--tr)"></div>
-        <div>
-          <div style="font-size:13px;color:var(--ink);font-weight:500">${z}</div>
-          <div style="font-size:11px;color:var(--ink-light)">${dias[z]}</div>
+  
+  // Show loading
+  if (btn) { btn.textContent = '...'; btn.disabled = true; }
+  resultEl.style.display = 'block';
+  resultEl.textContent = 'Cotizando...';
+  zonasEl.style.display = 'none';
+
+  // Load config prices from Firebase (admin can update them)
+  let precios = {CABA:3500, GBA:4500, Interior:6000};
+  try {
+    const snap = await db.ref('config/envio').once('value');
+    if (snap.val()) precios = {...precios, ...snap.val()};
+  } catch(e) {}
+
+  const dias = {CABA:'2-3 días hábiles', GBA:'3-5 días hábiles', Interior:'5-8 días hábiles'};
+  const zona = detectarZona(cp);
+
+  // Try Andreani public API via backend
+  let precioAndreani = null;
+  try {
+    const res = await fetch('https://diamantina-backend.onrender.com/andreani-cotizar', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ cpDestino: cp, peso: 0.3, largo: 20, ancho: 15, alto: 5 }),
+      signal: AbortSignal.timeout(6000)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.precio) precioAndreani = data.precio;
+    }
+  } catch(e) {
+    console.log('Andreani API no disponible, usando precios por zona');
+  }
+
+  if (btn) { btn.textContent = 'Calcular'; btn.disabled = false; }
+
+  if (precioAndreani) {
+    // Show real Andreani price
+    resultEl.textContent = '';
+    zonasEl.style.display = 'flex';
+    zonasEl.innerHTML = `
+      <div class="envio-zona-item" onclick="selectZona(this,${precioAndreani},'Andreani a domicilio - CP ${cp}')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff;cursor:pointer;transition:all var(--tr);margin-bottom:4px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:14px;height:14px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0"></div>
+          <div>
+            <div style="font-size:13px;color:var(--ink);font-weight:500">🚚 Andreani a domicilio</div>
+            <div style="font-size:11px;color:var(--ink-light)">${dias[zona] || '4-7 días hábiles'} · CP ${cp}</div>
+          </div>
         </div>
+        <div style="font-size:13px;font-weight:500;color:var(--rose)">$${precioAndreani.toLocaleString('es-AR')}</div>
+      </div>`;
+    resultEl.style.display = 'none';
+    const autoItem = zonasEl.querySelector('.envio-zona-item');
+    if (autoItem) selectZona(autoItem, precioAndreani, 'Andreani - CP ' + cp);
+  } else {
+    // Fallback: zone-based pricing
+    const zonas = ['CABA','GBA','Interior'];
+    zonasEl.style.display = 'flex';
+    zonasEl.innerHTML = zonas.map(z => `
+      <div class="envio-zona-item" onclick="selectZona(this,${precios[z]},'${z}')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff;cursor:pointer;transition:all var(--tr);margin-bottom:4px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:14px;height:14px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0"></div>
+          <div>
+            <div style="font-size:13px;color:var(--ink);font-weight:500">${z}</div>
+            <div style="font-size:11px;color:var(--ink-light)">${dias[z]}</div>
+          </div>
+        </div>
+        <div style="font-size:13px;font-weight:500;color:var(--rose)">$${precios[z].toLocaleString('es-AR')}</div>
       </div>
-      <div style="font-size:13px;font-weight:500;color:var(--rose)">$${precios[z].toLocaleString('es-AR')}</div>
-    </div>
-  `).join('');
-  document.getElementById('envio-result').style.display = 'block';
-  document.getElementById('envio-result').textContent = 'CP ' + cp + ' → Zona ' + zona + '. Seleccioná tu opción:';
-  // Auto-select detected zone
-  const autoItem = zonasEl.querySelectorAll('.envio-zona-item')[zonas.indexOf(zona)];
-  if (autoItem) selectZona(autoItem, precios[zona], zona);
+    `).join('');
+    resultEl.style.display = 'block';
+    resultEl.textContent = 'Precio estimado · CP ' + cp + ' → ' + zona;
+    const autoItem = zonasEl.querySelectorAll('.envio-zona-item')[zonas.indexOf(zona)];
+    if (autoItem) selectZona(autoItem, precios[zona], zona);
+  }
 };
 
 window.switchEnvioTab = function(tab) {
@@ -4039,6 +4107,26 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
           <div>
             <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">Número de WhatsApp</div>
             <input type="text" id="config-wa" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;box-sizing:border-box" placeholder="541162620304 (sin + ni espacios)">
+          </div>
+        </div>
+      </div>
+
+      <!-- PRECIOS DE ENVÍO -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.5rem">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:1.2rem;padding-bottom:8px;border-bottom:1px solid var(--border)">🚚 Precios de envío estimados</div>
+        <div style="font-size:11px;color:var(--ink-light);margin-bottom:12px">Se muestran cuando la API de Andreani no responde. Actualizalos cuando cambien las tarifas.</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--ink-mid);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">CABA</div>
+            <input type="number" id="config-envio-caba" placeholder="ej: 3500" style="width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;box-sizing:border-box">
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--ink-mid);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">GBA</div>
+            <input type="number" id="config-envio-gba" placeholder="ej: 4500" style="width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;box-sizing:border-box">
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--ink-mid);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Interior</div>
+            <input type="number" id="config-envio-interior" placeholder="ej: 6000" style="width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;box-sizing:border-box">
           </div>
         </div>
       </div>
