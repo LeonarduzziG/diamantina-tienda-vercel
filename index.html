@@ -426,6 +426,23 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 </style>
 </head>
 <body>
+<!-- AUTH MODAL -->
+<div id="auth-modal" style="display:none;position:fixed;inset:0;background:rgba(12,8,11,0.7);z-index:9990;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div style="background:#fff;border-radius:16px;padding:2.5rem;width:100%;max-width:380px;margin:1rem;box-shadow:0 24px 60px rgba(0,0,0,0.3);position:relative">
+    <button onclick="document.getElementById('auth-modal').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-light)">✕</button>
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--ink)">Panel Admin</div>
+      <div style="font-size:13px;color:var(--ink-light);margin-top:4px">Diamantina Lencería</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <input id="auth-email" type="email" placeholder="Email" onkeydown="if(event.key==='Enter')document.getElementById('auth-pass').focus()" style="padding:12px 16px;border:1px solid var(--border-strong);border-radius:8px;font-family:DM Sans,sans-serif;font-size:14px;outline:none;color:var(--ink)">
+      <input id="auth-pass" type="password" placeholder="Contraseña" onkeydown="if(event.key==='Enter')doLogin()" style="padding:12px 16px;border:1px solid var(--border-strong);border-radius:8px;font-family:DM Sans,sans-serif;font-size:14px;outline:none;color:var(--ink)">
+      <div id="auth-error" style="display:none;font-size:13px;color:#E24B4A;padding:8px 12px;background:#FCEBEB;border-radius:6px"></div>
+      <button id="auth-btn" onclick="doLogin()" style="padding:13px;background:var(--rose);border:none;border-radius:8px;color:#fff;font-family:DM Sans,sans-serif;font-size:15px;font-weight:500;cursor:pointer">Entrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- HOT SALE HANGING SIGN -->
 <div id="hotsale-sign" onclick="document.getElementById('ofertas-section').scrollIntoView({behavior:'smooth'});closeHotsaleSign()">
   <div class="sign-rope"></div>
@@ -1036,9 +1053,14 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 
 <div class="admin-panel" id="page-admin">
   <div style="display:flex;gap:8px;margin-bottom:1.5rem;border-bottom:2px solid var(--border);padding-bottom:0">
+    <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+    <div style="display:flex">
     <button id="atab-admin" onclick="switchAdminTab('admin')" style="padding:10px 18px;border:none;border-bottom:3px solid var(--rose);background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--rose);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">⚙️ Administración</button>
     <button id="atab-pedidos" onclick="switchAdminTab('pedidos')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">📦 Pedidos</button>
     <button id="atab-config" onclick="switchAdminTab('config')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">🎨 Tienda</button>
+    </div>
+    <button id="admin-logout-btn" onclick="doLogout()" style="display:none;padding:7px 16px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink-mid);cursor:pointer">Cerrar sesión</button>
+    </div>
   </div>
   <!-- TAB ADMIN -->
   <div id="admin-tab-admin">
@@ -1307,6 +1329,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <script>
 var searchQuery = ''; // declared early to avoid hoisting issues
@@ -1325,7 +1348,7 @@ const firebaseConfig = {
 };
 
 const BACKEND = "https://diamantina-backend.onrender.com";
-const ADMIN_PASS = "dia2024";
+// Auth handled by Firebase Authentication
 
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -1456,10 +1479,40 @@ loadVisitasAdmin();
 };
 
 window.showAdminPrompt = function() {
-  const pass = prompt('Contraseña de administrador:');
-  if (pass === ADMIN_PASS) showPage('admin');
-  else if (pass !== null) showToast('Contraseña incorrecta', 'error');
+  document.getElementById('auth-modal').style.display = 'flex';
+  setTimeout(() => { const el = document.getElementById('auth-email'); if(el) el.focus(); }, 100);
 };
+
+window.doLogin = async function() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-error');
+  const btn = document.getElementById('auth-btn');
+  if (!email || !pass) { errEl.textContent = 'Completá email y contraseña'; errEl.style.display='block'; return; }
+  btn.textContent = 'Entrando...'; btn.disabled = true; errEl.style.display='none';
+  try {
+    await firebase.auth().signInWithEmailAndPassword(email, pass);
+    document.getElementById('auth-modal').style.display = 'none';
+    document.getElementById('auth-email').value = '';
+    document.getElementById('auth-pass').value = '';
+    showPage('admin');
+  } catch(e) {
+    errEl.textContent = 'Email o contraseña incorrectos';
+    errEl.style.display = 'block';
+  }
+  btn.textContent = 'Entrar'; btn.disabled = false;
+};
+
+window.doLogout = async function() {
+  await firebase.auth().signOut();
+  showPage('tienda');
+  showToast('Sesión cerrada');
+};
+
+firebase.auth().onAuthStateChanged(user => {
+  const logoutBtn = document.getElementById('admin-logout-btn');
+  if (logoutBtn) logoutBtn.style.display = user ? 'inline-block' : 'none';
+});
 
 window._waNumber = '541162620304';
 
@@ -2444,6 +2497,7 @@ window.calcDescuento = function() {
 };
 
 window.saveProduct = async function() {
+  if (!firebase.auth().currentUser) { showToast('Sesión expirada. Iniciá sesión de nuevo.', 'error'); showAdminPrompt(); return; }
   const name = document.getElementById('prod-name').value.trim();
   const price = parseFloat(document.getElementById('prod-price').value);
   const descuento = parseFloat(document.getElementById('prod-descuento').value) || 0;
