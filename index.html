@@ -1536,11 +1536,11 @@ window.loadConfig = function() {
     if (b) b.value = ap.heroBg || '';
     if (w) w.value = ap.wa || '541162620304';
     updateConfigPreview(titleRaw);
-    // Load envio prices
-    const envio = cfg.envio || {};
-    if (document.getElementById('config-envio-caba')) document.getElementById('config-envio-caba').value = envio.CABA || '';
-    if (document.getElementById('config-envio-gba')) document.getElementById('config-envio-gba').value = envio.GBA || '';
-    if (document.getElementById('config-envio-interior')) document.getElementById('config-envio-interior').value = envio.Interior || '';
+    // Load envio prices from config/envios
+    const envio = cfg.envios || {};
+    if (document.getElementById('config-envio-caba')) document.getElementById('config-envio-caba').value = envio.caba || '';
+    if (document.getElementById('config-envio-gba')) document.getElementById('config-envio-gba').value = envio.gba || '';
+    if (document.getElementById('config-envio-interior')) document.getElementById('config-envio-interior').value = envio.interior || '';
   });
 };
 
@@ -1566,11 +1566,14 @@ window.guardarConfig = function() {
   const envioCABA = parseInt(document.getElementById('config-envio-caba')?.value) || 3500;
   const envioGBA = parseInt(document.getElementById('config-envio-gba')?.value) || 4500;
   const envioInterior = parseInt(document.getElementById('config-envio-interior')?.value) || 6000;
+  // Merge with existing envios config to preserve other fields (sur, gratisMin, etc)
+  const _envActual = window._envioConfig || {};
   db.ref().update({
     'config/hero': { title: titleRaw, sub, aviso },
     'config/apariencia': { color, heroBg, wa },
-    'config/envio': { CABA: envioCABA, GBA: envioGBA, Interior: envioInterior }
+    'config/envios': { ..._envActual, caba: envioCABA, gba: envioGBA, interior: envioInterior }
   }).then(() => {
+    window._envioConfig = { ..._envActual, caba: envioCABA, gba: envioGBA, interior: envioInterior };
     applyHeroConfig({ title: titleRaw, sub, aviso });
     applyApariencia({ color, heroBg, wa });
     const ok = document.getElementById('config-save-ok');
@@ -3692,11 +3695,13 @@ window.calcularEnvio = async function() {
   zonasEl.style.display = 'none';
 
   // Load config prices from Firebase (admin can update them)
-  let precios = {CABA:3500, GBA:4500, Interior:6000};
-  try {
-    const snap = await db.ref('config/envio').once('value');
-    if (snap.val()) precios = {...precios, ...snap.val()};
-  } catch(e) {}
+  // Read prices from _envioConfig (already loaded) or Firebase
+  const _ec = window._envioConfig || {};
+  let precios = {
+    CABA: _ec.caba || 3500,
+    GBA: _ec.gba || 4500,
+    Interior: _ec.interior || 6000
+  };
 
   const dias = {CABA:'2-3 días hábiles', GBA:'3-5 días hábiles', Interior:'5-8 días hábiles'};
   const zona = detectarZona(cp);
