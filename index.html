@@ -1315,6 +1315,21 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
           <option value="agotado">Agotado</option>
           <option value="oculto">Oculto</option>
         </select>
+        <select id="admin-descuento-filter" onchange="renderAdminList()" style="padding:6px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink-mid);background:var(--surface-2);outline:none;cursor:pointer">
+          <option value="">Todos los productos</option>
+          <option value="conDescuento">🏷️ Con descuento</option>
+          <option value="sinDescuento">Sin descuento</option>
+        </select>
+        <select id="admin-orden" onchange="renderAdminList()" style="padding:6px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink-mid);background:var(--surface-2);outline:none;cursor:pointer">
+          <option value="">Ordenar por...</option>
+          <option value="nombre-az">Nombre A→Z</option>
+          <option value="nombre-za">Nombre Z→A</option>
+          <option value="precio-asc">Precio menor→mayor</option>
+          <option value="precio-desc">Precio mayor→menor</option>
+          <option value="fecha-nuevo">Más nuevos primero</option>
+          <option value="fecha-viejo">Más antiguos primero</option>
+          <option value="descuento-desc">Mayor descuento</option>
+        </select>
       </div>
       <div style="font-size:11px;color:var(--ink-light);margin-bottom:8px" id="admin-count"></div>
       <div class="admin-prod-list" id="admin-prod-list"></div>
@@ -2654,12 +2669,31 @@ window.renderAdminList = function renderAdminList() {
       .map(([id,val]) => ({id,...val}))
       .filter(p => p.estado === 'oculto' && !products.find(x => x.id === p.id))
   );
+  const descuentoFilter = document.getElementById('admin-descuento-filter')?.value || '';
+  const orden = document.getElementById('admin-orden')?.value || '';
   let filtered = all.filter(p => {
     if (catFilter && p.cat !== catFilter) return false;
     if (estadoFilter && (p.estado || 'activo') !== estadoFilter) return false;
     if (searchVal && !p.name.toLowerCase().includes(searchVal)) return false;
+    if (descuentoFilter === 'conDescuento' && !(p.descuento > 0)) return false;
+    if (descuentoFilter === 'sinDescuento' && p.descuento > 0) return false;
     return true;
   });
+  // Sort
+  if (orden) {
+    filtered.sort((a, b) => {
+      switch(orden) {
+        case 'nombre-az': return (a.name||'').localeCompare(b.name||'');
+        case 'nombre-za': return (b.name||'').localeCompare(a.name||'');
+        case 'precio-asc': return (Number(a.price)||0) - (Number(b.price)||0);
+        case 'precio-desc': return (Number(b.price)||0) - (Number(a.price)||0);
+        case 'fecha-nuevo': return (b.ts||0) - (a.ts||0);
+        case 'fecha-viejo': return (a.ts||0) - (b.ts||0);
+        case 'descuento-desc': return (Number(b.descuento)||0) - (Number(a.descuento)||0);
+        default: return 0;
+      }
+    });
+  }
   const countEl = document.getElementById('admin-count');
   if (countEl) countEl.textContent = filtered.length + ' producto' + (filtered.length !== 1 ? 's' : '') + (filtered.length !== all.length ? ' (filtrados de ' + all.length + ')' : '');
   if (!filtered.length) { el.innerHTML = '<div class="admin-empty">No hay productos con ese filtro</div>'; return; }
