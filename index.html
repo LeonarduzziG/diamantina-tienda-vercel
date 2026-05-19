@@ -403,29 +403,24 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   #nav-right-mobile{display:none !important}
   #nav-mobile-menu{display:none !important}
 }
-/* ── HOT SALE HANGING SIGN ── */
-@keyframes swing{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
-@keyframes drop-in{0%{top:-220px;opacity:0}60%{top:12px;opacity:1}75%{top:0px}85%{top:10px}100%{top:4px;opacity:1}}
-@keyframes rope-sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
-#hotsale-sign{position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:8888;display:flex;flex-direction:column;align-items:center;animation:drop-in 1.2s cubic-bezier(.22,1,.36,1) 1.5s both;pointer-events:auto;cursor:pointer}
-#hotsale-sign:hover .sign-card{transform:scale(1.04);box-shadow:0 8px 32px rgba(201,79,124,0.5)}
-.sign-rope{width:3px;height:48px;background:linear-gradient(180deg,#8B6914,#c9a227,#8B6914);border-radius:2px;margin-bottom:-2px;animation:rope-sway 2s ease-in-out infinite;transform-origin:top center;box-shadow:1px 0 2px rgba(0,0,0,0.2)}
-.sign-rope::before,.sign-rope::after{content:'';position:absolute;width:8px;height:8px;background:#8B6914;border-radius:50%;left:50%;transform:translateX(-50%)}
-.sign-rope::before{top:-3px}
-.sign-rope::after{bottom:-3px}
-.sign-card{background:linear-gradient(135deg,#fff5f8,#ffe8ef);border:2px solid rgba(201,79,124,0.4);border-radius:14px;padding:14px 22px;text-align:center;box-shadow:0 6px 24px rgba(201,79,124,0.3),0 2px 8px rgba(0,0,0,0.12);position:relative;animation:swing 3s ease-in-out 2.7s infinite;transform-origin:top center;min-width:160px}
-.sign-card::before{content:'';position:absolute;inset:3px;border-radius:11px;border:1px dashed rgba(201,79,124,0.3);pointer-events:none}
-.sign-nail{width:10px;height:10px;background:radial-gradient(circle at 35% 35%,#e0e0e0,#888);border-radius:50%;position:absolute;top:-6px;left:50%;transform:translateX(-50%);box-shadow:0 2px 4px rgba(0,0,0,0.3)}
-.sign-fire{font-size:20px;line-height:1;margin-bottom:4px}
-.sign-title{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:700;color:#c94f7c;letter-spacing:1px;text-transform:uppercase;line-height:1.2}
-.sign-sub{font-family:'DM Sans',sans-serif;font-size:11px;color:#e88ab0;margin-top:3px;font-weight:500}
-.sign-cta{display:inline-block;margin-top:8px;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:var(--rose);color:#fff;padding:4px 12px;border-radius:999px}
-.sign-close{position:absolute;top:-8px;right:-8px;width:20px;height:20px;background:#fff;border:1px solid rgba(201,79,124,0.3);border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;color:var(--ink-mid);cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
-.sign-close:hover{background:var(--rose);color:#fff}
+
+
+
+@keyframes petal-fall{
+  0%{transform:translateY(-60px) rotate(0deg) translateX(0px);opacity:0}
+  10%{opacity:1}
+  85%{opacity:0.8}
+  100%{transform:translateY(110vh) rotate(720deg) translateX(var(--drift));opacity:0}
+}
+.petal{position:fixed;top:-60px;z-index:8700;pointer-events:none;font-size:var(--size);animation:petal-fall var(--dur) ease-in var(--delay) forwards;will-change:transform}
+
+.sp-particle{position:fixed;pointer-events:none;z-index:9050;animation:sparkle-burst var(--dur) ease-out var(--delay) forwards;font-size:var(--size);will-change:transform}
+.sp-float{position:fixed;pointer-events:none;z-index:9050;animation:sparkle-twinkle var(--dur) ease-in-out var(--delay) var(--rep);font-size:var(--size)}
 
 </style>
 </head>
 <body>
+
 <!-- AUTH MODAL -->
 <div id="auth-modal" style="display:none;position:fixed;inset:0;background:rgba(12,8,11,0.7);z-index:9990;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
   <div style="background:#fff;border-radius:16px;padding:2.5rem;width:100%;max-width:380px;margin:1rem;box-shadow:0 24px 60px rgba(0,0,0,0.3);position:relative">
@@ -443,18 +438,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
   </div>
 </div>
 
-<!-- HOT SALE HANGING SIGN -->
-<div id="hotsale-sign" onclick="document.getElementById('ofertas-section').scrollIntoView({behavior:'smooth'});closeHotsaleSign()">
-  <div class="sign-rope"></div>
-  <div class="sign-card">
-    <div class="sign-nail"></div>
-    <div class="sign-close" onclick="event.stopPropagation();closeHotsaleSign()">✕</div>
-    <div class="sign-fire">🔥</div>
-    <div class="sign-title">Hot Sale</div>
-    <div class="sign-sub">¡Aprovechá las ofertas!</div>
-    <div class="sign-cta">Ver ofertas ↓</div>
-  </div>
-</div>
+
 <div id="page-loader" style="position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity 0.4s;pointer-events:none">
   <img src="" id="loader-logo" style="width:64px;height:64px;object-fit:contain;border-radius:50%;opacity:0.8">
   <div style="font-family:'DM Sans',sans-serif;font-size:14px;color:#b8839a;letter-spacing:2px;text-transform:uppercase">Cargando...</div>
@@ -1625,17 +1609,6 @@ window.switchAdminTab = function(tab) {
   });
   if (tab === 'pedidos') renderPedidos();
   if (tab === 'config') loadConfig();
-};
-
-window.closeHotsaleSign = function() {
-  const sign = document.getElementById('hotsale-sign');
-  if (sign) {
-    sign.style.transition = 'top 0.4s ease,opacity 0.4s ease';
-    sign.style.top = '-220px';
-    sign.style.opacity = '0';
-    setTimeout(() => sign.remove(), 400);
-    localStorage.setItem('hotsale_closed', '1');
-  }
 };
 
 window.abrirWA = function() {
@@ -4000,11 +3973,7 @@ function loadUser() {
 }
 loadUser();
 loadBanner();
-// Hide hotsale sign if previously closed
-if (localStorage.getItem('hotsale_closed') === '1') {
-  const s = document.getElementById('hotsale-sign');
-  if (s) s.remove();
-}
+
 // Load config from Firebase on init
 db.ref('config').once('value').then(snap => {
   const cfg = snap.val() || {};
