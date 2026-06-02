@@ -4340,6 +4340,21 @@ if (document.readyState === 'loading') {
   const style = document.createElement('style');
   style.id = 'arg-theme-overrides';
   style.textContent = `
+    /* Override CSS variables with !important via attribute selector hack */
+    :root, html, body {
+      --rose: #1565C0 !important;
+      --rose-dark: #0D47A1 !important;
+      --rose-pale: #E3F2FD !important;
+      --rose-light: #BBDEFB !important;
+      --ink: #0D1B3E !important;
+      --ink-mid: #1E4A8A !important;
+      --ink-light: #7BADD6 !important;
+      --surface: #F0F8FF !important;
+      --surface-2: #E3F2FD !important;
+      --border: rgba(21,101,192,0.15) !important;
+      --border-strong: rgba(21,101,192,0.30) !important;
+    }
+    * { transition: background-color 0.5s, color 0.5s, border-color 0.5s; }
     .cart-btn { background: #FFD700 !important; color: #0D1B3E !important; }
     .cart-btn:hover { background: #FFC200 !important; }
     nav { background: rgba(21,101,192,0.97) !important; border-bottom: 2px solid #FFD700 !important; }
@@ -4347,20 +4362,25 @@ if (document.readyState === 'loading') {
     .nav-link:hover, .nav-link.active { color: #FFD700 !important; }
     .nav-brand { color: #fff !important; }
     .nav-brand span { color: #FFD700 !important; }
-    .hero { background: linear-gradient(135deg, #E3F2FD 0%, #fff 50%, #E3F2FD 100%) !important; }
+    body { background: #F0F8FF !important; }
+    .hero { background: linear-gradient(135deg, #E3F2FD 0%, #fff 50%, #E3F2FD 100%) !important; position: relative; }
     .hero-title em { color: #1565C0 !important; }
-    .hero-btn { background: #1565C0 !important; }
+    .hero-btn, .hero-btn-solid { background: #1565C0 !important; border-color: #1565C0 !important; }
     .hero-btn-outline { border-color: #1565C0 !important; color: #1565C0 !important; }
-    .load-more-btn { background: #1565C0 !important; }
-    .fav-btn.active svg { fill: #1565C0 !important; }
-    .badge-oferta { background: #1565C0 !important; }
+    .load-more-btn { background: #1565C0 !important; box-shadow: 0 4px 20px rgba(21,101,192,0.35) !important; }
+    .badge-oferta, .badge-desc { background: #1565C0 !important; }
     .badge-nuevo { background: #FFD700 !important; color: #0D1B3E !important; }
-    .prod-price-discount, .prod-price { color: #1565C0 !important; }
-    .pm-add-btn { background: #1565C0 !important; }
-    footer, .footer { background: #0D1B3E !important; }
-    ::-webkit-scrollbar-thumb { background: #1565C0 !important; }
-
-    /* Franja decorativa mundial en el hero */
+    .prod-price-discount, .prod-price span { color: #1565C0 !important; }
+    .prod-price .currency { color: #1565C0 !important; }
+    .pm-add-btn, .form-btn { background: #1565C0 !important; }
+    .color-dot.selected { border-color: #1565C0 !important; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1565C0 !important; }
+    .ofertas-section { background: #EBF5FF !important; border-bottom-color: #FFD700 !important; }
+    .ofertas-count { color: #1565C0 !important; }
+    .cat-btn.active, .cat-btn:hover { background: #1565C0 !important; color: #fff !important; }
+    .filter-btn.active { background: #1565C0 !important; }
+    .cart-close-btn:hover, .pm-close:hover { color: #1565C0 !important; }
+    input:focus, textarea:focus, select:focus { border-color: #1565C0 !important; }
+    .promo-banner { background: #1565C0 !important; }
     .hero::before {
       content: '';
       position: absolute;
@@ -4369,7 +4389,6 @@ if (document.readyState === 'loading') {
       background: linear-gradient(90deg, #74B9FF 0%, #fff 33%, #74B9FF 66%, #FFD700 100%);
       z-index: 1;
     }
-    .hero { position: relative; }
   `;
   document.head.appendChild(style);
 
