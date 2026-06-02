@@ -4295,6 +4295,12 @@ function loadUser() {
 }
 loadUser();
 loadBanner();
+// Set logo
+(function(){
+  const logoUrl = 'https://res.cloudinary.com/dy1yckjcj/image/upload/v1780442730/6011F3D2-4EA7-4B2B-A4C8-9F217ADD2F2B_lmotkd.png';
+  document.querySelectorAll('#nav-logo-img, #nosotras-logo').forEach(img => { if(img) img.src = logoUrl; });
+  db.ref('config/logo').set(logoUrl);
+})();
 
 // Load config from Firebase on init
 db.ref('config').once('value').then(snap => {
