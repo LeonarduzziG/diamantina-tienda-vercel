@@ -45,11 +45,11 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '960254479887199');
+fbq('init', '793243080366510');
 fbq('track', 'PageView');
 </script>
 <noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=960254479887199&ev=PageView&noscript=1"
+src="https://www.facebook.com/tr?id=793243080366510&ev=PageView&noscript=1"
 /></noscript>
 <!-- Fin Meta Pixel -->
 
@@ -435,6 +435,129 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
 .sp-particle{position:fixed;pointer-events:none;z-index:9050;animation:sparkle-burst var(--dur) ease-out var(--delay) forwards;font-size:var(--size);will-change:transform}
 .sp-float{position:fixed;pointer-events:none;z-index:9050;animation:sparkle-twinkle var(--dur) ease-in-out var(--delay) var(--rep);font-size:var(--size)}
 
+
+/* ── MUNDIAL 2026 ── */
+@keyframes ball-roll{
+  0%{left:-80px;transform:rotate(0deg);opacity:0}
+  5%{opacity:1}
+  95%{opacity:1}
+  100%{left:calc(100vw + 80px);transform:rotate(1080deg);opacity:0}
+}
+@keyframes arg-shimmer{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+@keyframes flag-wave{
+  0%,100%{transform:skewX(0deg)}
+  25%{transform:skewX(-3deg)}
+  75%{transform:skewX(3deg)}
+}
+@keyframes trophy-bounce{
+  0%,100%{transform:translateY(0) rotate(-5deg)}
+  50%{transform:translateY(-6px) rotate(5deg)}
+}
+@keyframes mundial-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(116,185,255,0.4)}
+  50%{box-shadow:0 0 0 12px rgba(116,185,255,0)}
+}
+@keyframes confetti-fall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0}
+}
+@keyframes sun-spin{
+  0%{transform:rotate(0deg)}
+  100%{transform:rotate(360deg)}
+}
+
+/* Banner mundial */
+#mundial-banner{
+  background:linear-gradient(135deg,#74B9FF 0%,#5BA3F5 25%,#fff 45%,#fff 55%,#5BA3F5 75%,#74B9FF 100%);
+  background-size:300% 300%;
+  animation:arg-shimmer 4s ease infinite;
+  padding:12px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  position:relative;
+  overflow:hidden;
+  border-bottom:3px solid #FFD700;
+  flex-wrap:wrap;
+}
+#mundial-banner::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 40px,
+    rgba(255,255,255,0.15) 40px,
+    rgba(255,255,255,0.15) 42px
+  );
+  pointer-events:none;
+}
+.mundial-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.mundial-flag{display:flex;flex-direction:column;width:36px;height:24px;border-radius:3px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.2);flex-shrink:0;animation:flag-wave 3s ease-in-out infinite}
+.mundial-flag .cel{flex:1;background:#74B9FF}
+.mundial-flag .wh{flex:1;background:#fff;display:flex;align-items:center;justify-content:center;font-size:9px}
+.mundial-trophy{font-size:24px;animation:trophy-bounce 2s ease-in-out infinite;flex-shrink:0}
+.mundial-text{min-width:0}
+.mundial-title{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#1a3c6e;letter-spacing:0.5px;line-height:1.2}
+.mundial-sub{font-family:'DM Sans',sans-serif;font-size:11px;color:#2d5aa0;margin-top:1px}
+.mundial-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.mundial-close{background:none;border:none;font-size:16px;color:#1a3c6e;cursor:pointer;opacity:0.6;padding:4px;line-height:1}
+.mundial-close:hover{opacity:1}
+
+/* Pelota rodando */
+#ball-runner{
+  position:fixed;
+  bottom:120px;
+  left:-80px;
+  z-index:8500;
+  font-size:44px;
+  pointer-events:none;
+  animation:ball-roll 5s cubic-bezier(.4,0,.6,1) 3s forwards;
+}
+
+/* Confetti argentina */
+.conf-arg{
+  position:fixed;
+  top:-20px;
+  z-index:9000;
+  pointer-events:none;
+  width:var(--w);
+  height:var(--h);
+  background:var(--color);
+  border-radius:var(--br);
+  animation:confetti-fall var(--dur) ease-in var(--delay) forwards;
+}
+
+/* Sol de mayo badge */
+.sun-badge{
+  width:22px;height:22px;
+  background:radial-gradient(circle at 50% 50%,#FFD700 30%,#FFC200 100%);
+  border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;
+  box-shadow:0 0 8px rgba(255,215,0,0.6);
+  animation:mundial-pulse 2s ease-in-out infinite;
+  flex-shrink:0;
+}
+
+/* Coleccion Argentina badge en producto */
+.badge-arg{
+  position:absolute;top:8px;right:8px;
+  background:linear-gradient(135deg,#74B9FF,#5BA3F5);
+  color:#fff;
+  font-size:9px;font-weight:700;
+  padding:3px 7px;border-radius:999px;
+  letter-spacing:0.5px;
+  border:1px solid #FFD700;
+  z-index:2;
+}
+
 </style>
 </head>
 <body>
@@ -561,6 +684,50 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
         <button class="ofertas-carousel-btn left" onclick="nuevosScroll(-1)" aria-label="Anterior">‹</button>
         <div class="ofertas-grid" id="nuevos-grid"></div>
         <button class="ofertas-carousel-btn right" onclick="nuevosScroll(1)" aria-label="Siguiente">›</button>
+      </div>
+    </div>
+  </div>
+
+  
+<!-- MUNDIAL 2026 BANNER -->
+<div id="mundial-banner">
+  <div class="mundial-left">
+    <div class="mundial-flag">
+      <div class="cel"></div>
+      <div class="wh">☀️</div>
+      <div class="cel"></div>
+    </div>
+    <div class="mundial-trophy">🏆</div>
+    <div class="mundial-text">
+      <div class="mundial-title">🇦🇷 ¡Vamos Argentina! — Mundial 2026</div>
+      <div class="mundial-sub">Celebrá con estilo ✨ Envíos a todo el país</div>
+    </div>
+  </div>
+  <div class="mundial-right">
+    <div class="sun-badge">☀️</div>
+    <button class="mundial-close" onclick="cerrarMundialBanner()">✕</button>
+  </div>
+</div>
+
+<!-- PELOTA RODANDO -->
+<div id="ball-runner">⚽</div>
+
+  <!-- COLECCION ARGENTINA -->
+  <div id="arg-section" style="display:none;padding:0 2rem 2rem;background:linear-gradient(135deg,#EBF5FF 0%,#fff 40%,#EBF5FF 100%);border-bottom:3px solid #FFD700;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#74B9FF,#fff,#74B9FF)"></div>
+    <div style="position:relative;z-index:1;padding-top:1.5rem">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;flex-wrap:wrap">
+        <div style="font-size:28px">🇦🇷</div>
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:#1a3c6e">Colección Argentina</div>
+          <div style="font-size:12px;color:#5BA3F5;font-weight:500">Para celebrar el Mundial 2026 ⚽🏆</div>
+        </div>
+        <div id="arg-count" style="font-size:12px;color:#74B9FF;margin-left:auto"></div>
+      </div>
+      <div style="position:relative">
+        <button onclick="argScroll(-1)" style="display:none;position:absolute;top:50%;left:-12px;transform:translateY(-50%);z-index:10;background:#fff;border:1px solid #74B9FF;border-radius:50%;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#1a3c6e;box-shadow:0 2px 8px rgba(116,185,255,0.3)" id="arg-btn-l">‹</button>
+        <div id="arg-grid" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
+        <button onclick="argScroll(1)" style="display:none;position:absolute;top:50%;right:-12px;transform:translateY(-50%);z-index:10;background:#fff;border:1px solid #74B9FF;border-radius:50%;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#1a3c6e;box-shadow:0 2px 8px rgba(116,185,255,0.3)" id="arg-btn-r">›</button>
       </div>
     </div>
   </div>
@@ -1191,6 +1358,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.96);backdrop
         <input type="checkbox" id="prod-es-nuevo" style="width:16px;height:16px;accent-color:var(--rose);cursor:pointer">
         <label for="prod-es-nuevo" style="font-size:13px;color:var(--ink);cursor:pointer;font-weight:500">✨ Mostrar en "Nuevos lanzamientos"</label>
       </div>
+      <div class="form-field" style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="prod-es-arg" style="width:16px;height:16px;accent-color:#74B9FF;cursor:pointer">
+        <label for="prod-es-arg" style="font-size:13px;color:#1a3c6e;cursor:pointer;font-weight:500">🇦🇷 Colección Argentina (Mundial 2026)</label>
+      </div>
       <div class="form-field">
         <label class="form-label">Precio (ARS)</label>
         <input type="number" class="form-input" id="prod-price" placeholder="ej: 12500" oninput="calcDescuento();updateCuotasPreview()">
@@ -1683,6 +1854,53 @@ function generarMensajeWACorto() {
   return '¡Hola! ¿En qué te ayudamos? 💖';
 }
 
+
+// ── MUNDIAL 2026 ──
+window.cerrarMundialBanner = function() {
+  const b = document.getElementById('mundial-banner');
+  if(b){ b.style.transition='all 0.4s'; b.style.maxHeight='0'; b.style.padding='0'; b.style.opacity='0'; setTimeout(()=>b.remove(),450); }
+  sessionStorage.setItem('mundial_closed','1');
+};
+
+function lanzarConfettiArg() {
+  if(sessionStorage.getItem('mundial_conf')) return;
+  sessionStorage.setItem('mundial_conf','1');
+  const colors = [
+    {color:'#74B9FF',br:'2px'},{color:'#5BA3F5',br:'2px'},
+    {color:'#ffffff',br:'2px'},{color:'#FFD700',br:'50%'},
+    {color:'#1a3c6e',br:'2px'}
+  ];
+  for(let i=0;i<60;i++){
+    const el = document.createElement('div');
+    el.className = 'conf-arg';
+    const c = colors[Math.floor(Math.random()*colors.length)];
+    const w = 6 + Math.random()*8;
+    const h = 8 + Math.random()*10;
+    const dur = 2.5 + Math.random()*2;
+    const delay = Math.random()*2;
+    el.style.cssText = '--w:'+w+'px;--h:'+h+'px;--color:'+c.color+';--br:'+c.br+';--dur:'+dur+'s;--delay:'+delay+'s;left:'+(Math.random()*100)+'vw';
+    document.body.appendChild(el);
+    setTimeout(()=>{ if(el.parentNode) el.remove(); }, (delay+dur+0.5)*1000);
+  }
+}
+
+// Init mundial
+(function(){
+  if(sessionStorage.getItem('mundial_closed')){
+    const b = document.getElementById('mundial-banner');
+    if(b) b.remove();
+  }
+  // Ball runs once per session
+  if(sessionStorage.getItem('ball_done')){
+    const b = document.getElementById('ball-runner');
+    if(b) b.remove();
+  } else {
+    sessionStorage.setItem('ball_done','1');
+  }
+  // Confetti on load
+  setTimeout(lanzarConfettiArg, 800);
+})();
+
 window.toggleMobileMenu = function() {
   const menu = document.getElementById('nav-mobile-menu');
   if (!menu) { console.error('nav-mobile-menu not found'); return; }
@@ -1710,6 +1928,7 @@ db.ref('productos').on('value', (snap) => {
   renderCatalog();
   renderOfertas();
   renderNuevos();
+  renderArg();
   renderColorFilters();
   renderAdminList();
 }, (err) => {
@@ -1915,6 +2134,40 @@ function renderPage(list, el, reset) {
 
 
 // ── OFERTAS ──
+window.argScroll = function(dir) {
+  const el = document.getElementById('arg-grid');
+  if(el) el.scrollBy({left: dir*220, behavior:'smooth'});
+};
+
+window.renderArg = function() {
+  const el = document.getElementById('arg-grid');
+  const section = document.getElementById('arg-section');
+  const countEl = document.getElementById('arg-count');
+  const btnL = document.getElementById('arg-btn-l');
+  const btnR = document.getElementById('arg-btn-r');
+  if(!el || !section) return;
+  const prods = products.filter(p => p.esArg && p.estado !== 'oculto');
+  if(prods.length === 0){ section.style.display='none'; return; }
+  section.style.display = 'block';
+  if(countEl) countEl.textContent = prods.length + ' producto' + (prods.length!==1?'s':'');
+  if(btnL) btnL.style.display = prods.length>1 ? 'flex' : 'none';
+  if(btnR) btnR.style.display = prods.length>1 ? 'flex' : 'none';
+  el.innerHTML = prods.map((p,idx) => {
+    const precio = precioHTML(p);
+    const img = (p.imgs && p.imgs[0]) || p.img || '';
+    return '<div class="prod-card" data-prod-id="'+p.id+'" style="cursor:pointer;min-width:200px;max-width:200px;scroll-snap-align:start;flex-shrink:0;animation:float-up 0.5s '+(idx*0.1)+'s ease both;border:2px solid rgba(116,185,255,0.3)">'
+      + '<div class="prod-img-wrap" style="position:relative">'
+      + (img ? '<img src="'+img+'" alt="'+p.name+'" class="prod-img" loading="lazy">' : '<div class="prod-img-placeholder"></div>')
+      + '<div class="badge-arg">🇦🇷 ARG</div>'
+      + '</div>'
+      + '<div class="card-body"><div class="card-name">'+p.name+'</div><div class="prod-price-row">'+precio+'</div></div>'
+      + '</div>';
+  }).join('');
+  el.querySelectorAll('.prod-card').forEach(card => {
+    card.addEventListener('click', () => openProdModal(card.dataset.prodId));
+  });
+};
+
 window.nuevosScroll = function(dir) {
   const el = document.getElementById('nuevos-grid');
   if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
@@ -2641,7 +2894,8 @@ window.saveProduct = async function() {
   const packQty = parseInt(document.getElementById('prod-pack-qty')?.value) || 0;
   const packPrice = parseInt(document.getElementById('prod-pack-price')?.value) || 0;
   const esNuevo = document.getElementById('prod-es-nuevo')?.checked || false;
-  const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas, esNuevo: esNuevo || null,
+  const esArg = document.getElementById('prod-es-arg')?.checked || false;
+  const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas, esNuevo: esNuevo || null, esArg: esArg || null,
     packQty: packQty >= 2 ? packQty : null,
     packPrice: packPrice > 0 && packQty >= 2 ? packPrice : null,
     keywords: keywords || null,
@@ -2683,6 +2937,7 @@ window.resetForm = function() {
   renderColorSwatchesAdmin();
   document.getElementById('prod-cuotas').value = '0';
   if (document.getElementById('prod-es-nuevo')) document.getElementById('prod-es-nuevo').checked = false;
+  if (document.getElementById('prod-es-arg')) document.getElementById('prod-es-arg').checked = false;
   if (document.getElementById('prod-pack-qty')) document.getElementById('prod-pack-qty').value = '';
   if (document.getElementById('prod-pack-price')) document.getElementById('prod-pack-price').value = '';
   if (document.getElementById('pack-preview')) document.getElementById('pack-preview').textContent = '';
@@ -2716,6 +2971,7 @@ window.editProduct = function(id) {
     renderColorSwatchesAdmin();
     document.getElementById('prod-cuotas').value = p.cuotas || '0';
     if (document.getElementById('prod-es-nuevo')) document.getElementById('prod-es-nuevo').checked = !!p.esNuevo;
+    if (document.getElementById('prod-es-arg')) document.getElementById('prod-es-arg').checked = !!p.esArg;
     if (document.getElementById('prod-pack-qty')) document.getElementById('prod-pack-qty').value = p.packQty || '';
     if (document.getElementById('prod-pack-price')) document.getElementById('prod-pack-price').value = p.packPrice || '';
     updatePackPreview();
@@ -4055,7 +4311,72 @@ loadIgFeed();
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => showPage(_returnPage));
 } else {
-  showPage(_returnPage);
+  
+// ── TEMA MUNDIAL ARGENTINA (11 jun - 19 jul 2026) ──
+(function() {
+  const hoy = new Date();
+  const inicio = new Date('2026-01-01');
+  const fin = new Date('2026-07-22'); // hasta el 21 inclusive
+
+  if (hoy < inicio || hoy >= fin) return; // fuera del período, no hace nada
+
+  const root = document.documentElement;
+
+  // Paleta Argentina
+  root.style.setProperty('--rose',        '#1565C0'); // azul celeste oscuro
+  root.style.setProperty('--rose-dark',   '#0D47A1'); // celeste más oscuro
+  root.style.setProperty('--rose-pale',   '#E3F2FD'); // celeste muy suave
+  root.style.setProperty('--rose-light',  '#BBDEFB'); // celeste claro
+  root.style.setProperty('--ink',         '#0D1B3E'); // azul noche Argentina
+  root.style.setProperty('--ink-mid',     '#1E4A8A'); // celeste medio
+  root.style.setProperty('--ink-light',   '#7BADD6'); // celeste suave
+  root.style.setProperty('--surface',     '#F0F8FF'); // fondo casi blanco azulado
+  root.style.setProperty('--surface-2',   '#E3F2FD'); // superficie secundaria
+  root.style.setProperty('--border',      'rgba(21,101,192,0.15)');
+  root.style.setProperty('--border-strong','rgba(21,101,192,0.30)');
+
+  // Ajustes específicos
+  // Carrito button → dorado Argentina
+  const style = document.createElement('style');
+  style.id = 'arg-theme-overrides';
+  style.textContent = `
+    .cart-btn { background: #FFD700 !important; color: #0D1B3E !important; }
+    .cart-btn:hover { background: #FFC200 !important; }
+    nav { background: rgba(21,101,192,0.97) !important; border-bottom: 2px solid #FFD700 !important; }
+    .nav-link { color: rgba(255,255,255,0.85) !important; }
+    .nav-link:hover, .nav-link.active { color: #FFD700 !important; }
+    .nav-brand { color: #fff !important; }
+    .nav-brand span { color: #FFD700 !important; }
+    .hero { background: linear-gradient(135deg, #E3F2FD 0%, #fff 50%, #E3F2FD 100%) !important; }
+    .hero-title em { color: #1565C0 !important; }
+    .hero-btn { background: #1565C0 !important; }
+    .hero-btn-outline { border-color: #1565C0 !important; color: #1565C0 !important; }
+    .load-more-btn { background: #1565C0 !important; }
+    .fav-btn.active svg { fill: #1565C0 !important; }
+    .badge-oferta { background: #1565C0 !important; }
+    .badge-nuevo { background: #FFD700 !important; color: #0D1B3E !important; }
+    .prod-price-discount, .prod-price { color: #1565C0 !important; }
+    .pm-add-btn { background: #1565C0 !important; }
+    footer, .footer { background: #0D1B3E !important; }
+    ::-webkit-scrollbar-thumb { background: #1565C0 !important; }
+
+    /* Franja decorativa mundial en el hero */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #74B9FF 0%, #fff 33%, #74B9FF 66%, #FFD700 100%);
+      z-index: 1;
+    }
+    .hero { position: relative; }
+  `;
+  document.head.appendChild(style);
+
+  console.log('🇦🇷 Tema Mundial Argentina activo hasta el 19 de julio');
+})();
+
+showPage(_returnPage);
 }
 // Hide loader
 function hideLoader() {
