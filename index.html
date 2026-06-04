@@ -3269,7 +3269,7 @@ function iniciarListenerPedidos() {
     if (!data) {
       window._pedidosCache = [];
     } else {
-      const list = Object.entries(data).map(([id, v]) => ({ id, ...v }));
+      const list = Object.entries(data).map(([fbKey, v]) => ({ id: fbKey, firebaseKey: fbKey, ...v }));
       list.sort((a, b) => (b.ts||0) - (a.ts||0));
       window._pedidosCache = list;
     }
