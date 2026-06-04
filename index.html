@@ -1644,11 +1644,16 @@ loadVisitasAdmin();
           cupon: cuponActivo ? _sanStr(cuponActivo.code) : null,
           envio: envioSeleccionado ? _sanStr(envioSeleccionado.zona) : null
         };
-        console.log('Guardando pedido nuevo en Firebase:', pedidoNuevo);
-        // Backend ya guardó y bajó el stock via webhook
-        // Solo notificamos por mail y actualizamos si hay key local
+        console.log('Guardando pedido nuevo via backend:', pedidoNuevo);
+        // Save via backend (has Firebase Admin credentials)
+        fetch(BACKEND + '/guardar-pedido', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ pedido: pedidoNuevo })
+        }).then(r => r.json()).then(d => console.log('Pedido guardado via backend:', d.key))
+          .catch(e => console.warn('Error guardando pedido:', e));
         notificarPedidoPorMail(pedidoNuevo);
-        // Llamar al backend para bajar stock como fallback (por si el webhook no llegó)
+        // Bajar stock via backend
         fetch(BACKEND + '/bajar-stock', {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
@@ -3352,9 +3357,7 @@ window.borrarPedido = async function(id) {
     // Remove from cache and re-render without Firebase read
     window._pedidosCache = window._pedidosCache.filter(x => x.id !== id);
     renderPedidosDesdeCache();
-    showToast('Pedido borrado');
-    // Refresh from Firebase after short delay to confirm deletion
-    setTimeout(() => renderPedidos(), 800);
+    showToast('Pedido borrado ✓');
   } catch(e) {
     console.error('Error borrando pedido:', e);
     showToast('Error al borrar', 'error');
