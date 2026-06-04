@@ -3258,36 +3258,63 @@ async function notificarPedidoPorMail(pedido) {
   }
 }
 
-async function getPedidos() {
-  try {
-    const snap = await db.ref('pedidos').get();
+// Cache de pedidos
+window._pedidosCache = [];
+window._pedidosListener = null;
+
+function iniciarListenerPedidos() {
+  if (window._pedidosListener) return; // ya iniciado
+  window._pedidosListener = db.ref('pedidos').on('value', snap => {
     const data = snap.val();
-    if (!data) return [];
-    const list = Object.entries(data).map(([id, v]) => ({ id, ...v }));
-    list.sort((a, b) => b.ts - a.ts);
-    return list;
-  } catch(e) {
-    console.error('Error leyendo pedidos:', e.code, e.message);
-    return [];
-  }
+    if (!data) {
+      window._pedidosCache = [];
+    } else {
+      const list = Object.entries(data).map(([id, v]) => ({ id, ...v }));
+      list.sort((a, b) => (b.ts||0) - (a.ts||0));
+      window._pedidosCache = list;
+    }
+    // Auto-refresh panel if open
+    const panel = document.getElementById('admin-tab-pedidos');
+    if (panel && panel.style.display !== 'none') {
+      renderPedidosDesdeCache();
+      actualizarStatsPedidos(window._pedidosCache);
+    }
+  }, err => {
+    console.error('Error listener pedidos:', err.code, err.message);
+  });
+  console.log('Listener pedidos iniciado');
 }
 
-// Cache de pedidos para re-render inmediato
-window._pedidosCache = [];
-
-window.renderPedidos = async function() {
-  const filtro = document.getElementById('filtro-estado-pedido')?.value || 'todos';
+window.renderPedidos = function() {
   const el = document.getElementById('pedidos-list');
   if (!el) return;
-  el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">Cargando pedidos...</div>';
-  // Always fresh from Firebase
-  const todosPedidos = await getPedidos();
-  console.log('Pedidos cargados:', todosPedidos.length);
-  window._pedidosCache = todosPedidos;
+  // Start realtime listener if not started
+  iniciarListenerPedidos();
+  // Show current cache immediately
+  if (window._pedidosCache.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">Cargando pedidos...</div>';
+  }
+  const filtro = document.getElementById('filtro-estado-pedido')?.value || 'todos';
+  const todosPedidos = window._pedidosCache;
   let pedidos = todosPedidos;
   if (filtro !== 'todos') pedidos = pedidos.filter(p => p.estado === filtro);
   _mostrarPedidos(pedidos, todosPedidos);
 };
+
+
+function actualizarStatsPedidos(todosPedidos) {
+  const aprobados = todosPedidos.filter(p => p.estado === 'aprobado' || p.estado === 'enviado' || p.estado === 'entregado');
+  const pendientes = todosPedidos.filter(p => p.estado === 'pendiente');
+  const totalVentas = aprobados.reduce((s,p) => s + (Number(p.total)||0), 0);
+  const stTotal = document.getElementById('stat-total-pedidos');
+  const stAprobados = document.getElementById('stat-aprobados');
+  const stVentas = document.getElementById('stat-total-ventas');
+  const stPendientes = document.getElementById('stat-pendientes');
+  if (stTotal) stTotal.textContent = todosPedidos.length;
+  if (stAprobados) stAprobados.textContent = aprobados.length;
+  if (stVentas) stVentas.textContent = '$' + totalVentas.toLocaleString('es-AR');
+  if (stPendientes) stPendientes.textContent = pendientes.length;
+}
 
 function _mostrarPedidos(pedidos, todosPedidos) {
   const el = document.getElementById('pedidos-list');
@@ -3379,6 +3406,7 @@ function renderPedidosDesdeCache() {
   let pedidos = window._pedidosCache;
   if (filtro !== 'todos') pedidos = pedidos.filter(p => p.estado === filtro);
   _mostrarPedidos(pedidos, window._pedidosCache);
+  actualizarStatsPedidos(window._pedidosCache);
 }
 
 window.exportarPedidosExcel = async function() {
