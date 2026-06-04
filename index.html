@@ -3248,16 +3248,30 @@ async function getPedidos() {
     const list = Object.entries(data).map(([id, v]) => ({ id, ...v }));
     list.sort((a, b) => b.ts - a.ts);
     return list;
-  } catch(e) { return []; }
+  } catch(e) {
+    console.error('Error leyendo pedidos:', e);
+    return [];
+  }
 }
+
+// Cache de pedidos para re-render inmediato
+window._pedidosCache = [];
 
 window.renderPedidos = async function() {
   const filtro = document.getElementById('filtro-estado-pedido')?.value || 'todos';
   const el = document.getElementById('pedidos-list');
+  if (!el) return;
   el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">Cargando pedidos...</div>';
   const todosPedidos = await getPedidos();
+  window._pedidosCache = todosPedidos;
   let pedidos = todosPedidos;
   if (filtro !== 'todos') pedidos = pedidos.filter(p => p.estado === filtro);
+  _mostrarPedidos(pedidos, todosPedidos);
+};
+
+function _mostrarPedidos(pedidos, todosPedidos) {
+  const el = document.getElementById('pedidos-list');
+  if (!el) return;
   const aprobados = todosPedidos.filter(p => p.estado === 'aprobado');
   const pendientes = todosPedidos.filter(p => p.estado === 'pendiente');
   const totalVentas = aprobados.reduce((s, p) => s + (p.total || 0), 0);
@@ -3303,17 +3317,41 @@ window.renderPedidos = async function() {
 };
 
 window.cambiarEstadoPedido = async function(id, nuevoEstado) {
-  await db.ref('pedidos/' + id).update({ estado: nuevoEstado });
-  showToast('Estado actualizado: ' + nuevoEstado);
-  renderPedidos();
+  try {
+    await db.ref('pedidos/' + id).update({ estado: nuevoEstado });
+    // Update cache directly and re-render without Firebase read
+    const p = window._pedidosCache.find(x => x.id === id);
+    if (p) p.estado = nuevoEstado;
+    renderPedidosDesdeCache();
+    showToast('Estado actualizado: ' + nuevoEstado);
+  } catch(e) {
+    console.error('Error actualizando estado:', e);
+    showToast('Error al actualizar', 'error');
+  }
 };
 
 window.borrarPedido = async function(id) {
   if (!confirm('¿Borrar este pedido? No se puede deshacer.')) return;
-  await db.ref('pedidos/' + id).remove();
-  showToast('Pedido borrado');
-  renderPedidos();
-};
+  try {
+    await db.ref('pedidos/' + id).remove();
+    // Remove from cache and re-render without Firebase read
+    window._pedidosCache = window._pedidosCache.filter(x => x.id !== id);
+    renderPedidosDesdeCache();
+    showToast('Pedido borrado');
+  } catch(e) {
+    console.error('Error borrando pedido:', e);
+    showToast('Error al borrar', 'error');
+  }
+}
+
+function renderPedidosDesdeCache() {
+  const filtro = document.getElementById('filtro-estado-pedido')?.value || 'todos';
+  const el = document.getElementById('pedidos-list');
+  if (!el) return;
+  let pedidos = window._pedidosCache;
+  if (filtro !== 'todos') pedidos = pedidos.filter(p => p.estado === filtro);
+  _mostrarPedidos(pedidos, window._pedidosCache);
+}
 
 window.exportarPedidosExcel = async function() {
   const pedidos = await getPedidos();
