@@ -1610,9 +1610,14 @@ loadVisitasAdmin();
       const pedidoPendiente = pedidoPendienteStr ? JSON.parse(pedidoPendienteStr) : null;
       console.log('Pedido pendiente firebaseKey:', pedidoPendiente ? pedidoPendiente.firebaseKey : 'ninguno');
       if (pedidoPendiente && pedidoPendiente.firebaseKey) {
-        // Backend ya actualizó via webhook, solo notificamos
+        // Actualizar pedido en Firebase (frontend fallback por si webhook no llegó)
+        db.ref('pedidos/' + pedidoPendiente.firebaseKey).update({
+          estado: 'aprobado',
+          payment_id: String(pedidoId)
+        }).then(() => console.log('Pedido actualizado a aprobado:', pedidoPendiente.firebaseKey))
+          .catch(e => console.warn('No se pudo actualizar pedido:', e));
         notificarPedidoPorMail({...pedidoPendiente, estado:'aprobado', payment_id: pedidoId});
-        // Fallback stock
+        // Bajar stock via backend
         fetch(BACKEND + '/bajar-stock', {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
@@ -1631,6 +1636,7 @@ loadVisitasAdmin();
             title: _sanStr(i.name),
             talla: _sanStr(i.talla || '—'),
             color: _sanStr((i.color && typeof i.color === 'object') ? (i.color.nombre || i.color.hex || '') : (i.color || '')),
+            name: _sanStr(i.name),
             qty: _sanNum(i.qty),
             price: _sanNum(i.price)
           })),
@@ -3258,7 +3264,7 @@ async function getPedidos() {
     list.sort((a, b) => b.ts - a.ts);
     return list;
   } catch(e) {
-    console.error('Error leyendo pedidos:', e);
+    console.error('Error leyendo pedidos:', e.code, e.message);
     return [];
   }
 }
@@ -3271,7 +3277,9 @@ window.renderPedidos = async function() {
   const el = document.getElementById('pedidos-list');
   if (!el) return;
   el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">Cargando pedidos...</div>';
+  // Always fresh from Firebase
   const todosPedidos = await getPedidos();
+  console.log('Pedidos cargados:', todosPedidos.length);
   window._pedidosCache = todosPedidos;
   let pedidos = todosPedidos;
   if (filtro !== 'todos') pedidos = pedidos.filter(p => p.estado === filtro);
