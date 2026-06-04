@@ -1610,9 +1610,14 @@ loadVisitasAdmin();
       const pedidoPendiente = pedidoPendienteStr ? JSON.parse(pedidoPendienteStr) : null;
       console.log('Pedido pendiente firebaseKey:', pedidoPendiente ? pedidoPendiente.firebaseKey : 'ninguno');
       if (pedidoPendiente && pedidoPendiente.firebaseKey) {
-        db.ref('pedidos/' + pedidoPendiente.firebaseKey).update({ estado: 'aprobado', payment_id: pedidoId })
-          .then(() => { console.log('Pedido actualizado OK:', pedidoPendiente.firebaseKey); notificarPedidoPorMail({...pedidoPendiente, estado:'aprobado', payment_id: pedidoId}); })
-          .catch(e => { console.error('Error actualizando pedido:', e); });
+        // Backend ya actualizó via webhook, solo notificamos
+        notificarPedidoPorMail({...pedidoPendiente, estado:'aprobado', payment_id: pedidoId});
+        // Fallback stock
+        fetch(BACKEND + '/bajar-stock', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ items: (pedidoPendiente.items||[]).map(i => ({ prodId: i.prodId||i.id, talla: i.talla||'—', color: i.color||'', qty: i.qty||1 })) })
+        }).catch(e => console.warn('Stock backend error:', e));
         localStorage.removeItem('diamantina_pedido_pendiente');
       } else {
         const _sanNum = v => (isNaN(v) || v === null || v === undefined) ? 0 : Number(v);
@@ -1634,9 +1639,15 @@ loadVisitasAdmin();
           envio: envioSeleccionado ? _sanStr(envioSeleccionado.zona) : null
         };
         console.log('Guardando pedido nuevo en Firebase:', pedidoNuevo);
-        db.ref('pedidos').push(pedidoNuevo)
-          .then(ref => { console.log('Pedido guardado OK, key:', ref.key); notificarPedidoPorMail(pedidoNuevo); })
-          .catch(e => console.error('Error guardando pedido:', e));
+        // Backend ya guardó y bajó el stock via webhook
+        // Solo notificamos por mail y actualizamos si hay key local
+        notificarPedidoPorMail(pedidoNuevo);
+        // Llamar al backend para bajar stock como fallback (por si el webhook no llegó)
+        fetch(BACKEND + '/bajar-stock', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ items: cart.map(i => ({ prodId: i.prodId||i.id, talla: i.talla||'—', color: i.color||'', qty: i.qty||1 })) })
+        }).then(() => console.log('Stock bajado via backend')).catch(e => console.warn('Stock backend error:', e));
       }
       cart.forEach(item => {
         if (!item.prodId) return;
@@ -2687,45 +2698,43 @@ window.checkout = async function() {
       unit_price: Math.max(1, Math.round(Number(i.price))),
       currency_id: 'ARS'
     }));
+    // Armar pedido completo para mandar al backend
+    const tsNow = Date.now();
+    const pedidoCompleto = {
+      ts: tsNow,
+      estado: 'pendiente',
+      nombre: myName || 'Cliente',
+      items: cart.map(i => ({
+        title: i.name,
+        name: i.name,
+        prodId: i.prodId || i.id,
+        talla: i.talla || '—',
+        color: i.color || '',
+        qty: i.qty,
+        price: i.price
+      })),
+      total: cart.reduce((s,i) => s + (Number(i.price)||0) * (Number(i.qty)||1), 0),
+      cupon: cuponActivo ? cuponActivo.code : null,
+      envio: envioSeleccionado ? envioSeleccionado.zona : null,
+      envio_precio: envioSeleccionado ? (envioSeleccionado.precio || 0) : 0
+    };
+
     const res = await fetch(BACKEND + '/crear-preferencia', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        items,
-        back_urls: {
-          success: 'https://www.diamantina.shop/?pago=aprobado',
-          failure: 'https://www.diamantina.shop/?pago=fallido',
-          pending: 'https://www.diamantina.shop/?pago=aprobado'
-        },
-        auto_return: 'approved',
-        statement_descriptor: 'DIAMANTINA'
-      })
+      body: JSON.stringify({ items, pedido: pedidoCompleto })
     });
     const data = await res.json();
     if (data.init_point) {
       localStorage.setItem('diamantina_cart_pending', JSON.stringify(cart));
-      // Guardar pedido como pendiente ANTES de redirigir
-      const tsNow = Date.now();
+      // Guardar referencia local para fallback
       const pedidoPendiente = {
-        id: data.id || tsNow.toString(),
-        ts: tsNow,
-        estado: 'pendiente',
-        nombre: myName || 'Cliente',
-        items: cart.map(i => ({ title: i.name, talla: i.talla || '—', color: i.color || '', qty: i.qty, price: i.price })),
-        total: cart.reduce((s,i) => s + i.price * i.qty, 0),
-        cupon: cuponActivo ? cuponActivo.code : null,
-        envio: envioSeleccionado ? envioSeleccionado.zona : null,
+        ...pedidoCompleto,
+        firebaseKey: data.pedidoKey || null,
         mp_id: data.id || null
       };
-      // Guardar en Firebase y obtener la key para poder actualizarlo al volver
-      try {
-        const ref = await db.ref('pedidos').push(pedidoPendiente);
-        pedidoPendiente.firebaseKey = ref.key;
-        console.log('Pedido pendiente guardado con key:', ref.key);
-      } catch(e) {
-        console.error('Error guardando pedido pendiente:', e);
-      }
       localStorage.setItem('diamantina_pedido_pendiente', JSON.stringify(pedidoPendiente));
+      console.log('Pedido guardado en backend con key:', data.pedidoKey);
       window.location.href = data.init_point;
     } else {
       throw new Error('No se recibió el link de pago');
