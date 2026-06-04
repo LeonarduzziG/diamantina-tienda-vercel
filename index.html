@@ -1669,9 +1669,7 @@ loadVisitasAdmin();
           }
         });
       });
-      const _envioInfo = envioSeleccionado ? (envioSeleccionado.tipo === 'coordinar' ? '%0AEntrega: ' + envioSeleccionado.zona : '%0AEnvío: ' + envioSeleccionado.zona) : '';
       // WhatsApp admin notification removed
-      setTimeout(() => { window.open('https://wa.me/' + WA_NOTIF_NUMBER + '?text=' + msg, '_blank'); }, 1500);
     } else {
       console.log('Pedido ya procesado (localStorage tiene flag):', pedidoId);
       // Si el cart tiene items igual, mostrar éxito sin re-guardar
@@ -3355,6 +3353,8 @@ window.borrarPedido = async function(id) {
     window._pedidosCache = window._pedidosCache.filter(x => x.id !== id);
     renderPedidosDesdeCache();
     showToast('Pedido borrado');
+    // Refresh from Firebase after short delay to confirm deletion
+    setTimeout(() => renderPedidos(), 800);
   } catch(e) {
     console.error('Error borrando pedido:', e);
     showToast('Error al borrar', 'error');
