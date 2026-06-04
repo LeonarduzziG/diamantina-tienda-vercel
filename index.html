@@ -3338,14 +3338,15 @@ function _mostrarPedidos(pedidos, todosPedidos) {
 
 window.cambiarEstadoPedido = async function(id, nuevoEstado) {
   try {
+    const user = firebase.auth().currentUser;
+    if (!user) { showToast('Sesión expirada', 'error'); showAdminPrompt(); return; }
     await db.ref('pedidos/' + id).update({ estado: nuevoEstado });
-    // Update cache directly and re-render without Firebase read
     const p = window._pedidosCache.find(x => x.id === id);
     if (p) p.estado = nuevoEstado;
     renderPedidosDesdeCache();
     showToast('Estado actualizado: ' + nuevoEstado);
   } catch(e) {
-    console.error('Error actualizando estado:', e);
+    console.error('Error actualizando estado:', e.code, e.message);
     showToast('Error al actualizar', 'error');
   }
 };
@@ -3353,14 +3354,21 @@ window.cambiarEstadoPedido = async function(id, nuevoEstado) {
 window.borrarPedido = async function(id) {
   if (!confirm('¿Borrar este pedido? No se puede deshacer.')) return;
   try {
+    const user = firebase.auth().currentUser;
+    console.log('Borrando pedido, user:', user ? user.email : 'NO AUTENTICADO', 'id:', id);
+    if (!user) { showToast('Sesión expirada — volvé a iniciar sesión', 'error'); showAdminPrompt(); return; }
     await db.ref('pedidos/' + id).remove();
-    // Remove from cache and re-render without Firebase read
+    console.log('Pedido borrado de Firebase OK:', id);
     window._pedidosCache = window._pedidosCache.filter(x => x.id !== id);
     renderPedidosDesdeCache();
     showToast('Pedido borrado ✓');
   } catch(e) {
-    console.error('Error borrando pedido:', e);
-    showToast('Error al borrar', 'error');
+    console.error('Error borrando pedido:', e.code, e.message);
+    if (e.code === 'PERMISSION_DENIED') {
+      showToast('Sin permisos — revisá las Firebase Rules', 'error');
+    } else {
+      showToast('Error: ' + e.message, 'error');
+    }
   }
 }
 
