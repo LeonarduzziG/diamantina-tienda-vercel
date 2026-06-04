@@ -3380,22 +3380,29 @@ window.cambiarEstadoPedido = async function(id, nuevoEstado) {
 
 window.borrarPedido = async function(id) {
   if (!confirm('¿Borrar este pedido? No se puede deshacer.')) return;
+  // Find the real Firebase key from cache
+  const pedido = window._pedidosCache.find(x => x.id === id || x.firebaseKey === id || x.payment_id === id);
+  const fbKey = pedido?.firebaseKey || pedido?.id || id;
+  console.log('Borrando pedido id:', id, '→ fbKey:', fbKey);
   try {
-    const user = firebase.auth().currentUser;
-    console.log('Borrando pedido, user:', user ? user.email : 'NO AUTENTICADO', 'id:', id);
-    if (!user) { showToast('Sesión expirada — volvé a iniciar sesión', 'error'); showAdminPrompt(); return; }
-    await db.ref('pedidos/' + id).remove();
-    console.log('Pedido borrado de Firebase OK:', id);
-    window._pedidosCache = window._pedidosCache.filter(x => x.id !== id);
-    renderPedidosDesdeCache();
-    showToast('Pedido borrado ✓');
-  } catch(e) {
-    console.error('Error borrando pedido:', e.code, e.message);
-    if (e.code === 'PERMISSION_DENIED') {
-      showToast('Sin permisos — revisá las Firebase Rules', 'error');
+    // Try via backend first (no auth needed)
+    const res = await fetch(BACKEND + '/borrar-pedido', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ key: fbKey })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      console.log('Pedido borrado via backend OK:', fbKey);
+      window._pedidosCache = window._pedidosCache.filter(x => x.id !== id && x.firebaseKey !== fbKey);
+      renderPedidosDesdeCache();
+      showToast('Pedido borrado ✓');
     } else {
-      showToast('Error: ' + e.message, 'error');
+      showToast('Error al borrar: ' + (data.error||''), 'error');
     }
+  } catch(e) {
+    console.error('Error borrando pedido:', e.message);
+    showToast('Error al borrar', 'error');
   }
 }
 
