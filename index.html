@@ -560,6 +560,56 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
   z-index:2;
 }
 
+
+/* ── NUEVO HERO FULLSCREEN ── */
+.hero-v2{position:relative;min-height:90vh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#111}
+.hero-v2-bg{position:absolute;inset:0;z-index:0}
+.hero-v2-bg img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.hero-v2-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.2) 60%,rgba(0,0,0,0.4) 100%)}
+.hero-v2-content{position:relative;z-index:1;text-align:left;padding:4rem 3rem;max-width:620px;margin-left:5vw}
+.hero-v2-eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.8);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.hero-v2-eyebrow::before{content:'';display:block;width:30px;height:1px;background:rgba(255,255,255,0.6)}
+.hero-v2-title{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,5vw,72px);font-weight:300;color:#fff;line-height:1.05;margin-bottom:20px;text-shadow:0 2px 20px rgba(0,0,0,0.3)}
+.hero-v2-title em{font-style:italic;color:#FFD6E8}
+.hero-v2-sub{font-size:16px;color:rgba(255,255,255,0.85);line-height:1.7;margin-bottom:32px;max-width:420px;text-shadow:0 1px 8px rgba(0,0,0,0.4)}
+.hero-v2-btns{display:flex;gap:12px;flex-wrap:wrap}
+.hero-v2-btn-primary{padding:15px 36px;background:#fff;color:#1a0a12;border:none;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.25s;letter-spacing:0.5px}
+.hero-v2-btn-primary:hover{background:#FFD6E8;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+.hero-v2-btn-secondary{padding:14px 28px;background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.7);border-radius:999px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.25s;display:flex;align-items:center;gap:8px;backdrop-filter:blur(4px)}
+.hero-v2-btn-secondary:hover{background:rgba(255,255,255,0.15);border-color:#fff}
+.hero-v2-badges{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
+.hero-v2-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.8);font-family:'DM Sans',sans-serif;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.2)}
+.hero-v2-badge svg{flex-shrink:0}
+/* Scroll indicator */
+.hero-scroll{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,0.6);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'DM Sans',sans-serif;animation:bounce 2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+
+/* Sección categorías visual */
+.cats-section{background:#fff;padding:2rem 1.5rem;border-bottom:1px solid var(--border)}
+.cats-section-title{text-align:center;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--ink);margin-bottom:1.5rem;letter-spacing:1px}
+.cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:800px;margin:0 auto}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:transform 0.2s}
+.cat-item:hover{transform:translateY(-3px)}
+.cat-img-wrap{width:80px;height:80px;border-radius:50%;overflow:hidden;border:2px solid var(--border);transition:border-color 0.2s;background:var(--surface-2)}
+.cat-item:hover .cat-img-wrap{border-color:var(--rose)}
+.cat-img-wrap img{width:100%;height:100%;object-fit:cover}
+.cat-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-mid);text-align:center}
+
+/* Trust bar */
+.trust-bar{background:var(--surface-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 2rem;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-mid);font-family:'DM Sans',sans-serif}
+.trust-item strong{color:var(--ink);font-weight:600}
+
+@media(max-width:768px){
+  .hero-v2{grid-template-columns:1fr;min-height:auto}
+  .hero-v2-img{height:280px;order:-1}
+  .hero-v2-content{padding:1.5rem}
+  .cats-grid{grid-template-columns:repeat(4,1fr);gap:8px}
+  .cat-img-wrap{width:60px;height:60px}
+  .cat-label{font-size:10px}
+  .trust-bar{gap:1rem;padding:10px 1rem}
+}
+
 </style>
 </head>
 <body>
@@ -632,13 +682,81 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 
 <!-- TIENDA -->
 <div id="page-tienda">
-  <div class="hero">
-    <img src="https://res.cloudinary.com/dy1yckjcj/image/upload/v1780442730/6011F3D2-4EA7-4B2B-A4C8-9F217ADD2F2B_lmotkd.png" alt="Diamantina" style="width:80px;height:80px;object-fit:contain;border-radius:50%;margin:0 auto 1.5rem;display:block">
-    <div class="hero-eyebrow">Colección actual</div>
-    <div class="hero-title">Lencería <em>fina</em><br>para vos</div>
-    <div class="hero-sub">Piezas únicas con el mejor confort y estilo para cada momento.</div>
-    <button class="hero-btn" onclick="document.getElementById('ofertas-section').scrollIntoView({behavior:'smooth'})">Ver Ofertas</button>
-    <button onclick="openGuiaModal()" style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:11px 28px;background:transparent;border:1px solid var(--rose);color:var(--rose);border-radius:999px;font-size:14px;font-weight:500;cursor:pointer;font-family:DM Sans,sans-serif;transition:all var(--tr)">🔍 Encontrá tu talle</button>
+  <!-- HERO V2 FULLSCREEN -->
+  <div class="hero-v2 hero">
+    <!-- Fondo imagen -->
+    <div class="hero-v2-bg">
+      <img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780699131/diamantina/laqavbxqgax6h1kq0qz0.png" alt="Diamantina Lencería" loading="eager">
+    </div>
+    <!-- Contenido encima -->
+    <div class="hero-v2-content">
+      <div class="hero-v2-eyebrow">🇦🇷 Colección Mundial 2026</div>
+      <div class="hero-v2-title hero-title">Sentite increíble,<br><em>todos los días.</em></div>
+      <div class="hero-v2-sub hero-sub">Diseños exclusivos, talles reales y calidad que se siente. Lencería de diseño hecha en Argentina.</div>
+      <div class="hero-v2-badges">
+        <div class="hero-v2-badge">🚚 <span>Envíos a todo el país</span></div>
+        <div class="hero-v2-badge">🔒 <span>Compra segura</span></div>
+        <div class="hero-v2-badge">💬 <span>Atención personalizada por WhatsApp</span></div>
+      </div>
+      <div class="hero-v2-btns">
+        <button class="hero-v2-btn-primary hero-btn" onclick="document.getElementById('cats-section').scrollIntoView({behavior:'smooth'})">Ver colección</button>
+        <button class="hero-v2-btn-secondary" onclick="openGuiaModal()">
+          🔍 Encontrá tu talle
+        </button>
+      </div>
+    </div>
+    <!-- Scroll indicator -->
+    <div class="hero-scroll">
+      <span>Explorar</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+  </div>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar">
+    <div class="trust-item">🚚 <span><strong>Envío gratis</strong> en compras +$80.000</span></div>
+    <div class="trust-item">🔒 <span><strong>Pagá seguro</strong> con MercadoPago</span></div>
+    <div class="trust-item">🔄 <span><strong>Cambios</strong> sin complicaciones</span></div>
+    <div class="trust-item">💬 <span><strong>Atención</strong> por WhatsApp</span></div>
+  </div>
+
+  <!-- CATEGORÍAS VISUALES -->
+  <div class="cats-section" id="cats-section">
+    <div class="cats-section-title">Elegí lo que más va con vos</div>
+    <div class="cats-grid">
+      <div class="cat-item" onclick="setFilter('Conjuntos');document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
+        <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780699536/conjuntosicon_gsm9zv.png" alt="Conjuntos" loading="lazy"></div>
+        <div class="cat-label">Conjuntos</div>
+      </div>
+      <div class="cat-item" onclick="setFilter('Colaless');document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
+        <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780699597/lessicon_dulayy.png" alt="Colaless" loading="lazy"></div>
+        <div class="cat-label">Colaless</div>
+      </div>
+      <div class="cat-item" onclick="setFilter('Bodys');document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
+        <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780699922/bodysicon_evu4gf.png" alt="Bodys" loading="lazy"></div>
+        <div class="cat-label">Bodys</div>
+      </div>
+      <div class="cat-item" onclick="setFilter('Tops');document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
+        <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780699961/topsicon_q21qgk.png" alt="Tops" loading="lazy"></div>
+        <div class="cat-label">Tops</div>
+      </div>
+      <div class="cat-item" onclick="setFilter('Babydoll');document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
+        <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780700051/babydollicon_owkrab.png" alt="Babydoll" loading="lazy"></div>
+        <div class="cat-label">Babydoll</div>
+      </div>
+      <div class="cat-item" onclick="setFilter('Bikinis');document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
+        <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780700144/bikiniicon_mverlg.png" alt="Bikinis" loading="lazy"></div>
+        <div class="cat-label">Bikinis</div>
+      </div>
+      <div class="cat-item" onclick="setFilter('Disfraces');document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
+        <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780700244/disfracesicon_gittyr.png" alt="Disfraces" loading="lazy"></div>
+        <div class="cat-label">Disfraces</div>
+      </div>
+      <div class="cat-item" onclick="setFilter('Accesorios');document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
+        <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780700355/accesoriosicon_f1umq8.png" alt="Accesorios" loading="lazy"></div>
+        <div class="cat-label">Accesorios</div>
+      </div>
+    </div>
   </div>
 
   <div class="ofertas-section" id="ofertas-section">
@@ -1354,6 +1472,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
           <option value="Babydoll">Babydoll</option>
           <option value="Colaless">Colaless</option>
           <option value="Bikinis">Bikinis</option>
+          <option value="Disfraces">Disfraces</option>
+          <option value="Accesorios">Accesorios</option>
         </select>
       </div>
       <div class="form-field" style="display:flex;align-items:center;gap:10px">
@@ -1483,6 +1603,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
           <option value="Babydoll">Babydoll</option>
           <option value="Colaless">Colaless</option>
           <option value="Bikinis">Bikinis</option>
+          <option value="Disfraces">Disfraces</option>
+          <option value="Accesorios">Accesorios</option>
         </select>
         <select id="admin-estado-filter" onchange="renderAdminList()" style="padding:6px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink-mid);background:var(--surface-2);outline:none;cursor:pointer">
           <option value="">Todos los estados</option>
@@ -4497,7 +4619,7 @@ if (document.readyState === 'loading') {
     .nav-brand { color: #fff !important; }
     .nav-brand span { color: #FFD700 !important; }
     body { background: #F0F8FF !important; }
-    .hero { background: linear-gradient(135deg, #E3F2FD 0%, #fff 50%, #E3F2FD 100%) !important; position: relative; }
+    .hero-v2 { background: #fff !important; } .hero-v2 .hero-v2-img { background: #E3F2FD; }
     .hero-title em { color: #1565C0 !important; }
     .hero-btn, .hero-btn-solid { background: #1565C0 !important; border-color: #1565C0 !important; }
     .hero-btn-outline { border-color: #1565C0 !important; color: #1565C0 !important; }
