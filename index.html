@@ -2465,9 +2465,30 @@ window.selectTalla = function(t, btn, agotada) {
 function renderRelacionados(prod) {
   const grid = document.getElementById('pm-relacionados-grid');
   if (!grid) return;
-  const relacionados = products
-    .filter(p => p.id !== prod.id && p.status !== 'agotado' && p.cat === prod.cat)
-    .slice(0, 6);
+
+  const complementarios = {
+    'Colaless': ['Conjuntos','Tops','Bodys'],
+    'Tops': ['Colaless','Conjuntos','Bikinis'],
+    'Conjuntos': ['Colaless','Babydoll'],
+    'Bodys': ['Colaless','Conjuntos'],
+    'Babydoll': ['Conjuntos','Colaless'],
+    'Bikinis': ['Tops','Conjuntos']
+  };
+  const catsComp = complementarios[prod.cat] || [];
+
+  const mismacat = products.filter(p =>
+    p.id !== prod.id && p.cat === prod.cat && p.estado !== 'agotado' && p.estado !== 'oculto'
+  ).sort(() => Math.random()-0.5).slice(0,3);
+
+  const cross = products.filter(p =>
+    p.id !== prod.id && catsComp.includes(p.cat) && p.estado !== 'agotado' && p.estado !== 'oculto'
+  ).sort(() => Math.random()-0.5).slice(0,3);
+
+  const relacionados = [...mismacat, ...cross].slice(0,6);
+
+  const titleEl = document.getElementById('pm-relacionados-title');
+  if (titleEl) titleEl.textContent = cross.length > 0 ? '✨ Completá tu look' : '👀 También te puede gustar';
+
   if (!relacionados.length) {
     document.getElementById('pm-relacionados').style.display = 'none';
     return;
@@ -2915,6 +2936,10 @@ window.saveProduct = async function() {
   const packPrice = parseInt(document.getElementById('prod-pack-price')?.value) || 0;
   const esNuevo = document.getElementById('prod-es-nuevo')?.checked || false;
   const esArg = document.getElementById('prod-es-arg')?.checked || false;
+  // Si estado=agotado, poner todo el stock en 0
+  if (estado === 'agotado') {
+    Object.keys(stock).forEach(k => { stock[k] = 0; });
+  }
   const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas, esNuevo: esNuevo || null, esArg: esArg || null,
     packQty: packQty >= 2 ? packQty : null,
     packPrice: packPrice > 0 && packQty >= 2 ? packPrice : null,
@@ -4614,6 +4639,7 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
       </div>
       <!-- PRODUCTOS RELACIONADOS -->
       <div id="pm-relacionados" style="border-top:1px solid var(--border);padding:14px 0 4px">
+        <div id="pm-relacionados-title" style="font-size:12px;font-weight:600;letter-spacing:1px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:8px">✨ Completá tu look</div>
         <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);margin-bottom:10px">También te puede gustar</div>
         <div id="pm-relacionados-grid" style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px"></div>
       </div>
