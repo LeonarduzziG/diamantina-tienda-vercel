@@ -2064,7 +2064,15 @@ db.ref('productos').on('value', (snap) => {
     const data = snap.val();
     const allProds = data ? Object.entries(data).map(([id, val]) => ({ id, ...val })) : [];
     window._allProducts = data || {};
-    products = allProds.filter(p => p.estado !== 'oculto');
+    products = allProds.filter(p => {
+      if (p.estado === 'oculto') return false;
+      // Ocultar si todo el stock es 0
+      if (p.stock && Object.keys(p.stock).length > 0) {
+        const totalStock = Object.values(p.stock).reduce((s, v) => s + (Number(v) || 0), 0);
+        if (totalStock === 0) return false;
+      }
+      return true;
+    });
   } catch(e) {
     products = [];
     console.error('Error procesando productos:', e);
