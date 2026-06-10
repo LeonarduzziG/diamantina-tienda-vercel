@@ -2549,6 +2549,9 @@ window.openProdModal = function(id) {
           this.style.border = '2px solid var(--rose)';
           this.style.boxShadow = '0 0 0 2px #fff, 0 0 0 4px var(--rose)';
           window.selectedColor = { hex: this.dataset.hex, nombre: this.dataset.nombre };
+          window._selectedColor = this.dataset.nombre;
+          // Re-render tallas with correct stock for this color
+          if (currentProd) renderTallasConStock(currentProd);
         });
       });
     } else {
@@ -2556,19 +2559,7 @@ window.openProdModal = function(id) {
     }
   }
 
-  tallasEl.innerHTML = (p.tallas||[]).map(t => {
-    // Buscar stock por talla+color seleccionado, o solo por talla
-    const _selColor = window._selectedColor || '';
-    const _stockKey = _selColor ? (t + '__' + _selColor) : t;
-    const stock = p.stock ? (p.stock[_stockKey] !== undefined ? p.stock[_stockKey] : (p.stock[t] !== undefined ? p.stock[t] : 99)) : 99;
-    const agotada = stock === 0;
-    const ultimas = stock > 0 && stock <= 3;
-    return `<button class="talla-btn${agotada?' agotada':''}" onclick="selectTalla('${t}',this,${agotada})" ${agotada?'disabled':''} style="${(agotada||ultimas)?'min-height:52px;height:auto;padding:5px 4px;flex-direction:column;gap:1px;':''}">
-      <span style="font-size:13px;line-height:1.2">${t}</span>
-      ${agotada ? '<span style="font-size:8px;line-height:1;opacity:0.7">Agotada</span>' : ''}
-      ${ultimas ? '<span style="font-size:8px;line-height:1;color:#E24B4A;font-weight:600">¡Última!</span>' : ''}
-    </button>`;
-  }).join('');
+  renderTallasConStock(p);
   document.getElementById('pm-add-btn').textContent = p.estado === 'agotado' ? 'Agotado' : 'Agregar al carrito';
   document.getElementById('pm-add-btn').disabled = p.estado === 'agotado';
   selectedStars = 0; window.selectedStars = 0;
@@ -2607,6 +2598,25 @@ window.openProdModal = function(id) {
   }
 
   document.getElementById('prod-modal-bg').classList.add('open');
+};
+
+window.renderTallasConStock = function(p) {
+  const tallasEl = document.getElementById('pm-tallas');
+  if (!tallasEl) return;
+  const _selColor = window._selectedColor || '';
+  tallasEl.innerHTML = (p.tallas||[]).map(t => {
+    const _stockKey = _selColor ? (t + '__' + _selColor) : t;
+    const stock = p.stock ? (p.stock[_stockKey] !== undefined ? p.stock[_stockKey] : (p.stock[t] !== undefined ? p.stock[t] : 99)) : 99;
+    const agotada = stock === 0;
+    const ultimas = stock > 0 && stock <= 3;
+    return `<button class="talla-btn${agotada?' agotada':''}" onclick="selectTalla('${t}',this,${agotada})" ${agotada?'disabled':''} style="${(agotada||ultimas)?'min-height:52px;height:auto;padding:5px 4px;flex-direction:column;gap:1px;'}">
+      <span style="font-size:13px;line-height:1.2">${t}</span>
+      ${agotada ? '<span style="font-size:8px;line-height:1;opacity:0.7">Agotada</span>' : ''}
+      ${ultimas ? '<span style="font-size:8px;line-height:1;color:#E24B4A;font-weight:600">¡Última!</span>' : ''}
+    </button>`;
+  }).join('');
+  // Reset talla selection
+  selectedTalla = null;
 };
 
 window.selectTalla = function(t, btn, agotada) {
@@ -3416,8 +3426,9 @@ window.testEmail = async function() {
 async function notificarPedidoPorMail(pedido) {
   try {
     const items = (pedido.items || []).map(i => {
-      const t = i.talla && i.talla !== '—' ? ' T.' + i.talla : '';
-      const c = i.color ? ' ' + i.color : '';
+      const t = i.talla && i.talla !== '—' ? ' · Talle ' + i.talla : '';
+      const colorVal = i.color && typeof i.color === 'object' ? (i.color.nombre || i.color.hex || '') : (i.color || '');
+      const c = colorVal ? ' · ' + colorVal : '';
       return (i.title || i.name || '—') + t + c + ' x' + (i.qty || 1);
     }).join(' | ');
     const templateParams = {
@@ -3450,7 +3461,7 @@ function iniciarListenerPedidos() {
     if (!data) {
       window._pedidosCache = [];
     } else {
-      const list = Object.entries(data).map(([fbKey, v]) => ({ id: fbKey, firebaseKey: fbKey, ...v }));
+      const list = Object.entries(data).map(([fbKey, v]) => ({ ...v, id: fbKey, firebaseKey: fbKey }));
       list.sort((a, b) => (b.ts||0) - (a.ts||0));
       window._pedidosCache = list;
     }
