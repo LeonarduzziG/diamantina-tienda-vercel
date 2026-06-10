@@ -1288,40 +1288,48 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
   <div class="cart-items" id="cart-items"></div>
   <div class="cart-footer">
     <div style="margin-bottom:14px;padding:12px;background:var(--rose-pale);border-radius:var(--radius-sm);border:1px solid var(--border)">
-      <!-- TABS ENVÍO -->
+      <!-- TABS -->
       <div style="display:flex;gap:6px;margin-bottom:10px">
-        <button id="tab-andreani" onclick="switchEnvioTab('andreani')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">📦 Envío a domicilio</button>
-        <button id="tab-coordinar" onclick="switchEnvioTab('coordinar')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">📍 Retiro personal</button>
+        <button id="tab-andreani" onclick="switchEnvioTab('andreani')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">🚚 Envío</button>
+        <button id="tab-coordinar" onclick="switchEnvioTab('coordinar')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">📍 Retiro gratis</button>
       </div>
-      <!-- TAB ENVÍO A DOMICILIO -->
+
+      <!-- PANEL ENVÍO -->
       <div id="panel-andreani">
         <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
-          <div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">📦 Correo Argentino o Andreani</div>
-          <div style="font-size:12px;color:var(--ink-mid);line-height:1.6;margin-bottom:10px">Ingresá tu código postal y te cotizamos el envío. Te avisamos antes de que pagues.</div>
-          <input type="text" id="cp-input" placeholder="Código postal (ej: 1405)" maxlength="8" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none;margin-bottom:10px" oninput="onCpInput()">
-          <div style="font-size:12px;color:var(--ink-mid);margin-bottom:6px;font-weight:500">¿Cómo te avisamos el costo?</div>
-          <div style="display:flex;gap:6px;margin-bottom:8px">
-            <button id="contacto-wp" onclick="seleccionarContacto('whatsapp')" style="flex:1;padding:7px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">💬 WhatsApp</button>
-            <button id="contacto-mail" onclick="seleccionarContacto('email')" style="flex:1;padding:7px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">✉️ Email</button>
+          <div style="font-size:12px;color:var(--ink-mid);line-height:1.5;margin-bottom:10px;padding:6px 8px;background:#FFF8E7;border-radius:var(--radius-sm);border:1px solid #FAC775">⚠️ El costo del envío <strong>no está incluido</strong> en el precio del producto. Lo coordinamos con vos después del pago.</div>
+          <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:6px">¿Cómo querés recibir tu pedido?</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+            <button id="serv-ubermoto" onclick="seleccionarServicioEnvio('UberMoto')" style="width:100%;padding:8px 12px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:left">🛵 UberMoto <span style="font-size:11px;color:var(--ink-light);font-weight:400">— mismo día en AMBA</span></button>
+            <button id="serv-correo" onclick="seleccionarServicioEnvio('Correo Argentino')" style="width:100%;padding:8px 12px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:left">📮 Correo Argentino <span style="font-size:11px;color:var(--ink-light);font-weight:400">— 2 a 7 días hábiles</span></button>
+            <button id="serv-andreani" onclick="seleccionarServicioEnvio('Andreani')" style="width:100%;padding:8px 12px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:left">🚚 Andreani <span style="font-size:11px;color:var(--ink-light);font-weight:400">— 1 a 5 días hábiles</span></button>
           </div>
-          <div id="campo-contacto-envio" style="display:none;margin-bottom:6px">
-            <input type="text" id="dato-contacto-envio" placeholder="" oninput="onDatoContactoInput()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none">
+          <div id="panel-contacto-envio" style="display:none">
+            <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:6px">¿Cómo te contactamos para coordinar el envío?</div>
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              <button id="contacto-wp" onclick="seleccionarContacto('whatsapp')" style="flex:1;padding:7px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">💬 WhatsApp</button>
+              <button id="contacto-mail" onclick="seleccionarContacto('email')" style="flex:1;padding:7px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">✉️ Email</button>
+            </div>
+            <div id="campo-contacto-envio" style="display:none;margin-bottom:6px">
+              <input type="text" id="dato-contacto-envio" placeholder="" oninput="onDatoContactoInput()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none">
+            </div>
           </div>
-          <div id="envio-domicilio-ok" style="display:none;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Te cotizamos el envío y te avisamos antes de que pagues</div>
+          <div id="envio-domicilio-ok" style="display:none;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Pedido listo — pagás los productos ahora, el envío lo coordinamos después</div>
         </div>
-        <div id="envio-zonas" style="display:none;flex-direction:column;gap:4px;margin-top:8px"></div>
-        <div id="envio-result" style="display:none;font-size:12px;color:var(--ink-mid);margin-top:6px;padding:6px 8px;background:#fff;border-radius:var(--radius-sm);border:1px solid var(--border)"></div>
+        <div id="envio-zonas" style="display:none"></div>
+        <div id="envio-result" style="display:none"></div>
       </div>
-      <!-- TAB RETIRO PERSONAL -->
+
+      <!-- PANEL RETIRO -->
       <div id="panel-coordinar" style="display:none">
         <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
-          <div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">📍 Retiro personal</div>
-          <div style="font-size:12px;color:var(--ink-mid);line-height:1.6;margin-bottom:10px">Coordinamos día y lugar por WhatsApp. Sin costo de envío. Pagás al confirmar.</div>
+          <div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">📍 Retiro sin costo</div>
+          <div style="font-size:12px;color:var(--ink-mid);line-height:1.6;margin-bottom:10px">Coordinamos día y horario por WhatsApp. No tiene costo adicional.</div>
           <div style="display:flex;gap:8px">
             <button id="zona-castelar" onclick="seleccionarZonaCoordinar('Castelar')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Castelar</button>
             <button id="zona-quilmes" onclick="seleccionarZonaCoordinar('Quilmes')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Quilmes</button>
           </div>
-          <div id="coord-ok" style="display:none;margin-top:8px;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Retiro en <span id="coord-zona-sel"></span> — te contactamos por WhatsApp para acordar el día</div>
+          <div id="coord-ok" style="display:none;margin-top:8px;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Retiro en <span id="coord-zona-sel"></span> — te contactamos por WhatsApp para coordinar</div>
         </div>
       </div>
     </div>
@@ -2862,92 +2870,26 @@ window.toggleCart = function(forceOpen) {
 window.checkout = async function() {
   if (!cart.length) return;
 
-  // Validar que haya elegido envío
   if (!envioSeleccionado) {
-    showToast('Elegí una opción de envío primero', 'error');
+    showToast('Elegí una opción de envío o retiro primero', 'error');
     return;
   }
 
-  // Si es courrier, validar CP y contacto
   if (envioSeleccionado.tipo === 'courrier') {
-    const cp = (document.getElementById('cp-input')?.value || '').trim();
     const dato = (document.getElementById('dato-contacto-envio')?.value || '').trim();
-    if (!cp || cp.length < 4) { showToast('Ingresá tu código postal', 'error'); return; }
-    if (!contactoEnvioTipo) { showToast('Elegí cómo querés que te avisemos', 'error'); return; }
+    if (!servicioEnvioSel) { showToast('Elegí el servicio de envío', 'error'); return; }
+    if (!contactoEnvioTipo) { showToast('Elegí cómo contactarte', 'error'); return; }
     if (!dato || dato.length < 5) { showToast('Ingresá tu ' + (contactoEnvioTipo === 'whatsapp' ? 'número de WhatsApp' : 'email'), 'error'); return; }
   }
 
   const btn = document.getElementById('checkout-btn');
   btn.disabled = true; btn.textContent = 'Procesando...';
 
-  // Meta Pixel: InitiateCheckout
   if (typeof fbq !== 'undefined') {
     const totalCheckout = cart.reduce((s,i) => s + i.price * i.qty, 0);
     fbq('track', 'InitiateCheckout', { content_ids: cart.map(i => i.id), num_items: cart.reduce((s,i) => s + i.qty, 0), value: totalCheckout, currency: 'ARS' });
   }
 
-  // ── FLUJO COURRIER: guardar pedido pendiente en Firebase, no cobrar aún ──
-  if (envioSeleccionado.tipo === 'courrier') {
-    try {
-      const pedidoCourrier = {
-        ts: Date.now(),
-        estado: 'pendiente_cotizacion',
-        nombre: myName || 'Cliente',
-        items: cart.map(i => ({
-          title: i.name, name: i.name, prodId: i.prodId || i.id,
-          talla: i.talla || '—',
-          color: i.color ? (typeof i.color === 'object' ? (i.color.nombre || i.color.hex || '') : i.color) : '',
-          qty: i.qty, price: i.price
-        })),
-        total: cart.reduce((s,i) => s + (Number(i.price)||0) * (Number(i.qty)||1), 0),
-        cupon: cuponActivo ? cuponActivo.code : null,
-        cp_destino: envioSeleccionado.cp,
-        contacto_tipo: envioSeleccionado.contactoTipo,
-        contacto_dato: envioSeleccionado.contactoDato,
-        envio: envioSeleccionado.zona,
-        envio_precio: 'a_cotizar'
-      };
-
-      const res = await fetch(BACKEND + '/guardar-pedido', {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ pedido: pedidoCourrier })
-      });
-      const data = await res.json();
-      console.log('Pedido courrier guardado:', data.key);
-
-      // Notificar por mail (admin)
-      notificarPedidoPorMail({...pedidoCourrier, firebaseKey: data.key});
-
-      // Mostrar página de confirmación interna
-      cart = []; saveCart(); updateCartUI();
-      // Cerrar carrito y mostrar mensaje
-      const drawer = document.getElementById('cart-drawer');
-      const overlay = document.getElementById('cart-overlay');
-      if(drawer) drawer.classList.remove('open');
-      if(overlay) overlay.classList.remove('open');
-      showToast('¡Pedido recibido! Te cotizamos el envío y te avisamos pronto 📦');
-      // Mostrar página de éxito con mensaje adaptado
-      setTimeout(() => {
-        const sel = document.getElementById('page-success');
-        if (sel) {
-          sel.style.display = 'block'; sel.classList.add('open');
-          const msgEl = sel.querySelector('.success-title, h2, .page-title');
-          // Intentar personalizar el mensaje si hay elemento
-          const allH = sel.querySelectorAll('h1,h2,h3,.success-title,.page-title');
-          allH.forEach(h => { if(h.textContent.includes('gracias') || h.textContent.includes('Gracias') || h.textContent.includes('pago')) h.textContent = '¡Pedido recibido! 🎉'; });
-          const allP = sel.querySelectorAll('p,.success-msg,.success-sub');
-          allP.forEach(p => { if(p.textContent.length < 200) p.textContent = 'Te vamos a contactar por ' + (envioSeleccionado?.contactoTipo === 'whatsapp' ? 'WhatsApp' : 'email') + ' con el costo del envío para coordinar el pago.'; });
-        }
-      }, 300);
-
-    } catch(err) {
-      showToast('Error al enviar el pedido: ' + err.message, 'error');
-      btn.disabled = false; btn.textContent = '📦 Enviar pedido — te cotizamos el envío';
-    }
-    return;
-  }
-
-  // ── FLUJO RETIRO / COORDINAR: ir a MercadoPago ──
   try {
     const items = cart.map(i => ({
       title: i.name + (i.talla && i.talla !== '—' ? ' (Talla ' + i.talla + ')' : ''),
@@ -2955,9 +2897,11 @@ window.checkout = async function() {
       unit_price: Math.max(1, Math.round(Number(i.price))),
       currency_id: 'ARS'
     }));
-    const tsNow = Date.now();
+
     const pedidoCompleto = {
-      ts: tsNow, estado: 'pendiente', nombre: myName || 'Cliente',
+      ts: Date.now(),
+      estado: 'pendiente',
+      nombre: myName || 'Cliente',
       items: cart.map(i => ({
         title: i.name, name: i.name, prodId: i.prodId || i.id,
         talla: i.talla || '—',
@@ -2966,9 +2910,14 @@ window.checkout = async function() {
       })),
       total: cart.reduce((s,i) => s + (Number(i.price)||0) * (Number(i.qty)||1), 0),
       cupon: cuponActivo ? cuponActivo.code : null,
-      envio: envioSeleccionado ? envioSeleccionado.zona : null,
+      envio: envioSeleccionado.zona,
+      envio_tipo: envioSeleccionado.tipo,
+      envio_servicio: envioSeleccionado.servicioEnvio || null,
+      contacto_tipo: envioSeleccionado.contactoTipo || null,
+      contacto_dato: envioSeleccionado.contactoDato || null,
       envio_precio: 0
     };
+
     const res = await fetch(BACKEND + '/crear-preferencia', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items, pedido: pedidoCompleto })
@@ -2976,15 +2925,14 @@ window.checkout = async function() {
     const data = await res.json();
     if (data.init_point) {
       localStorage.setItem('diamantina_cart_pending', JSON.stringify(cart));
-      const pedidoPendiente = { ...pedidoCompleto, firebaseKey: data.pedidoKey || null, mp_id: data.id || null };
-      localStorage.setItem('diamantina_pedido_pendiente', JSON.stringify(pedidoPendiente));
+      localStorage.setItem('diamantina_pedido_pendiente', JSON.stringify({ ...pedidoCompleto, firebaseKey: data.pedidoKey || null, mp_id: data.id || null }));
       window.location.href = data.init_point;
     } else {
       throw new Error('No se recibió el link de pago');
     }
   } catch(err) {
     showToast('Error al procesar el pago: ' + err.message, 'error');
-    btn.disabled = false; btn.textContent = '📍 Confirmar y pagar';
+    btn.disabled = false; btn.textContent = 'Pagar con MercadoPago';
   }
 };
 
@@ -4410,32 +4358,22 @@ function detectarZona(cp) {
 }
 
 envioSeleccionado = null;
-let contactoEnvioTipo = null; // 'whatsapp' o 'email'
+let contactoEnvioTipo = null;
+let servicioEnvioSel = null;
 
-window.onCpInput = function() {
+window.seleccionarServicioEnvio = function(servicio) {
+  servicioEnvioSel = servicio;
+  ['ubermoto','correo','andreani'].forEach(s => {
+    const b = document.getElementById('serv-' + s);
+    if (b) { b.style.borderColor = 'var(--border-strong)'; b.style.background = '#fff'; b.style.color = 'var(--ink-mid)'; }
+  });
+  const idMap = { 'UberMoto':'ubermoto', 'Correo Argentino':'correo', 'Andreani':'andreani' };
+  const sel = document.getElementById('serv-' + idMap[servicio]);
+  if (sel) { sel.style.borderColor = 'var(--rose)'; sel.style.background = 'var(--rose-pale)'; sel.style.color = 'var(--rose)'; }
+  const panel = document.getElementById('panel-contacto-envio');
+  if (panel) panel.style.display = 'block';
   validarEnvioDomicilio();
 };
-
-window.onDatoContactoInput = function() {
-  validarEnvioDomicilio();
-};
-
-function validarEnvioDomicilio() {
-  const cp = (document.getElementById('cp-input')?.value || '').trim();
-  const dato = (document.getElementById('dato-contacto-envio')?.value || '').trim();
-  const okEl = document.getElementById('envio-domicilio-ok');
-  if (cp.length >= 4 && contactoEnvioTipo && dato.length >= 5) {
-    envioSeleccionado = { precio: null, zona: 'Envío a domicilio (CP ' + cp + ')', tipo: 'courrier', cp, contactoTipo: contactoEnvioTipo, contactoDato: dato };
-    if (okEl) okEl.style.display = 'block';
-    updateCheckoutBtn();
-    updateCartUI();
-  } else {
-    envioSeleccionado = null;
-    if (okEl) okEl.style.display = 'none';
-    updateCheckoutBtn();
-    updateCartUI();
-  }
-}
 
 window.seleccionarContacto = function(tipo) {
   contactoEnvioTipo = tipo;
@@ -4443,17 +4381,34 @@ window.seleccionarContacto = function(tipo) {
   const mailBtn = document.getElementById('contacto-mail');
   const campoEl = document.getElementById('campo-contacto-envio');
   const inputEl = document.getElementById('dato-contacto-envio');
-  [wpBtn, mailBtn].forEach(b => { if(b){b.style.borderColor='var(--border-strong)';b.style.background='#fff';b.style.color='var(--ink-mid)';} });
+  [wpBtn, mailBtn].forEach(b => { if(b){ b.style.borderColor='var(--border-strong)'; b.style.background='#fff'; b.style.color='var(--ink-mid)'; }});
   if (tipo === 'whatsapp') {
-    if(wpBtn){wpBtn.style.borderColor='var(--rose)';wpBtn.style.background='var(--rose-pale)';wpBtn.style.color='var(--rose)';}
-    if(inputEl){inputEl.placeholder='Tu número de WhatsApp (ej: 1155667788)';}
+    if(wpBtn){ wpBtn.style.borderColor='var(--rose)'; wpBtn.style.background='var(--rose-pale)'; wpBtn.style.color='var(--rose)'; }
+    if(inputEl) inputEl.placeholder = 'Tu número de WhatsApp (ej: 1155667788)';
   } else {
-    if(mailBtn){mailBtn.style.borderColor='var(--rose)';mailBtn.style.background='var(--rose-pale)';mailBtn.style.color='var(--rose)';}
-    if(inputEl){inputEl.placeholder='Tu email (ej: nombre@gmail.com)';}
+    if(mailBtn){ mailBtn.style.borderColor='var(--rose)'; mailBtn.style.background='var(--rose-pale)'; mailBtn.style.color='var(--rose)'; }
+    if(inputEl) inputEl.placeholder = 'Tu email (ej: nombre@gmail.com)';
   }
   if(campoEl) campoEl.style.display = 'block';
   validarEnvioDomicilio();
 };
+
+window.onCpInput = function() { validarEnvioDomicilio(); };
+window.onDatoContactoInput = function() { validarEnvioDomicilio(); };
+
+function validarEnvioDomicilio() {
+  const dato = (document.getElementById('dato-contacto-envio')?.value || '').trim();
+  const okEl = document.getElementById('envio-domicilio-ok');
+  if (servicioEnvioSel && contactoEnvioTipo && dato.length >= 5) {
+    envioSeleccionado = { precio: 0, zona: servicioEnvioSel, tipo: 'courrier', servicioEnvio: servicioEnvioSel, contactoTipo: contactoEnvioTipo, contactoDato: dato };
+    if (okEl) okEl.style.display = 'block';
+  } else {
+    envioSeleccionado = null;
+    if (okEl) okEl.style.display = 'none';
+  }
+  updateCheckoutBtn();
+  updateCartUI();
+}
 
 function updateCheckoutBtn() {
   const btn = document.getElementById('checkout-btn');
@@ -4464,18 +4419,11 @@ function updateCheckoutBtn() {
     if(badge) badge.style.display = 'block';
     return;
   }
-  if (envioSeleccionado.tipo === 'coordinar') {
-    btn.textContent = '📍 Confirmar y pagar';
-    if(badge) badge.style.display = 'block';
-  } else if (envioSeleccionado.tipo === 'courrier') {
-    btn.textContent = '📦 Enviar pedido — te cotizamos el envío';
-    if(badge) badge.style.display = 'none';
-  }
+  btn.textContent = 'Pagar con MercadoPago';
+  if(badge) badge.style.display = 'block';
 }
 
-window.calcularEnvio = async function() {
-  // legacy stub — no longer used
-};
+window.calcularEnvio = async function() {};
 
 window.switchEnvioTab = function(tab) {
   const tabAndreani = document.getElementById('tab-andreani');
@@ -4483,37 +4431,37 @@ window.switchEnvioTab = function(tab) {
   const panelAndreani = document.getElementById('panel-andreani');
   const panelCoordinar = document.getElementById('panel-coordinar');
   if (tab === 'andreani') {
-    tabAndreani.style.background = 'var(--rose)'; tabAndreani.style.color = '#fff'; tabAndreani.style.borderColor = 'var(--rose)';
-    tabCoordinar.style.background = 'transparent'; tabCoordinar.style.color = 'var(--ink-mid)'; tabCoordinar.style.borderColor = 'var(--border-strong)';
+    tabAndreani.style.cssText += ';background:var(--rose);color:#fff;border-color:var(--rose)';
+    tabCoordinar.style.cssText += ';background:transparent;color:var(--ink-mid);border-color:var(--border-strong)';
     panelAndreani.style.display = 'block'; panelCoordinar.style.display = 'none';
     if (envioSeleccionado && envioSeleccionado.tipo === 'coordinar') { envioSeleccionado = null; updateCartUI(); updateCheckoutBtn(); }
   } else {
-    tabCoordinar.style.background = 'var(--rose)'; tabCoordinar.style.color = '#fff'; tabCoordinar.style.borderColor = 'var(--rose)';
-    tabAndreani.style.background = 'transparent'; tabAndreani.style.color = 'var(--ink-mid)'; tabAndreani.style.borderColor = 'var(--border-strong)';
+    tabCoordinar.style.cssText += ';background:var(--rose);color:#fff;border-color:var(--rose)';
+    tabAndreani.style.cssText += ';background:transparent;color:var(--ink-mid);border-color:var(--border-strong)';
     panelAndreani.style.display = 'none'; panelCoordinar.style.display = 'block';
-    if (envioSeleccionado && envioSeleccionado.tipo === 'courrier') { envioSeleccionado = null; updateCartUI(); updateCheckoutBtn(); }
+    if (envioSeleccionado && envioSeleccionado.tipo === 'courrier') { envioSeleccionado = null; servicioEnvioSel = null; updateCartUI(); updateCheckoutBtn(); }
   }
 };
 
 window.seleccionarZonaCoordinar = function(zona) {
   ['castelar','quilmes'].forEach(z => {
     const b = document.getElementById('zona-' + z);
-    if (b) { b.style.borderColor = 'var(--border-strong)'; b.style.background = '#fff'; b.style.color = 'var(--ink-mid)'; }
+    if (b) { b.style.borderColor='var(--border-strong)'; b.style.background='#fff'; b.style.color='var(--ink-mid)'; }
   });
   const sel = document.getElementById('zona-' + zona.toLowerCase());
-  if (sel) { sel.style.borderColor = 'var(--rose)'; sel.style.background = 'var(--rose-pale)'; sel.style.color = 'var(--rose)'; }
+  if (sel) { sel.style.borderColor='var(--rose)'; sel.style.background='var(--rose-pale)'; sel.style.color='var(--rose)'; }
   envioSeleccionado = { precio: 0, zona: 'Retiro en ' + zona, tipo: 'coordinar' };
   const coordOk = document.getElementById('coord-ok');
   const coordZona = document.getElementById('coord-zona-sel');
   if (coordZona) coordZona.textContent = zona;
   if (coordOk) coordOk.style.display = 'block';
   updateCartUI(); updateCheckoutBtn();
-  showToast('Retiro en ' + zona + ' ✦ Sin costo de envío');
+  showToast('Retiro en ' + zona + ' ✦ Sin costo');
 };
 
 window.selectZona = function(el, precio, zona) {
   document.querySelectorAll('.envio-zona-item').forEach(z => { z.style.borderColor='var(--border)'; z.style.background='#fff'; });
-  el.style.borderColor = 'var(--rose)'; el.style.background = 'var(--rose-pale)';
+  el.style.borderColor='var(--rose)'; el.style.background='var(--rose-pale)';
   envioSeleccionado = {precio, zona};
   updateCartUI();
 };
