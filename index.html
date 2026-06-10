@@ -1290,30 +1290,38 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
     <div style="margin-bottom:14px;padding:12px;background:var(--rose-pale);border-radius:var(--radius-sm);border:1px solid var(--border)">
       <!-- TABS ENVÍO -->
       <div style="display:flex;gap:6px;margin-bottom:10px">
-        <button id="tab-andreani" onclick="switchEnvioTab('andreani')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s">🚚 Andreani</button>
-        <button id="tab-coordinar" onclick="switchEnvioTab('coordinar')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s">📍 Coordinar entrega</button>
+        <button id="tab-andreani" onclick="switchEnvioTab('andreani')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">📦 Envío a domicilio</button>
+        <button id="tab-coordinar" onclick="switchEnvioTab('coordinar')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">📍 Retiro personal</button>
       </div>
-      <!-- TAB ANDREANI -->
+      <!-- TAB ENVÍO A DOMICILIO -->
       <div id="panel-andreani">
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="text" id="cp-input" placeholder="Código postal" maxlength="8" style="flex:1;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none">
-          <button onclick="calcularEnvio()" style="padding:7px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">Calcular</button>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
+          <div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">📦 Correo Argentino o Andreani</div>
+          <div style="font-size:12px;color:var(--ink-mid);line-height:1.6;margin-bottom:10px">Ingresá tu código postal y te cotizamos el envío. Te avisamos antes de que pagues.</div>
+          <input type="text" id="cp-input" placeholder="Código postal (ej: 1405)" maxlength="8" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none;margin-bottom:10px" oninput="onCpInput()">
+          <div style="font-size:12px;color:var(--ink-mid);margin-bottom:6px;font-weight:500">¿Cómo te avisamos el costo?</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <button id="contacto-wp" onclick="seleccionarContacto('whatsapp')" style="flex:1;padding:7px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">💬 WhatsApp</button>
+            <button id="contacto-mail" onclick="seleccionarContacto('email')" style="flex:1;padding:7px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">✉️ Email</button>
+          </div>
+          <div id="campo-contacto-envio" style="display:none;margin-bottom:6px">
+            <input type="text" id="dato-contacto-envio" placeholder="" oninput="onDatoContactoInput()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none">
+          </div>
+          <div id="envio-domicilio-ok" style="display:none;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Te cotizamos el envío y te avisamos antes de que pagues</div>
         </div>
         <div id="envio-zonas" style="display:none;flex-direction:column;gap:4px;margin-top:8px"></div>
         <div id="envio-result" style="display:none;font-size:12px;color:var(--ink-mid);margin-top:6px;padding:6px 8px;background:#fff;border-radius:var(--radius-sm);border:1px solid var(--border)"></div>
       </div>
-      <!-- TAB COORDINAR -->
+      <!-- TAB RETIRO PERSONAL -->
       <div id="panel-coordinar" style="display:none">
         <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
-          <div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">📍 Coordinar entrega personal</div>
-          <div style="font-size:12px;color:var(--ink-mid);line-height:1.6;margin-bottom:10px">Coordinamos día y lugar por WhatsApp. Sin costo de envío.</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;gap:8px">
-              <button id="zona-castelar" onclick="seleccionarZonaCoordinar('Castelar')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Castelar</button>
-              <button id="zona-quilmes" onclick="seleccionarZonaCoordinar('Quilmes')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Quilmes</button>
-            </div>
+          <div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">📍 Retiro personal</div>
+          <div style="font-size:12px;color:var(--ink-mid);line-height:1.6;margin-bottom:10px">Coordinamos día y lugar por WhatsApp. Sin costo de envío. Pagás al confirmar.</div>
+          <div style="display:flex;gap:8px">
+            <button id="zona-castelar" onclick="seleccionarZonaCoordinar('Castelar')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Castelar</button>
+            <button id="zona-quilmes" onclick="seleccionarZonaCoordinar('Quilmes')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Quilmes</button>
           </div>
-          <div id="coord-ok" style="display:none;margin-top:8px;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Entrega coordinada — te contactamos por WhatsApp para acordar el día</div>
+          <div id="coord-ok" style="display:none;margin-top:8px;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Retiro en <span id="coord-zona-sel"></span> — te contactamos por WhatsApp para acordar el día</div>
         </div>
       </div>
     </div>
@@ -1340,9 +1348,9 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
       </div>
     </div>
     <button class="checkout-btn" id="checkout-btn" onclick="checkout()">
-      Pagar con MercadoPago
+      Confirmar pedido
     </button>
-    <div class="mp-badge">Pagá con <span>tarjeta, débito o efectivo</span> — 100% seguro</div>
+    <div class="mp-badge" id="mp-badge-txt">Pagá con <span>tarjeta, débito o efectivo</span> — 100% seguro</div>
   </div>
 </div>
 
@@ -2853,18 +2861,93 @@ window.toggleCart = function(forceOpen) {
 // ── CHECKOUT ──
 window.checkout = async function() {
   if (!cart.length) return;
+
+  // Validar que haya elegido envío
+  if (!envioSeleccionado) {
+    showToast('Elegí una opción de envío primero', 'error');
+    return;
+  }
+
+  // Si es courrier, validar CP y contacto
+  if (envioSeleccionado.tipo === 'courrier') {
+    const cp = (document.getElementById('cp-input')?.value || '').trim();
+    const dato = (document.getElementById('dato-contacto-envio')?.value || '').trim();
+    if (!cp || cp.length < 4) { showToast('Ingresá tu código postal', 'error'); return; }
+    if (!contactoEnvioTipo) { showToast('Elegí cómo querés que te avisemos', 'error'); return; }
+    if (!dato || dato.length < 5) { showToast('Ingresá tu ' + (contactoEnvioTipo === 'whatsapp' ? 'número de WhatsApp' : 'email'), 'error'); return; }
+  }
+
   const btn = document.getElementById('checkout-btn');
   btn.disabled = true; btn.textContent = 'Procesando...';
+
   // Meta Pixel: InitiateCheckout
   if (typeof fbq !== 'undefined') {
     const totalCheckout = cart.reduce((s,i) => s + i.price * i.qty, 0);
-    fbq('track', 'InitiateCheckout', {
-      content_ids: cart.map(i => i.id),
-      num_items: cart.reduce((s,i) => s + i.qty, 0),
-      value: totalCheckout,
-      currency: 'ARS'
-    });
+    fbq('track', 'InitiateCheckout', { content_ids: cart.map(i => i.id), num_items: cart.reduce((s,i) => s + i.qty, 0), value: totalCheckout, currency: 'ARS' });
   }
+
+  // ── FLUJO COURRIER: guardar pedido pendiente en Firebase, no cobrar aún ──
+  if (envioSeleccionado.tipo === 'courrier') {
+    try {
+      const pedidoCourrier = {
+        ts: Date.now(),
+        estado: 'pendiente_cotizacion',
+        nombre: myName || 'Cliente',
+        items: cart.map(i => ({
+          title: i.name, name: i.name, prodId: i.prodId || i.id,
+          talla: i.talla || '—',
+          color: i.color ? (typeof i.color === 'object' ? (i.color.nombre || i.color.hex || '') : i.color) : '',
+          qty: i.qty, price: i.price
+        })),
+        total: cart.reduce((s,i) => s + (Number(i.price)||0) * (Number(i.qty)||1), 0),
+        cupon: cuponActivo ? cuponActivo.code : null,
+        cp_destino: envioSeleccionado.cp,
+        contacto_tipo: envioSeleccionado.contactoTipo,
+        contacto_dato: envioSeleccionado.contactoDato,
+        envio: envioSeleccionado.zona,
+        envio_precio: 'a_cotizar'
+      };
+
+      const res = await fetch(BACKEND + '/guardar-pedido', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ pedido: pedidoCourrier })
+      });
+      const data = await res.json();
+      console.log('Pedido courrier guardado:', data.key);
+
+      // Notificar por mail (admin)
+      notificarPedidoPorMail({...pedidoCourrier, firebaseKey: data.key});
+
+      // Mostrar página de confirmación interna
+      cart = []; saveCart(); updateCartUI();
+      // Cerrar carrito y mostrar mensaje
+      const drawer = document.getElementById('cart-drawer');
+      const overlay = document.getElementById('cart-overlay');
+      if(drawer) drawer.classList.remove('open');
+      if(overlay) overlay.classList.remove('open');
+      showToast('¡Pedido recibido! Te cotizamos el envío y te avisamos pronto 📦');
+      // Mostrar página de éxito con mensaje adaptado
+      setTimeout(() => {
+        const sel = document.getElementById('page-success');
+        if (sel) {
+          sel.style.display = 'block'; sel.classList.add('open');
+          const msgEl = sel.querySelector('.success-title, h2, .page-title');
+          // Intentar personalizar el mensaje si hay elemento
+          const allH = sel.querySelectorAll('h1,h2,h3,.success-title,.page-title');
+          allH.forEach(h => { if(h.textContent.includes('gracias') || h.textContent.includes('Gracias') || h.textContent.includes('pago')) h.textContent = '¡Pedido recibido! 🎉'; });
+          const allP = sel.querySelectorAll('p,.success-msg,.success-sub');
+          allP.forEach(p => { if(p.textContent.length < 200) p.textContent = 'Te vamos a contactar por ' + (envioSeleccionado?.contactoTipo === 'whatsapp' ? 'WhatsApp' : 'email') + ' con el costo del envío para coordinar el pago.'; });
+        }
+      }, 300);
+
+    } catch(err) {
+      showToast('Error al enviar el pedido: ' + err.message, 'error');
+      btn.disabled = false; btn.textContent = '📦 Enviar pedido — te cotizamos el envío';
+    }
+    return;
+  }
+
+  // ── FLUJO RETIRO / COORDINAR: ir a MercadoPago ──
   try {
     const items = cart.map(i => ({
       title: i.name + (i.talla && i.talla !== '—' ? ' (Talla ' + i.talla + ')' : ''),
@@ -2872,50 +2955,36 @@ window.checkout = async function() {
       unit_price: Math.max(1, Math.round(Number(i.price))),
       currency_id: 'ARS'
     }));
-    // Armar pedido completo para mandar al backend
     const tsNow = Date.now();
     const pedidoCompleto = {
-      ts: tsNow,
-      estado: 'pendiente',
-      nombre: myName || 'Cliente',
+      ts: tsNow, estado: 'pendiente', nombre: myName || 'Cliente',
       items: cart.map(i => ({
-        title: i.name,
-        name: i.name,
-        prodId: i.prodId || i.id,
+        title: i.name, name: i.name, prodId: i.prodId || i.id,
         talla: i.talla || '—',
-        color: i.color || '',
-        qty: i.qty,
-        price: i.price
+        color: i.color ? (typeof i.color === 'object' ? (i.color.nombre || i.color.hex || '') : i.color) : '',
+        qty: i.qty, price: i.price
       })),
       total: cart.reduce((s,i) => s + (Number(i.price)||0) * (Number(i.qty)||1), 0),
       cupon: cuponActivo ? cuponActivo.code : null,
       envio: envioSeleccionado ? envioSeleccionado.zona : null,
-      envio_precio: envioSeleccionado ? (envioSeleccionado.precio || 0) : 0
+      envio_precio: 0
     };
-
     const res = await fetch(BACKEND + '/crear-preferencia', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items, pedido: pedidoCompleto })
     });
     const data = await res.json();
     if (data.init_point) {
       localStorage.setItem('diamantina_cart_pending', JSON.stringify(cart));
-      // Guardar referencia local para fallback
-      const pedidoPendiente = {
-        ...pedidoCompleto,
-        firebaseKey: data.pedidoKey || null,
-        mp_id: data.id || null
-      };
+      const pedidoPendiente = { ...pedidoCompleto, firebaseKey: data.pedidoKey || null, mp_id: data.id || null };
       localStorage.setItem('diamantina_pedido_pendiente', JSON.stringify(pedidoPendiente));
-      console.log('Pedido guardado en backend con key:', data.pedidoKey);
       window.location.href = data.init_point;
     } else {
       throw new Error('No se recibió el link de pago');
     }
   } catch(err) {
     showToast('Error al procesar el pago: ' + err.message, 'error');
-    btn.disabled = false; btn.textContent = 'Pagar con MercadoPago';
+    btn.disabled = false; btn.textContent = '📍 Confirmar y pagar';
   }
 };
 
@@ -3490,16 +3559,30 @@ function _mostrarPedidos(pedidos, todosPedidos) {
   if (!el) return;
   const aprobados = todosPedidos.filter(p => p.estado === 'aprobado');
   const pendientes = todosPedidos.filter(p => p.estado === 'pendiente');
+  const aCotizar = todosPedidos.filter(p => p.estado === 'pendiente_cotizacion');
   const totalVentas = aprobados.reduce((s, p) => s + (p.total || 0), 0);
   document.getElementById('stat-total-pedidos').textContent = todosPedidos.length;
   document.getElementById('stat-aprobados').textContent = aprobados.length;
   document.getElementById('stat-pendientes').textContent = pendientes.length;
   document.getElementById('stat-total-ventas').textContent = '$' + totalVentas.toLocaleString('es-AR');
+  const aCotizarEl = document.getElementById('stat-a-cotizar');
+  if (aCotizarEl) aCotizarEl.textContent = aCotizar.length;
   if (!pedidos.length) { el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">No hay pedidos todavía</div>'; return; }
-  const estadoColor = { aprobado:'#3B6D11', pendiente:'#BA7517', fallido:'#A32D2D', enviado:'#1565C0', entregado:'#1B5E20', cancelado:'#888780' };
-  const estadoBg = { aprobado:'#EAF3DE', pendiente:'#FAEEDA', fallido:'#FCEBEB', enviado:'#E3F0FB', entregado:'#EAF3DE', cancelado:'#F5F5F5' };
-  el.innerHTML = pedidos.map(p => `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px">
+  const estadoColor = { aprobado:'#3B6D11', pendiente:'#BA7517', pendiente_cotizacion:'#854F0B', fallido:'#A32D2D', enviado:'#1565C0', entregado:'#1B5E20', cancelado:'#888780' };
+  const estadoBg   = { aprobado:'#EAF3DE', pendiente:'#FAEEDA', pendiente_cotizacion:'#FAEEDA', fallido:'#FCEBEB', enviado:'#E3F0FB', entregado:'#EAF3DE', cancelado:'#F5F5F5' };
+  const estadoLabel = { aprobado:'aprobado', pendiente:'pendiente', pendiente_cotizacion:'⏳ a cotizar envío', fallido:'fallido', enviado:'enviado', entregado:'entregado', cancelado:'cancelado' };
+  el.innerHTML = pedidos.map(p => {
+    const esCotizar = p.estado === 'pendiente_cotizacion';
+    const contactoIcono = p.contacto_tipo === 'whatsapp' ? '💬' : p.contacto_tipo === 'email' ? '✉️' : '';
+    const contactoLabel = p.contacto_tipo === 'whatsapp' ? 'WhatsApp' : p.contacto_tipo === 'email' ? 'Email' : '';
+    const wpLink = p.contacto_tipo === 'whatsapp' && p.contacto_dato
+      ? `<a href="https://wa.me/549${p.contacto_dato.replace(/\D/g,'')}" target="_blank" style="color:var(--rose);text-decoration:none;font-weight:500">Abrir WhatsApp ↗</a>`
+      : '';
+    const mailLink = p.contacto_tipo === 'email' && p.contacto_dato
+      ? `<a href="mailto:${p.contacto_dato}" style="color:var(--rose);text-decoration:none;font-weight:500">Enviar email ↗</a>`
+      : '';
+    return `
+    <div style="background:#fff;border:1px solid ${esCotizar ? '#EF9F27' : 'var(--border)'};border-radius:var(--radius-sm);padding:14px 16px${esCotizar ? ';border-left:3px solid #EF9F27' : ''}">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
         <div>
           <div style="font-size:13px;font-weight:500;color:var(--ink)">${p.nombre||'Cliente'}</div>
@@ -3507,6 +3590,7 @@ function _mostrarPedidos(pedidos, todosPedidos) {
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <select onchange="cambiarEstadoPedido('${p.id}',this.value)" style="font-size:11px;font-weight:500;padding:3px 8px;border-radius:999px;border:1px solid var(--border-strong);background:${estadoBg[p.estado]||'#F7F0F5'};color:${estadoColor[p.estado]||'var(--ink-mid)'};cursor:pointer;font-family:DM Sans,sans-serif;outline:none">
+            <option value="pendiente_cotizacion" ${p.estado==='pendiente_cotizacion'?'selected':''}>⏳ a cotizar envío</option>
             <option value="aprobado" ${p.estado==='aprobado'?'selected':''}>aprobado</option>
             <option value="pendiente" ${p.estado==='pendiente'?'selected':''}>pendiente</option>
             <option value="enviado" ${p.estado==='enviado'?'selected':''}>enviado</option>
@@ -3515,7 +3599,7 @@ function _mostrarPedidos(pedidos, todosPedidos) {
             <option value="cancelado" ${p.estado==='cancelado'?'selected':''}>cancelado</option>
           </select>
           <span style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--rose)">$${(p.total||0).toLocaleString('es-AR')}</span>
-          <button onclick="borrarPedido('${p.id}')" style="background:none;border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:3px 8px;font-size:11px;color:#A32D2D;cursor:pointer;font-family:DM Sans,sans-serif" title="Borrar pedido">✕ Borrar</button>
+          <button onclick="borrarPedido('${p.id}')" style="background:none;border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:3px 8px;font-size:11px;color:#A32D2D;cursor:pointer;font-family:DM Sans,sans-serif" title="Borrar pedido">✕</button>
         </div>
       </div>
       <div style="font-size:12px;color:var(--ink-mid);border-top:1px solid var(--border);padding-top:8px">
@@ -3526,10 +3610,19 @@ function _mostrarPedidos(pedidos, todosPedidos) {
           return `<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:var(--surface-2);border-radius:999px;border:1px solid var(--border)">${nombre}${talla}${color} ×${i.qty||1}</span>`;
         }).join('')}
       </div>
-      ${p.cupon ? '<div style="font-size:11px;color:#2e7d32;margin-top:4px">🎟️ Cupón: '+p.cupon+'</div>' : ''}
-      ${p.envio ? '<div style="font-size:11px;color:var(--ink-light);margin-top:2px">📦 Envío: '+p.envio+'</div>' : ''}
-    </div>
-  `).join('');
+      ${p.cupon ? `<div style="font-size:11px;color:#2e7d32;margin-top:4px">🎟️ Cupón: ${p.cupon}</div>` : ''}
+      ${esCotizar ? `
+        <div style="margin-top:10px;background:#FAEEDA;border-radius:var(--radius-sm);padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:12px;font-weight:500;color:#854F0B">📦 Pendiente de cotización de envío</div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#633806">
+            <span>📍 CP destino: <strong>${p.cp_destino || '—'}</strong></span>
+            <span>${contactoIcono} ${contactoLabel}: <strong>${p.contacto_dato || '—'}</strong></span>
+          </div>
+          <div style="font-size:12px">${wpLink}${mailLink}</div>
+        </div>
+      ` : (p.envio ? `<div style="font-size:11px;color:var(--ink-light);margin-top:4px">📦 ${p.envio}</div>` : '')}
+    </div>`;
+  }).join('');
 };
 
 window.cambiarEstadoPedido = async function(id, nuevoEstado) {
@@ -4317,91 +4410,71 @@ function detectarZona(cp) {
 }
 
 envioSeleccionado = null;
+let contactoEnvioTipo = null; // 'whatsapp' o 'email'
+
+window.onCpInput = function() {
+  validarEnvioDomicilio();
+};
+
+window.onDatoContactoInput = function() {
+  validarEnvioDomicilio();
+};
+
+function validarEnvioDomicilio() {
+  const cp = (document.getElementById('cp-input')?.value || '').trim();
+  const dato = (document.getElementById('dato-contacto-envio')?.value || '').trim();
+  const okEl = document.getElementById('envio-domicilio-ok');
+  if (cp.length >= 4 && contactoEnvioTipo && dato.length >= 5) {
+    envioSeleccionado = { precio: null, zona: 'Envío a domicilio (CP ' + cp + ')', tipo: 'courrier', cp, contactoTipo: contactoEnvioTipo, contactoDato: dato };
+    if (okEl) okEl.style.display = 'block';
+    updateCheckoutBtn();
+    updateCartUI();
+  } else {
+    envioSeleccionado = null;
+    if (okEl) okEl.style.display = 'none';
+    updateCheckoutBtn();
+    updateCartUI();
+  }
+}
+
+window.seleccionarContacto = function(tipo) {
+  contactoEnvioTipo = tipo;
+  const wpBtn = document.getElementById('contacto-wp');
+  const mailBtn = document.getElementById('contacto-mail');
+  const campoEl = document.getElementById('campo-contacto-envio');
+  const inputEl = document.getElementById('dato-contacto-envio');
+  [wpBtn, mailBtn].forEach(b => { if(b){b.style.borderColor='var(--border-strong)';b.style.background='#fff';b.style.color='var(--ink-mid)';} });
+  if (tipo === 'whatsapp') {
+    if(wpBtn){wpBtn.style.borderColor='var(--rose)';wpBtn.style.background='var(--rose-pale)';wpBtn.style.color='var(--rose)';}
+    if(inputEl){inputEl.placeholder='Tu número de WhatsApp (ej: 1155667788)';}
+  } else {
+    if(mailBtn){mailBtn.style.borderColor='var(--rose)';mailBtn.style.background='var(--rose-pale)';mailBtn.style.color='var(--rose)';}
+    if(inputEl){inputEl.placeholder='Tu email (ej: nombre@gmail.com)';}
+  }
+  if(campoEl) campoEl.style.display = 'block';
+  validarEnvioDomicilio();
+};
+
+function updateCheckoutBtn() {
+  const btn = document.getElementById('checkout-btn');
+  const badge = document.getElementById('mp-badge-txt');
+  if (!btn) return;
+  if (!envioSeleccionado) {
+    btn.textContent = 'Confirmar pedido';
+    if(badge) badge.style.display = 'block';
+    return;
+  }
+  if (envioSeleccionado.tipo === 'coordinar') {
+    btn.textContent = '📍 Confirmar y pagar';
+    if(badge) badge.style.display = 'block';
+  } else if (envioSeleccionado.tipo === 'courrier') {
+    btn.textContent = '📦 Enviar pedido — te cotizamos el envío';
+    if(badge) badge.style.display = 'none';
+  }
+}
 
 window.calcularEnvio = async function() {
-  const cp = document.getElementById('cp-input').value.trim();
-  if (!cp || cp.length < 4) { showToast('Ingresá un código postal válido','error'); return; }
-  
-  const btn = document.querySelector('#panel-andreani button[onclick="calcularEnvio()"]');
-  const resultEl = document.getElementById('envio-result');
-  const zonasEl = document.getElementById('envio-zonas');
-  
-  // Show loading
-  if (btn) { btn.textContent = '...'; btn.disabled = true; }
-  resultEl.style.display = 'block';
-  resultEl.textContent = 'Cotizando...';
-  zonasEl.style.display = 'none';
-
-  // Load config prices from Firebase (admin can update them)
-  // Read prices from _envioConfig (already loaded) or Firebase
-  const _ec = window._envioConfig || {};
-  let precios = {
-    CABA: _ec.caba || 3500,
-    GBA: _ec.gba || 4500,
-    Interior: _ec.interior || 6000
-  };
-
-  const dias = {CABA:'2-3 días hábiles', GBA:'3-5 días hábiles', Interior:'5-8 días hábiles'};
-  const zona = detectarZona(cp);
-
-  // Try Andreani public API via backend
-  let precioAndreani = null;
-  try {
-    const res = await fetch('https://diamantina-backend.onrender.com/andreani-cotizar', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ cpDestino: cp, peso: 0.3, largo: 20, ancho: 15, alto: 5 }),
-      signal: AbortSignal.timeout(6000)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.precio) precioAndreani = data.precio;
-    }
-  } catch(e) {
-    console.log('Andreani API no disponible, usando precios por zona');
-  }
-
-  if (btn) { btn.textContent = 'Calcular'; btn.disabled = false; }
-
-  if (precioAndreani) {
-    // Show real Andreani price
-    resultEl.textContent = '';
-    zonasEl.style.display = 'flex';
-    zonasEl.innerHTML = `
-      <div class="envio-zona-item" onclick="selectZona(this,${precioAndreani},'Andreani a domicilio - CP ${cp}')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff;cursor:pointer;transition:all var(--tr);margin-bottom:4px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:14px;height:14px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0"></div>
-          <div>
-            <div style="font-size:13px;color:var(--ink);font-weight:500">🚚 Andreani a domicilio</div>
-            <div style="font-size:11px;color:var(--ink-light)">${dias[zona] || '4-7 días hábiles'} · CP ${cp}</div>
-          </div>
-        </div>
-        <div style="font-size:13px;font-weight:500;color:var(--rose)">$${precioAndreani.toLocaleString('es-AR')}</div>
-      </div>`;
-    resultEl.style.display = 'none';
-    const autoItem = zonasEl.querySelector('.envio-zona-item');
-    if (autoItem) selectZona(autoItem, precioAndreani, 'Andreani - CP ' + cp);
-  } else {
-    // Fallback: zone-based pricing
-    const zonas = ['CABA','GBA','Interior'];
-    zonasEl.style.display = 'flex';
-    zonasEl.innerHTML = zonas.map(z => `
-      <div class="envio-zona-item" onclick="selectZona(this,${precios[z]},'${z}')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff;cursor:pointer;transition:all var(--tr);margin-bottom:4px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:14px;height:14px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0"></div>
-          <div>
-            <div style="font-size:13px;color:var(--ink);font-weight:500">${z}</div>
-            <div style="font-size:11px;color:var(--ink-light)">${dias[z]}</div>
-          </div>
-        </div>
-        <div style="font-size:13px;font-weight:500;color:var(--rose)">$${precios[z].toLocaleString('es-AR')}</div>
-      </div>
-    `).join('');
-    resultEl.style.display = 'block';
-    resultEl.textContent = 'Precio estimado · CP ' + cp + ' → ' + zona;
-    const autoItem = zonasEl.querySelectorAll('.envio-zona-item')[zonas.indexOf(zona)];
-    if (autoItem) selectZona(autoItem, precios[zona], zona);
-  }
+  // legacy stub — no longer used
 };
 
 window.switchEnvioTab = function(tab) {
@@ -4410,53 +4483,37 @@ window.switchEnvioTab = function(tab) {
   const panelAndreani = document.getElementById('panel-andreani');
   const panelCoordinar = document.getElementById('panel-coordinar');
   if (tab === 'andreani') {
-    tabAndreani.style.background = 'var(--rose)';
-    tabAndreani.style.color = '#fff';
-    tabAndreani.style.borderColor = 'var(--rose)';
-    tabCoordinar.style.background = 'transparent';
-    tabCoordinar.style.color = 'var(--ink-mid)';
-    tabCoordinar.style.borderColor = 'var(--border-strong)';
-    panelAndreani.style.display = 'block';
-    panelCoordinar.style.display = 'none';
-    // Si había coordinar seleccionado, limpiar
-    if (envioSeleccionado && envioSeleccionado.tipo === 'coordinar') {
-      envioSeleccionado = null;
-      updateCartUI();
-    }
+    tabAndreani.style.background = 'var(--rose)'; tabAndreani.style.color = '#fff'; tabAndreani.style.borderColor = 'var(--rose)';
+    tabCoordinar.style.background = 'transparent'; tabCoordinar.style.color = 'var(--ink-mid)'; tabCoordinar.style.borderColor = 'var(--border-strong)';
+    panelAndreani.style.display = 'block'; panelCoordinar.style.display = 'none';
+    if (envioSeleccionado && envioSeleccionado.tipo === 'coordinar') { envioSeleccionado = null; updateCartUI(); updateCheckoutBtn(); }
   } else {
-    tabCoordinar.style.background = 'var(--rose)';
-    tabCoordinar.style.color = '#fff';
-    tabCoordinar.style.borderColor = 'var(--rose)';
-    tabAndreani.style.background = 'transparent';
-    tabAndreani.style.color = 'var(--ink-mid)';
-    tabAndreani.style.borderColor = 'var(--border-strong)';
-    panelAndreani.style.display = 'none';
-    panelCoordinar.style.display = 'block';
+    tabCoordinar.style.background = 'var(--rose)'; tabCoordinar.style.color = '#fff'; tabCoordinar.style.borderColor = 'var(--rose)';
+    tabAndreani.style.background = 'transparent'; tabAndreani.style.color = 'var(--ink-mid)'; tabAndreani.style.borderColor = 'var(--border-strong)';
+    panelAndreani.style.display = 'none'; panelCoordinar.style.display = 'block';
+    if (envioSeleccionado && envioSeleccionado.tipo === 'courrier') { envioSeleccionado = null; updateCartUI(); updateCheckoutBtn(); }
   }
 };
 
 window.seleccionarZonaCoordinar = function(zona) {
-  // Reset buttons
   ['castelar','quilmes'].forEach(z => {
-    const btn = document.getElementById('zona-' + z);
-    if (btn) { btn.style.borderColor = 'var(--border-strong)'; btn.style.background = '#fff'; btn.style.color = 'var(--ink-mid)'; }
+    const b = document.getElementById('zona-' + z);
+    if (b) { b.style.borderColor = 'var(--border-strong)'; b.style.background = '#fff'; b.style.color = 'var(--ink-mid)'; }
   });
-  // Highlight selected
   const sel = document.getElementById('zona-' + zona.toLowerCase());
   if (sel) { sel.style.borderColor = 'var(--rose)'; sel.style.background = 'var(--rose-pale)'; sel.style.color = 'var(--rose)'; }
-  envioSeleccionado = { precio: 0, zona: 'Entrega en ' + zona, tipo: 'coordinar' };
-  document.getElementById('coord-ok').style.display = 'block';
-  updateCartUI();
-  showToast('Entrega en ' + zona + ' ✦ Sin costo de envío');
+  envioSeleccionado = { precio: 0, zona: 'Retiro en ' + zona, tipo: 'coordinar' };
+  const coordOk = document.getElementById('coord-ok');
+  const coordZona = document.getElementById('coord-zona-sel');
+  if (coordZona) coordZona.textContent = zona;
+  if (coordOk) coordOk.style.display = 'block';
+  updateCartUI(); updateCheckoutBtn();
+  showToast('Retiro en ' + zona + ' ✦ Sin costo de envío');
 };
 
 window.selectZona = function(el, precio, zona) {
-  document.querySelectorAll('.envio-zona-item').forEach(z => {
-    z.style.borderColor = 'var(--border)';
-    z.style.background = '#fff';
-  });
-  el.style.borderColor = 'var(--rose)';
-  el.style.background = 'var(--rose-pale)';
+  document.querySelectorAll('.envio-zona-item').forEach(z => { z.style.borderColor='var(--border)'; z.style.background='#fff'; });
+  el.style.borderColor = 'var(--rose)'; el.style.background = 'var(--rose-pale)';
   envioSeleccionado = {precio, zona};
   updateCartUI();
 };
@@ -4897,16 +4954,24 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
         <button onclick="exportarPedidosExcel()" style="padding:8px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">↓ Exportar Excel</button>
         <select id="filtro-estado-pedido" onchange="renderPedidos()" style="padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer">
           <option value="todos">Todos los estados</option>
+          <option value="pendiente_cotizacion">A cotizar envío</option>
           <option value="aprobado">Aprobados</option>
           <option value="pendiente">Pendientes</option>
+          <option value="enviado">Enviados</option>
+          <option value="entregado">Entregados</option>
           <option value="fallido">Fallidos</option>
+          <option value="cancelado">Cancelados</option>
         </select>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem">
       <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:1rem;text-align:center">
         <div style="font-size:22px;font-weight:500;color:var(--ink)" id="stat-total-pedidos">0</div>
         <div style="font-size:12px;color:var(--ink-light)">Total pedidos</div>
+      </div>
+      <div style="background:#FAEEDA;border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-size:22px;font-weight:500;color:#BA7517" id="stat-a-cotizar">0</div>
+        <div style="font-size:12px;color:#BA7517">A cotizar envío</div>
       </div>
       <div style="background:#EAF3DE;border-radius:var(--radius-sm);padding:1rem;text-align:center">
         <div style="font-size:22px;font-weight:500;color:#3B6D11" id="stat-aprobados">0</div>
@@ -4918,7 +4983,7 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
       </div>
       <div style="background:#FFF5F5;border-radius:var(--radius-sm);padding:1rem;text-align:center">
         <div style="font-size:22px;font-weight:500;color:#E24B4A" id="stat-pendientes">0</div>
-        <div style="font-size:12px;color:#E24B4A">Pendientes</div>
+        <div style="font-size:12px;color:#E24B4A">Pendientes pago</div>
       </div>
     </div>
     <div id="pedidos-list" style="display:flex;flex-direction:column;gap:10px">
