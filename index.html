@@ -2604,18 +2604,21 @@ window.renderTallasConStock = function(p) {
   const tallasEl = document.getElementById('pm-tallas');
   if (!tallasEl) return;
   const _selColor = window._selectedColor || '';
-  tallasEl.innerHTML = (p.tallas||[]).map(t => {
+  tallasEl.innerHTML = (p.tallas||[]).map(function(t) {
     const _stockKey = _selColor ? (t + '__' + _selColor) : t;
     const stock = p.stock ? (p.stock[_stockKey] !== undefined ? p.stock[_stockKey] : (p.stock[t] !== undefined ? p.stock[t] : 99)) : 99;
     const agotada = stock === 0;
     const ultimas = stock > 0 && stock <= 3;
-    return `<button class="talla-btn${agotada?' agotada':''}" onclick="selectTalla('${t}',this,${agotada})" ${agotada?'disabled':''} style="${(agotada||ultimas)?'min-height:52px;height:auto;padding:5px 4px;flex-direction:column;gap:1px;'}">
-      <span style="font-size:13px;line-height:1.2">${t}</span>
-      ${agotada ? '<span style="font-size:8px;line-height:1;opacity:0.7">Agotada</span>' : ''}
-      ${ultimas ? '<span style="font-size:8px;line-height:1;color:#E24B4A;font-weight:600">¡Última!</span>' : ''}
-    </button>`;
+    const extraStyle = (agotada||ultimas) ? 'min-height:52px;height:auto;padding:5px 4px;flex-direction:column;gap:1px;' : '';
+    const agotadaClass = agotada ? ' agotada' : '';
+    const disabledAttr = agotada ? 'disabled' : '';
+    const subAgotada = agotada ? '<span style="font-size:8px;line-height:1;opacity:0.7">Agotada</span>' : '';
+    const subUltima = ultimas ? '<span style="font-size:8px;line-height:1;color:#E24B4A;font-weight:600">Ultima!</span>' : '';
+    return '<button class="talla-btn' + agotadaClass + '" onclick="selectTalla('' + t + '',this,' + agotada + ')" ' + disabledAttr + ' style="' + extraStyle + '">'
+      + '<span style="font-size:13px;line-height:1.2">' + t + '</span>'
+      + subAgotada + subUltima
+      + '</button>';
   }).join('');
-  // Reset talla selection
   selectedTalla = null;
 };
 
