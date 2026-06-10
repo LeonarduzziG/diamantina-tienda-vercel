@@ -1287,50 +1287,45 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
   </div>
   <div class="cart-items" id="cart-items"></div>
   <div class="cart-footer">
-    <div style="margin-bottom:14px;padding:12px;background:var(--rose-pale);border-radius:var(--radius-sm);border:1px solid var(--border)">
+    <div style="margin-bottom:12px;padding:10px;background:var(--rose-pale);border-radius:var(--radius-sm);border:1px solid var(--border)">
       <!-- TABS -->
-      <div style="display:flex;gap:6px;margin-bottom:10px">
-        <button id="tab-andreani" onclick="switchEnvioTab('andreani')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">🚚 Envío</button>
-        <button id="tab-coordinar" onclick="switchEnvioTab('coordinar')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">📍 Retiro gratis</button>
+      <div style="display:flex;gap:5px;margin-bottom:8px">
+        <button id="tab-andreani" onclick="switchEnvioTab('andreani')" style="flex:1;padding:5px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">🚚 Envío</button>
+        <button id="tab-coordinar" onclick="switchEnvioTab('coordinar')" style="flex:1;padding:5px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">📍 Retiro gratis</button>
       </div>
 
       <!-- PANEL ENVÍO -->
       <div id="panel-andreani">
-        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
-          <div style="font-size:12px;color:var(--ink-mid);line-height:1.5;margin-bottom:10px;padding:6px 8px;background:#FFF8E7;border-radius:var(--radius-sm);border:1px solid #FAC775">⚠️ El costo del envío <strong>no está incluido</strong> en el precio del producto. Lo coordinamos con vos después del pago.</div>
-          <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:6px">¿Cómo querés recibir tu pedido?</div>
-          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
-            <button id="serv-ubermoto" onclick="seleccionarServicioEnvio('UberMoto')" style="width:100%;padding:8px 12px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:left">🛵 UberMoto <span style="font-size:11px;color:var(--ink-light);font-weight:400">— mismo día en AMBA</span></button>
-            <button id="serv-correo" onclick="seleccionarServicioEnvio('Correo Argentino')" style="width:100%;padding:8px 12px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:left">📮 Correo Argentino <span style="font-size:11px;color:var(--ink-light);font-weight:400">— 2 a 7 días hábiles</span></button>
-            <button id="serv-andreani" onclick="seleccionarServicioEnvio('Andreani')" style="width:100%;padding:8px 12px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:left">🚚 Andreani <span style="font-size:11px;color:var(--ink-light);font-weight:400">— 1 a 5 días hábiles</span></button>
-          </div>
-          <div id="panel-contacto-envio" style="display:none">
-            <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:6px">¿Cómo te contactamos para coordinar el envío?</div>
-            <div style="display:flex;gap:6px;margin-bottom:8px">
-              <button id="contacto-wp" onclick="seleccionarContacto('whatsapp')" style="flex:1;padding:7px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">💬 WhatsApp</button>
-              <button id="contacto-mail" onclick="seleccionarContacto('email')" style="flex:1;padding:7px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">✉️ Email</button>
-            </div>
-            <div id="campo-contacto-envio" style="display:none;margin-bottom:6px">
-              <input type="text" id="dato-contacto-envio" placeholder="" oninput="onDatoContactoInput()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none">
-            </div>
-          </div>
-          <div id="envio-domicilio-ok" style="display:none;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Pedido listo — pagás los productos ahora, el envío lo coordinamos después</div>
+        <div style="font-size:11px;color:#854F0B;background:#FFF8E7;border-radius:var(--radius-sm);border:1px solid #FAC775;padding:5px 8px;margin-bottom:8px">⚠️ El envío <strong>no está incluido</strong> — lo coordinamos después del pago.</div>
+        <!-- Servicios: 3 en una fila -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px">
+          <button id="serv-ubermoto" onclick="seleccionarServicioEnvio('UberMoto')" style="padding:6px 4px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:center;line-height:1.3">🛵<br>UberMoto</button>
+          <button id="serv-correo" onclick="seleccionarServicioEnvio('Correo Argentino')" style="padding:6px 4px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:center;line-height:1.3">📮<br>Correo Arg.</button>
+          <button id="serv-andreani" onclick="seleccionarServicioEnvio('Andreani')" style="padding:6px 4px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:center;line-height:1.3">🚚<br>Andreani</button>
         </div>
+        <!-- Contacto: aparece al elegir servicio -->
+        <div id="panel-contacto-envio" style="display:none">
+          <div style="display:flex;gap:4px;margin-bottom:5px">
+            <button id="contacto-wp" onclick="seleccionarContacto('whatsapp')" style="flex:1;padding:5px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">💬 WhatsApp</button>
+            <button id="contacto-mail" onclick="seleccionarContacto('email')" style="flex:1;padding:5px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">✉️ Email</button>
+          </div>
+          <div id="campo-contacto-envio" style="display:none">
+            <input type="text" id="dato-contacto-envio" placeholder="" oninput="onDatoContactoInput()" style="width:100%;box-sizing:border-box;padding:6px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none">
+          </div>
+        </div>
+        <div id="envio-domicilio-ok" style="display:none;font-size:11px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:5px 8px;margin-top:5px">✓ Listo — el envío lo coordinamos después del pago</div>
         <div id="envio-zonas" style="display:none"></div>
         <div id="envio-result" style="display:none"></div>
       </div>
 
       <!-- PANEL RETIRO -->
       <div id="panel-coordinar" style="display:none">
-        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
-          <div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">📍 Retiro sin costo</div>
-          <div style="font-size:12px;color:var(--ink-mid);line-height:1.6;margin-bottom:10px">Coordinamos día y horario por WhatsApp. No tiene costo adicional.</div>
-          <div style="display:flex;gap:8px">
-            <button id="zona-castelar" onclick="seleccionarZonaCoordinar('Castelar')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Castelar</button>
-            <button id="zona-quilmes" onclick="seleccionarZonaCoordinar('Quilmes')" style="flex:1;padding:9px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Quilmes</button>
-          </div>
-          <div id="coord-ok" style="display:none;margin-top:8px;font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:6px 10px">✓ Retiro en <span id="coord-zona-sel"></span> — te contactamos por WhatsApp para coordinar</div>
+        <div style="font-size:11px;color:var(--ink-mid);margin-bottom:6px">Sin costo. Coordinamos por WhatsApp.</div>
+        <div style="display:flex;gap:6px">
+          <button id="zona-castelar" onclick="seleccionarZonaCoordinar('Castelar')" style="flex:1;padding:8px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Castelar</button>
+          <button id="zona-quilmes" onclick="seleccionarZonaCoordinar('Quilmes')" style="flex:1;padding:8px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Quilmes</button>
         </div>
+        <div id="coord-ok" style="display:none;margin-top:6px;font-size:11px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:5px 8px">✓ Retiro en <span id="coord-zona-sel"></span> — te contactamos para coordinar</div>
       </div>
     </div>
     <div style="margin-bottom:14px">
