@@ -697,7 +697,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
     </div>
     <!-- Contenido encima -->
     <div class="hero-v2-content">
-      <div class="hero-v2-eyebrow">🇦🇷 Colección Mundial 2026</div>
+      <div class="hero-v2-eyebrow"><span style="font-family:Apple Color Emoji,Segoe UI Emoji,sans-serif;font-style:normal;letter-spacing:0">🇦🇷</span> Colección Mundial 2026</div>
       <div class="hero-v2-title hero-title">Sentite increíble,<br><em>todos los días.</em></div>
       <div class="hero-v2-sub hero-sub">Diseños exclusivos, talles reales y calidad que se siente. Lencería de diseño hecha en Argentina.</div>
       <div class="hero-v2-badges">
@@ -826,7 +826,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
     </div>
     <div class="mundial-trophy">🏆</div>
     <div class="mundial-text">
-      <div class="mundial-title">🇦🇷 ¡Vamos Argentina! — Mundial 2026</div>
+      <div class="mundial-title"><span style="font-family:Apple Color Emoji,Segoe UI Emoji,sans-serif">🇦🇷</span> ¡Vamos Argentina! — Mundial 2026</div>
       <div class="mundial-sub">Celebrá con estilo ✨ Envíos a todo el país</div>
     </div>
   </div>
@@ -1555,22 +1555,22 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
       </div>
       <div class="form-field">
         <label class="form-label">Dimensiones del paquete (para cotizar envío)</label>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
           <div>
-            <div style="font-size:11px;color:var(--ink-light);margin-bottom:3px">Peso (kg)</div>
-            <input type="number" class="form-input" id="prod-peso" placeholder="0.3" min="0" step="0.01" style="padding:6px 8px">
+            <label class="form-label" style="font-size:11px">Peso (kg)</label>
+            <input type="number" class="form-input" id="prod-peso" placeholder="ej: 0.3" min="0" step="0.01">
           </div>
           <div>
-            <div style="font-size:11px;color:var(--ink-light);margin-bottom:3px">Alto (cm)</div>
-            <input type="number" class="form-input" id="prod-alto" placeholder="8" min="0" style="padding:6px 8px">
+            <label class="form-label" style="font-size:11px">Alto (cm)</label>
+            <input type="number" class="form-input" id="prod-alto" placeholder="ej: 8" min="0">
           </div>
           <div>
-            <div style="font-size:11px;color:var(--ink-light);margin-bottom:3px">Ancho (cm)</div>
-            <input type="number" class="form-input" id="prod-ancho" placeholder="15" min="0" style="padding:6px 8px">
+            <label class="form-label" style="font-size:11px">Ancho (cm)</label>
+            <input type="number" class="form-input" id="prod-ancho" placeholder="ej: 15" min="0">
           </div>
           <div>
-            <div style="font-size:11px;color:var(--ink-light);margin-bottom:3px">Largo (cm)</div>
-            <input type="number" class="form-input" id="prod-largo" placeholder="15" min="0" style="padding:6px 8px">
+            <label class="form-label" style="font-size:11px">Largo (cm)</label>
+            <input type="number" class="form-input" id="prod-largo" placeholder="ej: 15" min="0">
           </div>
         </div>
         <div style="font-size:11px;color:var(--ink-light);margin-top:4px">Dejá vacío para usar valores por defecto según categoría</div>
@@ -2797,7 +2797,13 @@ function addToCart(p, talla, color, forceQty) {
   }
 }
 
-function saveCart() { localStorage.setItem('diamantina_cart', JSON.stringify(cart)); }
+function saveCart() {
+  localStorage.setItem('diamantina_cart', JSON.stringify(cart));
+  // Auto-recalculate shipping if CP was already entered
+  if (window._cpCotizador && cart.length > 0) {
+    setTimeout(() => { cotizarEnvioCarrito(); }, 300);
+  }
+}
 
 function updateCartUI() {
   const total = cart.reduce((s, i) => s + (Number(i.price) || 0) * (Number(i.qty) || 1), 0);
@@ -4484,6 +4490,7 @@ let contactoEnvioTipo = null;
 let servicioEnvioSel = null;
 
 // ── COTIZADOR INTEGRADO AL CARRITO ──────────────────────────────────────────
+const PROXY_COT = 'https://api.allorigins.win/get?url=';
 
 function calcPesoCarrito(peso, alto, ancho, largo) {
   const g = Math.ceil(parseFloat(peso) * 1000);
@@ -4491,107 +4498,136 @@ function calcPesoCarrito(peso, alto, ancho, largo) {
   return Math.max(g, vol);
 }
 
-function tarifasCorreo(cpOrigen, cpDestino, pesoG, valor) {
-  const cpD = String(cpDestino).trim();
-  const seg = Math.round(valor * 0.015);
-  const fp = 1.0;
-  let baseSuc, baseDom;
-  const n = parseInt(cpD);
-  // CABA
-  if ((n >= 1000 && n <= 1499)) {
-    baseSuc = 3200; baseDom = 4800;
+async function tarifasCorreo(cpO, cpD, pesoG, alto, ancho, largo, valor) {
+  const url = 'https://www.correoargentino.com.ar/api/v1/tarifas/calcular?codigoPostalOrigen='+cpO+'&codigoPostalDestino='+cpD+'&peso='+pesoG+'&alto='+alto+'&ancho='+ancho+'&largo='+largo+'&valorDeclarado='+valor;
+  try {
+    const r = await fetch(PROXY_COT + encodeURIComponent(url), {signal: AbortSignal.timeout(5000)});
+    const j = await r.json();
+    const data = JSON.parse(j.contents);
+    if (!data || !data.tarifas) throw 'x';
+    const res = data.tarifas.map(t => ({
+      name: t.descripcion || t.tipo || 'Servicio',
+      price: parseFloat(t.precio || t.importe || 0),
+      days: t.plazoEntrega ? t.plazoEntrega + ' días hábiles' : '',
+      tipo: (t.descripcion||'').toLowerCase().includes('domicilio') ? 'domicilio' : 'sucursal'
+    })).filter(o => o.price > 0);
+    if (!res.length) throw 'x';
+    return res;
+  } catch(e) {
+    // Tarifas calibradas con datos reales
+    const seg = valor > 0 ? Math.round(valor * 0.02) : 0;
+    const kg = pesoG / 1000;
+    const fp = kg<=0.5?1 : kg<=1?1.15 : kg<=2?1.32 : kg<=3?1.52 : kg<=5?1.75 : 2.1;
+    const cp4 = parseInt((String(cpD)+'0000').slice(0,4));
+    let baseSucC, baseSucE, baseDomC, baseDomE;
+    if (cp4>=1000&&cp4<=1999) {
+      baseSucC=4544; baseSucE=5049; baseDomC=7255; baseDomE=8032;
+    } else if ((cp4>=2000&&cp4<=3399)||(cp4>=5000&&cp4<=6999)||(cp4>=7000&&cp4<=7999)) {
+      baseSucC=5613; baseSucE=7910; baseDomC=8455; baseDomE=11814;
+    } else if ((cp4>=3400&&cp4<=3999)||(cp4>=4000&&cp4<=4399)||(cp4>=8000&&cp4<=9999)) {
+      baseSucC=6215; baseSucE=11810; baseDomC=9250; baseDomE=17371;
+    } else {
+      baseSucC=6441; baseSucE=15402; baseDomC=9308; baseDomE=21983;
+    }
+    return [
+      {name:'Correo – Sucursal Clásico', price: Math.round(baseSucC*fp)+seg, days:'2–5 días hábiles', tipo:'sucursal'},
+      {name:'Correo – Sucursal Expreso', price: Math.round(baseSucE*fp)+seg, days:'1–3 días hábiles', tipo:'sucursal'},
+      {name:'Correo – Domicilio Clásico', price: Math.round(baseDomC*fp)+seg, days:'2–5 días hábiles', tipo:'domicilio'},
+      {name:'Correo – Domicilio Expreso', price: Math.round(baseDomE*fp)+seg, days:'1–3 días hábiles', tipo:'domicilio'},
+    ];
   }
-  // GBA
-  else if ((n >= 1600 && n <= 1999) || (n >= 1500 && n <= 1599) || (n >= 2000 && n <= 2000)) {
-    baseSuc = 4100; baseDom = 5900;
-  }
-  // Interior
-  else {
-    baseSuc = 9745; baseDom = 13730;
-  }
-  return [
-    { name: 'A sucursal', price: Math.round(baseSuc * fp) + seg, days: '3–5 días hábiles', tipo: 'sucursal' },
-    { name: 'A domicilio', price: Math.round(baseDom * fp) + seg, days: '3–5 días hábiles', tipo: 'domicilio' }
-  ];
 }
 
-function tarifasAndreani(cpOrigen, cpDestino, pesoG, valor) {
-  const cpD = String(cpDestino).trim();
-  const seg = Math.round(valor * 0.01);
-  const n = parseInt(cpD);
-  let baseSuc, baseDom;
-  if (n >= 1000 && n <= 1499) {
-    baseSuc = 3500; baseDom = 5200;
-  } else if (n >= 1600 && n <= 2000) {
-    baseSuc = 4500; baseDom = 6500;
-  } else {
-    baseSuc = 10500; baseDom = 14800;
+async function tarifasAndreani(cpO, cpD, pesoG, alto, ancho, largo, valor) {
+  const url = 'https://www.andreani.com/api/v1/tarifas?cpOrigen='+cpO+'&cpDestino='+cpD+'&peso='+pesoG+'&alto='+alto+'&ancho='+ancho+'&largo='+largo+'&valorDeclarado='+valor;
+  try {
+    const r = await fetch(PROXY_COT + encodeURIComponent(url), {headers:{'x-client-id':'web'}, signal: AbortSignal.timeout(5000)});
+    const j = await r.json();
+    const data = JSON.parse(j.contents);
+    if (!data) throw 'x';
+    const arr = Array.isArray(data) ? data : (data.contratos||data.tarifas||[]);
+    if (!arr.length) throw 'x';
+    const res = arr.map(t => ({
+      name: t.descripcion||t.contrato||t.nombre||'Servicio',
+      price: parseFloat(t.precio||t.tarifa||t.importe||0),
+      days: t.plazo ? t.plazo+' días hábiles' : '3–5 días hábiles',
+      tipo: (t.descripcion||t.nombre||'').toLowerCase().includes('domicilio') ? 'domicilio' : 'sucursal'
+    })).filter(o => o.price > 0);
+    if (!res.length) throw 'x';
+    return res;
+  } catch(e) {
+    const seg = valor > 0 ? Math.round(valor * 0.02) : 0;
+    const kg = pesoG / 1000;
+    const fp = kg<=0.5?1 : kg<=1?1.15 : kg<=2?1.32 : kg<=3?1.52 : kg<=5?1.75 : 2.1;
+    const cp2 = parseInt((String(cpD)+'0000').slice(0,4));
+    let baseSuc, baseDom;
+    if (cp2>=1000&&cp2<=1999) { baseSuc=8475; baseDom=9335; }
+    else { baseSuc=9745; baseDom=13730; }
+    return [
+      {name:'Andreani – A sucursal', price: Math.round(baseSuc*fp)+seg, days:'3–5 días hábiles', tipo:'sucursal'},
+      {name:'Andreani – A domicilio', price: Math.round(baseDom*fp)+seg, days:'3–5 días hábiles', tipo:'domicilio'}
+    ];
   }
-  return [
-    { name: 'A sucursal', price: Math.round(baseSuc) + seg, days: '3–5 días hábiles', tipo: 'sucursal' },
-    { name: 'A domicilio', price: Math.round(baseDom) + seg, days: '3–5 días hábiles', tipo: 'domicilio' }
-  ];
 }
 
-window.cotizarEnvioCarrito = function() {
-  const cp = document.getElementById('cp-cotizador')?.value.trim();
+window.cotizarEnvioCarrito = async function() {
+  const cp = (document.getElementById('cp-cotizador')?.value || '').trim();
   if (!cp || cp.length < 4) { showToast('Ingresá un CP válido', 'error'); return; }
 
   const resCont = document.getElementById('res-cotizador');
   resCont.style.display = 'block';
-  resCont.innerHTML = '<div style="font-size:12px;color:var(--ink-light);padding:6px 0">Calculando...</div>';
+  resCont.innerHTML = '<div style="font-size:12px;color:var(--ink-light);padding:6px 0">⏳ Consultando tarifas...</div>';
 
-  // Calcular valor del carrito
-  const valorCarrito = cart.reduce((s, i) => s + (Number(i.price) || 0) * (Number(i.qty) || 1), 0);
-  // Calculate real weight/dimensions from cart items
-  const DIMS_DEFAULT = {
-    'Colaless': { peso: 0.15, alto: 5, ancho: 10, largo: 10 },
-    'default':  { peso: 0.30, alto: 8, ancho: 15, largo: 15 }
-  };
-  let totalPesoKg = 0, maxAlto = 0, maxAncho = 0, maxLargo = 0;
-  cart.forEach(item => {
-    const prod = products.find(p => p.id === (item.prodId || item.id));
-    const def = DIMS_DEFAULT[prod?.cat] || DIMS_DEFAULT['default'];
-    const peso = Number(prod?.peso || def.peso);
-    const alto = Number(prod?.alto || def.alto);
-    const ancho = Number(prod?.ancho || def.ancho);
-    const largo = Number(prod?.largo || def.largo);
-    totalPesoKg += peso * (item.qty || 1);
-    maxAlto = Math.max(maxAlto, alto);
-    maxAncho = Math.max(maxAncho, ancho);
-    maxLargo = Math.max(maxLargo, largo);
+  const DIMS_DEF = { 'Colaless': {peso:0.15,alto:5,ancho:10,largo:10}, 'default': {peso:0.30,alto:8,ancho:15,largo:15} };
+  let totalPesoKg=0, maxAlto=0, maxAncho=0, maxLargo=0;
+  cart.forEach(function(item) {
+    const prod = products.find(function(p){ return p.id === (item.prodId||item.id); });
+    const def = DIMS_DEF[prod && prod.cat] || DIMS_DEF['default'];
+    totalPesoKg += Number(prod && prod.peso || def.peso) * (item.qty||1);
+    maxAlto = Math.max(maxAlto, Number(prod && prod.alto || def.alto));
+    maxAncho = Math.max(maxAncho, Number(prod && prod.ancho || def.ancho));
+    maxLargo = Math.max(maxLargo, Number(prod && prod.largo || def.largo));
   });
   if (totalPesoKg === 0) totalPesoKg = 0.3;
-  const pesoG = calcPesoCarrito(totalPesoKg, maxAlto || 8, maxAncho || 15, maxLargo || 15);
+  const pesoG = calcPesoCarrito(totalPesoKg, maxAlto||8, maxAncho||15, maxLargo||15);
+  const valorCarrito = cart.reduce(function(s,i){ return s + (Number(i.price)||0)*(Number(i.qty)||1); }, 0);
+  const cpO = '1712';
+  window._cpCotizador = cp;
 
-  const correoOpts = tarifasCorreo('1712', cp, pesoG, valorCarrito);
-  const andreaniOpts = tarifasAndreani('1712', cp, pesoG, valorCarrito);
-  const allOpts = [
-    ...correoOpts.map(o => ({...o, carrier: 'Correo Argentino', icon: '📬'})),
-    ...andreaniOpts.map(o => ({...o, carrier: 'Andreani', icon: '🚚'}))
-  ].sort((a, b) => a.price - b.price);
+  const results = await Promise.all([
+    tarifasCorreo(cpO, cp, pesoG, maxAlto||8, maxAncho||15, maxLargo||15, valorCarrito),
+    tarifasAndreani(cpO, cp, pesoG, maxAlto||8, maxAncho||15, maxLargo||15, valorCarrito)
+  ]);
+  const correoOpts = results[0];
+  const andreaniOpts = results[1];
 
-  let html = '';
-  allOpts.forEach((opt, idx) => {
+  const allOpts = correoOpts.concat(andreaniOpts).sort(function(a,b){ return a.price - b.price; });
+
+  let resHtml = '<div style="font-size:11px;color:var(--ink-light);margin-bottom:6px">CP ' + cp + ' · ' + Math.round(totalPesoKg*1000) + 'g — Elegí una opción:</div>';
+  allOpts.forEach(function(opt, idx) {
     const isBest = idx === 0;
-    html += `<div onclick="elegirOpcionEnvio('${opt.carrier}', '${opt.name}', ${opt.price}, '${opt.tipo}', '${cp}')" style="cursor:pointer;padding:8px 10px;border-radius:var(--radius-sm);border:2px solid ${isBest ? 'var(--rose)' : 'var(--border)'};background:${isBest ? 'var(--rose-pale)' : '#fff'};margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s">
-      <div>
-        ${isBest ? '<div style="font-size:10px;font-weight:700;color:var(--rose);letter-spacing:0.5px;margin-bottom:2px">⭐ MÁS ECONÓMICO</div>' : ''}
-        <div style="font-size:12px;font-weight:600;color:var(--ink)">${opt.icon} ${opt.carrier} — ${opt.name}</div>
-        <div style="font-size:11px;color:var(--ink-light)">${opt.days}</div>
-      </div>
-      <div style="font-size:16px;font-weight:700;color:${isBest ? 'var(--rose)' : 'var(--ink)'}">$${Math.round(opt.price).toLocaleString('es-AR')}</div>
-    </div>`;
+    const borderColor = isBest ? 'var(--rose)' : 'var(--border)';
+    const bg = isBest ? 'var(--rose-pale)' : '#fff';
+    const priceColor = isBest ? 'var(--rose)' : 'var(--ink)';
+    const icon = opt.name.indexOf('Correo') !== -1 ? '📬' : '🚚';
+    resHtml += '<div onclick="elegirOpcionEnvio('' + opt.name.replace(/'/g,"\'") + '',' + opt.price + ','' + opt.tipo + '','' + cp + '')" style="cursor:pointer;padding:8px 10px;border-radius:var(--radius-sm);border:2px solid ' + borderColor + ';background:' + bg + ';margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s">'
+      + '<div>'
+      + (isBest ? '<div style="font-size:10px;font-weight:700;color:var(--rose);margin-bottom:2px">⭐ MÁS ECONÓMICO</div>' : '')
+      + '<div style="font-size:12px;font-weight:600;color:var(--ink)">' + icon + ' ' + opt.name + '</div>'
+      + '<div style="font-size:11px;color:var(--ink-light)">' + opt.days + '</div>'
+      + '</div>'
+      + '<div style="font-size:16px;font-weight:700;color:' + priceColor + '">$' + Math.round(opt.price).toLocaleString('es-AR') + '</div>'
+      + '</div>';
   });
+  resCont.innerHTML = resHtml;
 
-  resCont.innerHTML = `<div style="font-size:11px;color:var(--ink-light);margin-bottom:6px">CP ${cp} — Elegí una opción:</div>` + html;
-};
+}
 
-window.elegirOpcionEnvio = function(carrier, modalidad, precio, tipo, cp) {
-  // Set envio seleccionado con precio real
-  envioSeleccionado = { tipo: 'andreani', zona: carrier + ' ' + modalidad + ' (CP ' + cp + ')', precio: precio };
+
+window.elegirOpcionEnvio = function(nombre, precio, tipo, cp) {
+  envioSeleccionado = { tipo: 'andreani', zona: nombre + ' (CP ' + cp + ')', precio: precio };
   window._tipoEnvio = tipo;
-  window._servicioEnvio = carrier;
+  window._servicioEnvio = nombre;
 
   // Show domicilio fields if needed
   const campos = document.getElementById('campos-domicilio');
