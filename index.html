@@ -1296,37 +1296,26 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 
       <!-- PANEL ENVÍO -->
       <div id="panel-andreani">
-        <div style="font-size:11px;color:#854F0B;background:#FFF8E7;border-radius:var(--radius-sm);border:1px solid #FAC775;padding:5px 8px;margin-bottom:8px">⚠️ El envío <strong>no está incluido</strong> — lo coordinamos después del pago.</div>
-        <!-- Servicios: 3 en una fila -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px">
-          <button id="serv-ubermoto" onclick="seleccionarServicioEnvio('UberMoto')" style="padding:6px 4px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:center;line-height:1.3">🛵<br>UberMoto</button>
-          <button id="serv-correo" onclick="seleccionarServicioEnvio('Correo Argentino')" style="padding:6px 4px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:center;line-height:1.3">📮<br>Correo Arg.</button>
-          <button id="serv-andreani" onclick="seleccionarServicioEnvio('Andreani')" style="padding:6px 4px;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s;text-align:center;line-height:1.3">🚚<br>Andreani</button>
-        </div>
-        <!-- Contacto: aparece al elegir servicio -->
-        <div id="panel-contacto-envio" style="display:none">
-          <div style="display:flex;gap:4px;margin-bottom:5px">
-            <button id="contacto-wp" onclick="seleccionarContacto('whatsapp')" style="flex:1;padding:5px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">💬 WhatsApp</button>
-            <button id="contacto-mail" onclick="seleccionarContacto('email')" style="flex:1;padding:5px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">✉️ Email</button>
-          </div>
-          <div id="campo-contacto-envio" style="display:none">
-            <input type="text" id="dato-contacto-envio" placeholder="" oninput="onDatoContactoInput()" style="width:100%;box-sizing:border-box;padding:6px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none">
+        <!-- CP destino + cotizar -->
+        <div style="margin-bottom:8px">
+          <div style="font-size:11px;font-weight:600;color:var(--ink-mid);margin-bottom:4px">¿A qué CP enviamos?</div>
+          <div style="display:flex;gap:6px">
+            <input type="text" id="cp-cotizador" placeholder="Ej: 5000" maxlength="8" oninput="this.value=this.value.replace(/\D/g,'')" style="flex:1;width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6pxmargin-bottom:0">
+            <button onclick="cotizarEnvioCarrito()" style="padding:7px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">Calcular</button>
           </div>
         </div>
-        <!-- DATOS COMPRADOR ENVIO -->
-        <div id="form-datos-envio" style="display:none;margin-top:8px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:6px">Datos para el envío</div>
+
+        <!-- Resultados cotizador -->
+        <div id="res-cotizador" style="display:none;margin-bottom:8px"></div>
+
+        <!-- Formulario datos comprador (aparece al elegir opción) -->
+        <div id="form-datos-envio" style="display:none;background:var(--surface-2);border-radius:var(--radius-sm);padding:10px;margin-top:8px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:8px">Tus datos</div>
           <input type="text" id="envio-nombre" placeholder="Nombre y apellido *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
-          <input type="text" id="envio-cp" placeholder="Código postal *" maxlength="8" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
           <input type="tel" id="envio-tel" placeholder="Teléfono / WhatsApp *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <input type="email" id="envio-email" placeholder="Email (opcional)" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
 
-          <!-- Tipo: sucursal o domicilio -->
-          <div style="display:flex;gap:6px;margin-bottom:6px">
-            <button id="tipo-sucursal" onclick="seleccionarTipoEnvio('sucursal')" style="flex:1;padding:6px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">🏪 Sucursal</button>
-            <button id="tipo-domicilio" onclick="seleccionarTipoEnvio('domicilio')" style="flex:1;padding:6px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">🏠 A domicilio</button>
-          </div>
-
-          <!-- Datos domicilio (solo si elige a domicilio) -->
+          <!-- Domicilio si eligió a domicilio -->
           <div id="campos-domicilio" style="display:none">
             <input type="text" id="envio-calle" placeholder="Calle y altura *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
             <div style="display:flex;gap:6px">
@@ -1338,9 +1327,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
           </div>
 
           <textarea id="envio-obs" placeholder="Observaciones (opcional)" rows="2" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6pxresize:vertical"></textarea>
-          <button onclick="confirmarDatosEnvio()" style="width:100%;padding:8px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-sizing:border-box">Confirmar datos ✓</button>
+          <button onclick="confirmarDatosEnvio()" style="width:100%;padding:8px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:600;cursor:pointer;box-sizing:border-box">Confirmar datos ✓</button>
         </div>
-        <div id="envio-domicilio-ok" style="display:none;font-size:11px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:5px 8px;margin-top:5px">✓ Listo — el envío lo coordinamos después del pago</div>
+
+        <div id="envio-domicilio-ok" style="display:none;font-size:11px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:8px 10px;margin-top:6px"></div>
         <div id="envio-zonas" style="display:none"></div>
         <div id="envio-result" style="display:none"></div>
       </div>
@@ -4411,6 +4401,109 @@ envioSeleccionado = null;
 let contactoEnvioTipo = null;
 let servicioEnvioSel = null;
 
+// ── COTIZADOR INTEGRADO AL CARRITO ──────────────────────────────────────────
+
+function calcPesoCarrito(peso, alto, ancho, largo) {
+  const g = Math.ceil(parseFloat(peso) * 1000);
+  const vol = Math.ceil((parseFloat(alto) * parseFloat(ancho) * parseFloat(largo)) / 5);
+  return Math.max(g, vol);
+}
+
+function tarifasCorreo(cpOrigen, cpDestino, pesoG, valor) {
+  const cpD = String(cpDestino).trim();
+  const seg = Math.round(valor * 0.015);
+  const fp = 1.0;
+  let baseSuc, baseDom;
+  const n = parseInt(cpD);
+  // CABA
+  if ((n >= 1000 && n <= 1499)) {
+    baseSuc = 3200; baseDom = 4800;
+  }
+  // GBA
+  else if ((n >= 1600 && n <= 1999) || (n >= 1500 && n <= 1599) || (n >= 2000 && n <= 2000)) {
+    baseSuc = 4100; baseDom = 5900;
+  }
+  // Interior
+  else {
+    baseSuc = 9745; baseDom = 13730;
+  }
+  return [
+    { name: 'A sucursal', price: Math.round(baseSuc * fp) + seg, days: '3–5 días hábiles', tipo: 'sucursal' },
+    { name: 'A domicilio', price: Math.round(baseDom * fp) + seg, days: '3–5 días hábiles', tipo: 'domicilio' }
+  ];
+}
+
+function tarifasAndreani(cpOrigen, cpDestino, pesoG, valor) {
+  const cpD = String(cpDestino).trim();
+  const seg = Math.round(valor * 0.01);
+  const n = parseInt(cpD);
+  let baseSuc, baseDom;
+  if (n >= 1000 && n <= 1499) {
+    baseSuc = 3500; baseDom = 5200;
+  } else if (n >= 1600 && n <= 2000) {
+    baseSuc = 4500; baseDom = 6500;
+  } else {
+    baseSuc = 10500; baseDom = 14800;
+  }
+  return [
+    { name: 'A sucursal', price: Math.round(baseSuc) + seg, days: '3–5 días hábiles', tipo: 'sucursal' },
+    { name: 'A domicilio', price: Math.round(baseDom) + seg, days: '3–5 días hábiles', tipo: 'domicilio' }
+  ];
+}
+
+window.cotizarEnvioCarrito = function() {
+  const cp = document.getElementById('cp-cotizador')?.value.trim();
+  if (!cp || cp.length < 4) { showToast('Ingresá un CP válido', 'error'); return; }
+
+  const resCont = document.getElementById('res-cotizador');
+  resCont.style.display = 'block';
+  resCont.innerHTML = '<div style="font-size:12px;color:var(--ink-light);padding:6px 0">Calculando...</div>';
+
+  // Calcular valor del carrito
+  const valorCarrito = cart.reduce((s, i) => s + (Number(i.price) || 0) * (Number(i.qty) || 1), 0);
+  const pesoG = calcPesoCarrito(0.3, 5, 15, 20); // default Diamantina
+
+  const correoOpts = tarifasCorreo('1712', cp, pesoG, valorCarrito);
+  const andreaniOpts = tarifasAndreani('1712', cp, pesoG, valorCarrito);
+  const allOpts = [
+    ...correoOpts.map(o => ({...o, carrier: 'Correo Argentino', icon: '📬'})),
+    ...andreaniOpts.map(o => ({...o, carrier: 'Andreani', icon: '🚚'}))
+  ].sort((a, b) => a.price - b.price);
+
+  let html = '';
+  allOpts.forEach((opt, idx) => {
+    const isBest = idx === 0;
+    html += `<div onclick="elegirOpcionEnvio('${opt.carrier}', '${opt.name}', ${opt.price}, '${opt.tipo}', '${cp}')" style="cursor:pointer;padding:8px 10px;border-radius:var(--radius-sm);border:2px solid ${isBest ? 'var(--rose)' : 'var(--border)'};background:${isBest ? 'var(--rose-pale)' : '#fff'};margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s">
+      <div>
+        ${isBest ? '<div style="font-size:10px;font-weight:700;color:var(--rose);letter-spacing:0.5px;margin-bottom:2px">⭐ MÁS ECONÓMICO</div>' : ''}
+        <div style="font-size:12px;font-weight:600;color:var(--ink)">${opt.icon} ${opt.carrier} — ${opt.name}</div>
+        <div style="font-size:11px;color:var(--ink-light)">${opt.days}</div>
+      </div>
+      <div style="font-size:16px;font-weight:700;color:${isBest ? 'var(--rose)' : 'var(--ink)'}">$${Math.round(opt.price).toLocaleString('es-AR')}</div>
+    </div>`;
+  });
+
+  resCont.innerHTML = `<div style="font-size:11px;color:var(--ink-light);margin-bottom:6px">CP ${cp} — Elegí una opción:</div>` + html;
+};
+
+window.elegirOpcionEnvio = function(carrier, modalidad, precio, tipo, cp) {
+  // Set envio seleccionado con precio real
+  envioSeleccionado = { tipo: 'andreani', zona: carrier + ' ' + modalidad + ' (CP ' + cp + ')', precio: precio };
+  window._tipoEnvio = tipo;
+  window._servicioEnvio = carrier;
+
+  // Show domicilio fields if needed
+  const campos = document.getElementById('campos-domicilio');
+  if (campos) campos.style.display = tipo === 'domicilio' ? 'block' : 'none';
+
+  // Show form
+  document.getElementById('form-datos-envio').style.display = 'block';
+
+  // Update total
+  updateCartUI();
+  showToast(carrier + ' ' + modalidad + ' — $' + Math.round(precio).toLocaleString('es-AR'));
+};
+
 window.seleccionarTipoEnvio = function(tipo) {
   const btnSuc = document.getElementById('tipo-sucursal');
   const btnDom = document.getElementById('tipo-domicilio');
@@ -4429,9 +4522,10 @@ window.seleccionarTipoEnvio = function(tipo) {
 
 window.confirmarDatosEnvio = function() {
   const nombre = document.getElementById('envio-nombre')?.value.trim();
-  const cp = document.getElementById('envio-cp')?.value.trim();
   const tel = document.getElementById('envio-tel')?.value.trim();
-  if (!nombre || !cp || !tel) { showToast('Completá nombre, CP y teléfono', 'error'); return; }
+  const email = document.getElementById('envio-email')?.value.trim();
+  const cp = document.getElementById('cp-cotizador')?.value.trim();
+  if (!nombre || !tel) { showToast('Completá nombre y teléfono', 'error'); return; }
   const tipo = window._tipoEnvio || 'sucursal';
   let direccion = '';
   if (tipo === 'domicilio') {
@@ -4444,13 +4538,13 @@ window.confirmarDatosEnvio = function() {
     direccion = calle + (piso ? ' Piso ' + piso : '') + (depto ? ' Dpto ' + depto : '') + ', ' + localidad + ', ' + provincia;
   }
   const obs = document.getElementById('envio-obs')?.value.trim();
-  window._datosBuyer = { nombre, cp, tel, tipo, direccion, obs };
-  const servicioActual = window._servicioEnvio || 'Envío';
-  const resumen = tipo === 'domicilio' ? servicioActual + ' a domicilio — ' + direccion : servicioActual + ' a sucursal — CP ' + cp;
-  if (envioSeleccionado) envioSeleccionado.zona = resumen;
-  document.getElementById('envio-domicilio-ok').style.display = 'block';
-  document.getElementById('envio-domicilio-ok').textContent = '✓ ' + nombre + ' · ' + (tipo === 'domicilio' ? 'A domicilio' : 'Sucursal') + ' · CP ' + cp;
+  window._datosBuyer = { nombre, tel, email, cp, tipo, direccion, obs };
+  const okEl = document.getElementById('envio-domicilio-ok');
+  okEl.style.display = 'block';
+  const precio = envioSeleccionado?.precio || 0;
+  okEl.innerHTML = '✓ ' + nombre + ' · ' + (tipo === 'domicilio' ? 'A domicilio — ' + (direccion || '') : 'A sucursal — CP ' + cp) + (precio ? ' · $' + Math.round(precio).toLocaleString('es-AR') : '');
   document.getElementById('form-datos-envio').style.display = 'none';
+  document.getElementById('res-cotizador').style.display = 'none';
   updateCartUI();
   showToast('Datos confirmados ✓');
 };
