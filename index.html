@@ -1313,6 +1313,33 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
             <input type="text" id="dato-contacto-envio" placeholder="" oninput="onDatoContactoInput()" style="width:100%;box-sizing:border-box;padding:6px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none">
           </div>
         </div>
+        <!-- DATOS COMPRADOR ENVIO -->
+        <div id="form-datos-envio" style="display:none;margin-top:8px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:6px">Datos para el envío</div>
+          <input type="text" id="envio-nombre" placeholder="Nombre y apellido *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <input type="text" id="envio-cp" placeholder="Código postal *" maxlength="8" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <input type="tel" id="envio-tel" placeholder="Teléfono / WhatsApp *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+
+          <!-- Tipo: sucursal o domicilio -->
+          <div style="display:flex;gap:6px;margin-bottom:6px">
+            <button id="tipo-sucursal" onclick="seleccionarTipoEnvio('sucursal')" style="flex:1;padding:6px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">🏪 Sucursal</button>
+            <button id="tipo-domicilio" onclick="seleccionarTipoEnvio('domicilio')" style="flex:1;padding:6px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">🏠 A domicilio</button>
+          </div>
+
+          <!-- Datos domicilio (solo si elige a domicilio) -->
+          <div id="campos-domicilio" style="display:none">
+            <input type="text" id="envio-calle" placeholder="Calle y altura *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+            <div style="display:flex;gap:6px">
+              <input type="text" id="envio-piso" placeholder="Piso" style="flex:1;width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+              <input type="text" id="envio-depto" placeholder="Depto" style="flex:1;width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+            </div>
+            <input type="text" id="envio-localidad" placeholder="Localidad *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+            <input type="text" id="envio-provincia" placeholder="Provincia *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          </div>
+
+          <textarea id="envio-obs" placeholder="Observaciones (opcional)" rows="2" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6pxresize:vertical"></textarea>
+          <button onclick="confirmarDatosEnvio()" style="width:100%;padding:8px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-sizing:border-box">Confirmar datos ✓</button>
+        </div>
         <div id="envio-domicilio-ok" style="display:none;font-size:11px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:5px 8px;margin-top:5px">✓ Listo — el envío lo coordinamos después del pago</div>
         <div id="envio-zonas" style="display:none"></div>
         <div id="envio-result" style="display:none"></div>
@@ -1324,6 +1351,15 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
         <div style="display:flex;gap:6px">
           <button id="zona-castelar" onclick="seleccionarZonaCoordinar('Castelar')" style="flex:1;padding:8px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Castelar</button>
           <button id="zona-quilmes" onclick="seleccionarZonaCoordinar('Quilmes')" style="flex:1;padding:8px 0;border:2px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s">📍 Quilmes</button>
+        </div>
+        <!-- DATOS RETIRO -->
+        <div id="form-datos-retiro" style="display:none;margin-top:8px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:6px">Tus datos</div>
+          <input type="text" id="retiro-nombre" placeholder="Nombre y apellido *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <input type="text" id="retiro-cp" placeholder="Código postal *" maxlength="8" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <input type="tel" id="retiro-tel" placeholder="Teléfono / WhatsApp *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <textarea id="retiro-obs" placeholder="Observaciones (opcional)" rows="2" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6pxresize:vertical"></textarea>
+          <button onclick="confirmarDatosRetiro()" style="width:100%;padding:8px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-sizing:border-box">Confirmar datos ✓</button>
         </div>
         <div id="coord-ok" style="display:none;margin-top:6px;font-size:11px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:5px 8px">✓ Retiro en <span id="coord-zona-sel"></span> — te contactamos para coordinar</div>
       </div>
@@ -2909,7 +2945,12 @@ window.checkout = async function() {
     const pedidoCompleto = {
       ts: Date.now(),
       estado: 'pendiente',
-      nombre: myName || 'Cliente',
+      nombre: (window._datosBuyer?.nombre) || myName || 'Cliente',
+      telefono: window._datosBuyer?.tel || null,
+      cpDestino: window._datosBuyer?.cp || null,
+      direccion: window._datosBuyer?.direccion || null,
+      tipoEnvio: window._datosBuyer?.tipo || null,
+      observaciones: window._datosBuyer?.obs || null,
       items: cart.map(i => ({
         title: i.name, name: i.name, prodId: i.prodId || i.id,
         talla: i.talla || '—',
@@ -4369,6 +4410,66 @@ function detectarZona(cp) {
 envioSeleccionado = null;
 let contactoEnvioTipo = null;
 let servicioEnvioSel = null;
+
+window.seleccionarTipoEnvio = function(tipo) {
+  const btnSuc = document.getElementById('tipo-sucursal');
+  const btnDom = document.getElementById('tipo-domicilio');
+  const campos = document.getElementById('campos-domicilio');
+  if (tipo === 'domicilio') {
+    btnDom.style.borderColor = 'var(--rose)'; btnDom.style.color = 'var(--rose)'; btnDom.style.background = 'var(--rose-pale)';
+    btnSuc.style.borderColor = 'var(--border-strong)'; btnSuc.style.color = 'var(--ink-mid)'; btnSuc.style.background = '#fff';
+    if (campos) campos.style.display = 'block';
+  } else {
+    btnSuc.style.borderColor = 'var(--rose)'; btnSuc.style.color = 'var(--rose)'; btnSuc.style.background = 'var(--rose-pale)';
+    btnDom.style.borderColor = 'var(--border-strong)'; btnDom.style.color = 'var(--ink-mid)'; btnDom.style.background = '#fff';
+    if (campos) campos.style.display = 'none';
+  }
+  window._tipoEnvio = tipo;
+};
+
+window.confirmarDatosEnvio = function() {
+  const nombre = document.getElementById('envio-nombre')?.value.trim();
+  const cp = document.getElementById('envio-cp')?.value.trim();
+  const tel = document.getElementById('envio-tel')?.value.trim();
+  if (!nombre || !cp || !tel) { showToast('Completá nombre, CP y teléfono', 'error'); return; }
+  const tipo = window._tipoEnvio || 'sucursal';
+  let direccion = '';
+  if (tipo === 'domicilio') {
+    const calle = document.getElementById('envio-calle')?.value.trim();
+    const piso = document.getElementById('envio-piso')?.value.trim();
+    const depto = document.getElementById('envio-depto')?.value.trim();
+    const localidad = document.getElementById('envio-localidad')?.value.trim();
+    const provincia = document.getElementById('envio-provincia')?.value.trim();
+    if (!calle || !localidad || !provincia) { showToast('Completá la dirección completa', 'error'); return; }
+    direccion = calle + (piso ? ' Piso ' + piso : '') + (depto ? ' Dpto ' + depto : '') + ', ' + localidad + ', ' + provincia;
+  }
+  const obs = document.getElementById('envio-obs')?.value.trim();
+  window._datosBuyer = { nombre, cp, tel, tipo, direccion, obs };
+  const servicioActual = window._servicioEnvio || 'Envío';
+  const resumen = tipo === 'domicilio' ? servicioActual + ' a domicilio — ' + direccion : servicioActual + ' a sucursal — CP ' + cp;
+  if (envioSeleccionado) envioSeleccionado.zona = resumen;
+  document.getElementById('envio-domicilio-ok').style.display = 'block';
+  document.getElementById('envio-domicilio-ok').textContent = '✓ ' + nombre + ' · ' + (tipo === 'domicilio' ? 'A domicilio' : 'Sucursal') + ' · CP ' + cp;
+  document.getElementById('form-datos-envio').style.display = 'none';
+  updateCartUI();
+  showToast('Datos confirmados ✓');
+};
+
+window.confirmarDatosRetiro = function() {
+  const nombre = document.getElementById('retiro-nombre')?.value.trim();
+  const cp = document.getElementById('retiro-cp')?.value.trim();
+  const tel = document.getElementById('retiro-tel')?.value.trim();
+  if (!nombre || !cp || !tel) { showToast('Completá nombre, CP y teléfono', 'error'); return; }
+  const obs = document.getElementById('retiro-obs')?.value.trim();
+  window._datosBuyer = { nombre, cp, tel, obs };
+  const zonaEl = document.getElementById('coord-zona-sel');
+  document.getElementById('form-datos-retiro').style.display = 'block';
+  document.getElementById('coord-ok').style.display = 'none';
+  document.getElementById('form-datos-retiro').style.display = 'none';
+  if (envioSeleccionado) envioSeleccionado.datosBuyer = window._datosBuyer;
+  updateCartUI();
+  showToast('Datos confirmados ✓');
+};
 
 window.seleccionarServicioEnvio = function(servicio) {
   servicioEnvioSel = servicio;
