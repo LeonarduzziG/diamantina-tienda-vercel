@@ -1554,6 +1554,28 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
         </div>
       </div>
       <div class="form-field">
+        <label class="form-label">Dimensiones del paquete (para cotizar envío)</label>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+          <div>
+            <div style="font-size:11px;color:var(--ink-light);margin-bottom:3px">Peso (kg)</div>
+            <input type="number" class="form-input" id="prod-peso" placeholder="0.3" min="0" step="0.01" style="padding:6px 8px">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--ink-light);margin-bottom:3px">Alto (cm)</div>
+            <input type="number" class="form-input" id="prod-alto" placeholder="8" min="0" style="padding:6px 8px">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--ink-light);margin-bottom:3px">Ancho (cm)</div>
+            <input type="number" class="form-input" id="prod-ancho" placeholder="15" min="0" style="padding:6px 8px">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--ink-light);margin-bottom:3px">Largo (cm)</div>
+            <input type="number" class="form-input" id="prod-largo" placeholder="15" min="0" style="padding:6px 8px">
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--ink-light);margin-top:4px">Dejá vacío para usar valores por defecto según categoría</div>
+      </div>
+      <div class="form-field">
         <label class="form-label">Precio por pack (opcional)</label>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <input type="number" class="form-input" id="prod-pack-qty" placeholder="ej: 3" min="2" style="width:80px" oninput="updatePackPreview()">
@@ -1819,6 +1841,8 @@ loadVisitasAdmin();
         }).then(r => r.json()).then(d => console.log('Pedido guardado via backend:', d.key))
           .catch(e => console.warn('Error guardando pedido:', e));
         notificarPedidoPorMail(pedidoNuevo);
+  // Guardar cliente
+  if (window._datosBuyer) guardarCliente(window._datosBuyer);
         // Bajar stock via backend
         fetch(BACKEND + '/bajar-stock', {
           method: 'POST',
@@ -3132,6 +3156,10 @@ window.saveProduct = async function() {
   }
   const colores = window.adminColores || [];
   const cuotas = parseInt(document.getElementById('prod-cuotas').value) || 0;
+  const prodPeso = parseFloat(document.getElementById('prod-peso')?.value) || null;
+  const prodAlto = parseFloat(document.getElementById('prod-alto')?.value) || null;
+  const prodAncho = parseFloat(document.getElementById('prod-ancho')?.value) || null;
+  const prodLargo = parseFloat(document.getElementById('prod-largo')?.value) || null;
   const packQty = parseInt(document.getElementById('prod-pack-qty')?.value) || 0;
   const packPrice = parseInt(document.getElementById('prod-pack-price')?.value) || 0;
   const esNuevo = document.getElementById('prod-es-nuevo')?.checked || false;
@@ -3144,6 +3172,7 @@ window.saveProduct = async function() {
     packQty: packQty >= 2 ? packQty : null,
     packPrice: packPrice > 0 && packQty >= 2 ? packPrice : null,
     keywords: keywords || null,
+    peso: prodPeso, alto: prodAlto, ancho: prodAncho, largo: prodLargo,
     ts: Date.now() };
   if (adminImgs.length > 0) {
     data.img = adminImgs[0];
@@ -3181,6 +3210,7 @@ window.resetForm = function() {
   window.adminColores = [];
   renderColorSwatchesAdmin();
   document.getElementById('prod-cuotas').value = '0';
+  ['prod-peso','prod-alto','prod-ancho','prod-largo'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   if (document.getElementById('prod-es-nuevo')) document.getElementById('prod-es-nuevo').checked = false;
   if (document.getElementById('prod-es-arg')) document.getElementById('prod-es-arg').checked = false;
   if (document.getElementById('prod-pack-qty')) document.getElementById('prod-pack-qty').value = '';
@@ -3457,6 +3487,31 @@ window.testEmail = async function() {
   }
 };
 
+// ── GUARDAR CLIENTE ─────────────────────────────────────────────────────────
+async function guardarCliente(datos) {
+  if (!datos || !datos.nombre) return;
+  try {
+    // Use tel or email as unique key
+    const uid = (datos.tel || datos.email || '').replace(/[^a-zA-Z0-9]/g, '');
+    if (!uid) return;
+    const ref = db.ref('clientes/' + uid);
+    const snap = await ref.get();
+    const existing = snap.val() || {};
+    await ref.set({
+      nombre: datos.nombre,
+      tel: datos.tel || existing.tel || null,
+      email: datos.email || existing.email || null,
+      cp: datos.cp || existing.cp || null,
+      ultimaCompra: Date.now(),
+      cantidadCompras: (existing.cantidadCompras || 0) + 1,
+      primeraCompra: existing.primeraCompra || Date.now()
+    });
+    console.log('Cliente guardado:', datos.nombre);
+  } catch(e) {
+    console.warn('Error guardando cliente:', e.message);
+  }
+}
+
 async function notificarPedidoPorMail(pedido) {
   try {
     const items = (pedido.items || []).map(i => {
@@ -3665,6 +3720,34 @@ function renderPedidosDesdeCache() {
   _mostrarPedidos(pedidos, window._pedidosCache);
   actualizarStatsPedidos(window._pedidosCache);
 }
+
+window.exportarClientes = async function() {
+  try {
+    const snap = await db.ref('clientes').get();
+    const data = snap.val();
+    if (!data) { showToast('No hay clientes guardados', 'error'); return; }
+    const clientes = Object.values(data).sort((a,b) => (b.ultimaCompra||0) - (a.ultimaCompra||0));
+    // Build CSV
+    const headers = ['Nombre','Teléfono','Email','CP','Compras','Última compra'];
+    const rows = clientes.map(c => [
+      c.nombre || '',
+      c.tel || '',
+      c.email || '',
+      c.cp || '',
+      c.cantidadCompras || 1,
+      c.ultimaCompra ? new Date(c.ultimaCompra).toLocaleDateString('es-AR') : ''
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('
+');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'clientes-diamantina.csv'; a.click();
+    URL.revokeObjectURL(url);
+    showToast('Clientes exportados (' + clientes.length + ')');
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+};
 
 window.exportarPedidosExcel = async function() {
   const pedidos = await getPedidos();
@@ -4461,7 +4544,26 @@ window.cotizarEnvioCarrito = function() {
 
   // Calcular valor del carrito
   const valorCarrito = cart.reduce((s, i) => s + (Number(i.price) || 0) * (Number(i.qty) || 1), 0);
-  const pesoG = calcPesoCarrito(0.3, 5, 15, 20); // default Diamantina
+  // Calculate real weight/dimensions from cart items
+  const DIMS_DEFAULT = {
+    'Colaless': { peso: 0.15, alto: 5, ancho: 10, largo: 10 },
+    'default':  { peso: 0.30, alto: 8, ancho: 15, largo: 15 }
+  };
+  let totalPesoKg = 0, maxAlto = 0, maxAncho = 0, maxLargo = 0;
+  cart.forEach(item => {
+    const prod = products.find(p => p.id === (item.prodId || item.id));
+    const def = DIMS_DEFAULT[prod?.cat] || DIMS_DEFAULT['default'];
+    const peso = Number(prod?.peso || def.peso);
+    const alto = Number(prod?.alto || def.alto);
+    const ancho = Number(prod?.ancho || def.ancho);
+    const largo = Number(prod?.largo || def.largo);
+    totalPesoKg += peso * (item.qty || 1);
+    maxAlto = Math.max(maxAlto, alto);
+    maxAncho = Math.max(maxAncho, ancho);
+    maxLargo = Math.max(maxLargo, largo);
+  });
+  if (totalPesoKg === 0) totalPesoKg = 0.3;
+  const pesoG = calcPesoCarrito(totalPesoKg, maxAlto || 8, maxAncho || 15, maxLargo || 15);
 
   const correoOpts = tarifasCorreo('1712', cp, pesoG, valorCarrito);
   const andreaniOpts = tarifasAndreani('1712', cp, pesoG, valorCarrito);
@@ -5103,6 +5205,7 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
       <div class="admin-title" style="margin-bottom:0">📦 Pedidos</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="exportarClientes()" style="padding:7px 14px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink-mid);cursor:pointer;display:flex;align-items:center;gap:6px">👥 Exportar clientes</button>
         <button onclick="exportarPedidosExcel()" style="padding:8px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">↓ Exportar Excel</button>
         <select id="filtro-estado-pedido" onchange="renderPedidos()" style="padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer">
           <option value="todos">Todos los estados</option>
