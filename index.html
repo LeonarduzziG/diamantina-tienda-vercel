@@ -4610,13 +4610,14 @@ window.cotizarEnvioCarrito = async function() {
     const bg = isBest ? 'var(--rose-pale)' : '#fff';
     const priceColor = isBest ? 'var(--rose)' : 'var(--ink)';
     const icon = opt.name.indexOf('Correo') !== -1 ? '📬' : '🚚';
-    resHtml += '<div onclick="elegirOpcionEnvio('' + opt.name.replace(/'/g,"\'") + '',' + opt.price + ','' + opt.tipo + '','' + cp + '')" style="cursor:pointer;padding:8px 10px;border-radius:var(--radius-sm);border:2px solid ' + borderColor + ';background:' + bg + ';margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s">'
+    const safeName = opt.name.replace(/\\/g,'').replace(/'/g,'');
+    resHtml += '<div onclick="elegirOpcionEnvio(\''+safeName+'\','+opt.price+',\''+opt.tipo+'\',\''+cp+'\''+')" style="cursor:pointer;padding:8px 10px;border-radius:var(--radius-sm);border:2px solid '+borderColor+';background:'+bg+';margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s">'
       + '<div>'
       + (isBest ? '<div style="font-size:10px;font-weight:700;color:var(--rose);margin-bottom:2px">⭐ MÁS ECONÓMICO</div>' : '')
-      + '<div style="font-size:12px;font-weight:600;color:var(--ink)">' + icon + ' ' + opt.name + '</div>'
-      + '<div style="font-size:11px;color:var(--ink-light)">' + opt.days + '</div>'
+      + '<div style="font-size:12px;font-weight:600;color:var(--ink)">'+icon+' '+opt.name+'</div>'
+      + '<div style="font-size:11px;color:var(--ink-light)">'+opt.days+'</div>'
       + '</div>'
-      + '<div style="font-size:16px;font-weight:700;color:' + priceColor + '">$' + Math.round(opt.price).toLocaleString('es-AR') + '</div>'
+      + '<div style="font-size:16px;font-weight:700;color:'+priceColor+'">$'+Math.round(opt.price).toLocaleString('es-AR')+'</div>'
       + '</div>';
   });
   resCont.innerHTML = resHtml;
