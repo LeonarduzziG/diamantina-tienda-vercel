@@ -3872,15 +3872,120 @@ window.exportarPedidosExcel = async function() {
 };
 
 window.exportarCatalogo = function() {
-  if (!products.length) { showToast('No hay productos para exportar', 'error'); return; }
-  const rows = [['Nombre','Categoría','Precio','Descuento %','Precio Final','Tallas','Estado']];
-  products.forEach(p => rows.push([p.name, p.cat, p.price||0, p.descuento||0, p.precioFinal||p.price||0, (p.tallas||[]).join('; '), p.estado||'activo']));
-  const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  if (!products.length) { showToast('No hay productos', 'error'); return; }
+
+  function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  const CSS = [
+    'body{font-family:Arial,sans-serif;font-size:11px;padding:20px;background:#f9f9f9}',
+    'h2{color:#C94F7C;font-size:16px;margin-bottom:4px}',
+    'p{color:#888;font-size:11px;margin:0 0 14px}',
+    'table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:8px;overflow:hidden}',
+    'th{background:#C94F7C;color:#fff;padding:8px 10px;text-align:left;font-size:11px;font-weight:600}',
+    'th.num{text-align:center}',
+    'td{padding:7px 10px;border-bottom:1px solid #f0e0e8;vertical-align:top;font-size:11px}',
+    'tr:last-child td{border-bottom:none}',
+    'tr:hover td{background:#FDF0F6}',
+    '.cat{background:#FCE4EC;color:#C94F7C;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:600;white-space:nowrap}',
+    '.precio{font-weight:700;color:#1a0a12;font-size:13px}',
+    '.precio-orig{text-decoration:line-through;color:#bbb;font-size:10px}',
+    '.desc{background:#E8F5E9;color:#2E7D32;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:600}',
+    '.talla{background:#EEE;color:#555;padding:2px 5px;border-radius:3px;font-size:9px;margin:1px;display:inline-block}',
+    '.color-dot{display:inline-block;width:12px;height:12px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);margin:1px;vertical-align:middle}',
+    '.stk-ok{color:#2E7D32;font-weight:600}',
+    '.stk-low{color:#E65100;font-weight:600}',
+    '.stk-no{color:#C62828;font-weight:600}',
+    '.est-activo{color:#2E7D32}.est-agotado{color:#C62828}.est-oculto{color:#888}',
+    'input.buscar{width:100%;max-width:340px;padding:7px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;margin-bottom:12px;box-sizing:border-box}',
+    '@media print{.np{display:none}}'
+  ].join('');
+
+  const JS = [
+    'function buscar(v){',
+    '  v=v.toLowerCase();',
+    '  document.querySelectorAll("tbody tr").forEach(function(r){',
+    '    r.style.display=r.textContent.toLowerCase().indexOf(v)>=0?"":"none";',
+    '  });',
+    '}'
+  ].join('');
+
+  const allProds = window._allProducts ? Object.entries(window._allProducts).map(function(e){ return Object.assign({id:e[0]},e[1]); }) : products;
+
+  let rows = '';
+  allProds.forEach(function(p, i) {
+    const precioFinal = p.precioFinal || p.price || 0;
+    const tieneDesc = p.descuento > 0;
+
+    // Stock total y detalle
+    let stockTotal = 0, stockHtml = '';
+    if (p.stock && Object.keys(p.stock).length) {
+      const stockEntries = Object.entries(p.stock);
+      stockTotal = stockEntries.reduce(function(s,e){ return s + (Number(e[1])||0); }, 0);
+      stockHtml = stockEntries.map(function(e){
+        const k = e[0], v = Number(e[1])||0;
+        const cls = v === 0 ? 'stk-no' : v <= 3 ? 'stk-low' : 'stk-ok';
+        return '<span class="talla">'+esc(k)+'</span><span class="'+cls+'"> '+v+'</span>';
+      }).join('  ');
+    } else {
+      stockTotal = 99; stockHtml = '<span class="stk-ok">Disponible</span>';
+    }
+    const stkCls = stockTotal === 0 ? 'stk-no' : stockTotal <= 3 ? 'stk-low' : 'stk-ok';
+    const stkLabel = stockTotal === 0 ? '✗ Agotado' : stockTotal <= 3 ? '⚠ ' + stockTotal + ' uds' : '✓ ' + stockTotal + ' uds';
+
+    // Colores
+    let coloresHtml = '';
+    if (p.colores && p.colores.length) {
+      coloresHtml = p.colores.map(function(c){
+        const hex = typeof c === 'object' ? c.hex : c;
+        const nom = typeof c === 'object' ? (c.nombre||hex) : hex;
+        return '<span class="color-dot" style="background:'+esc(hex)+'" title="'+esc(nom)+'"></span>';
+      }).join('');
+    }
+
+    // Tallas
+    const tallasHtml = (p.tallas||[]).map(function(t){ return '<span class="talla">'+esc(t)+'</span>'; }).join('');
+
+    const estCls = 'est-'+(p.estado||'activo');
+
+    rows += '<tr>';
+    rows += '<td style="color:#bbb;text-align:center;font-size:10px">'+(i+1)+'</td>';
+    rows += '<td><strong>'+esc(p.name||'—')+'</strong></td>';
+    rows += '<td><span class="cat">'+esc(p.cat||'—')+'</span></td>';
+    rows += '<td class="num">';
+    if (tieneDesc) rows += '<div class="precio-orig">$'+Number(p.price||0).toLocaleString('es-AR')+'</div>';
+    rows += '<div class="precio">$'+Number(precioFinal).toLocaleString('es-AR')+'</div>';
+    if (tieneDesc) rows += '<span class="desc">-'+p.descuento+'%</span>';
+    rows += '</td>';
+    rows += '<td>'+tallasHtml+'</td>';
+    rows += '<td>'+coloresHtml+'</td>';
+    rows += '<td><span class="'+stkCls+'">'+stkLabel+'</span><br><div style="margin-top:3px;font-size:10px;color:#888">'+stockHtml+'</div></td>';
+    rows += '<td class="'+estCls+'">'+esc(p.estado||'activo')+'</td>';
+    rows += '</tr>';
+  });
+
+  const fechaHoy = new Date().toLocaleDateString('es-AR');
+  const doc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Catalogo Diamantina</title>'
+    + '<style>'+CSS+'</style>'
+    + '<scr'+'ipt>'+JS+'</scr'+'ipt>'
+    + '</head><body>'
+    + '<h2>Diamantina Lenceria — Catalogo</h2>'
+    + '<p>'+fechaHoy+' &nbsp;&middot;&nbsp; '+allProds.length+' productos</p>'
+    + '<input class="buscar np" oninput="buscar(this.value)" placeholder="Buscar producto...">'
+    + '<table>'
+    + '<thead><tr>'
+    + '<th class="num">#</th><th>Nombre</th><th>Categoria</th>'
+    + '<th class="num">Precio</th><th>Tallas</th><th>Colores</th>'
+    + '<th>Stock</th><th>Estado</th>'
+    + '</tr></thead>'
+    + '<tbody>'+rows+'</tbody>'
+    + '</table></body></html>';
+
+  const blob = new Blob([doc], {type:'text/html;charset=utf-8'});
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'}));
-  a.download = 'catalogo-diamantina-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.href = URL.createObjectURL(blob);
+  a.download = 'catalogo-diamantina-'+new Date().toISOString().slice(0,10)+'.html';
   a.click();
-  showToast('Catálogo exportado ✦');
+  showToast('Catalogo exportado ✓');
 };
 
 // ── FAVORITOS ──
