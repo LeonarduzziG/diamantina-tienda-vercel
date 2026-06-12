@@ -2493,9 +2493,24 @@ window.updateCarousel = function() {
 }
 
 window.openProdModal = function(id) {
-  const p = products.find(x => x.id === id);
+  const p = products.find(x => x.id === id) || (window._allProducts && window._allProducts[id] ? Object.assign({id}, window._allProducts[id]) : null);
   if (!p) return;
   currentProd = p;
+  // Update URL without reload
+  try { history.replaceState(null,'','/?producto='+encodeURIComponent(id)); } catch(e){}
+  // Update meta tags for sharing
+  const prodUrl = window.location.origin + '/?producto=' + encodeURIComponent(id);
+  const prodImg = (p.imgs && p.imgs[0]) || p.img || '';
+  const prodDesc = (p.desc || '').replace(/<[^>]+>/g,'').slice(0,120);
+  document.title = (p.name || 'Producto') + ' — Diamantina Lencería';
+  const setMeta = function(sel, val) { const el = document.querySelector(sel); if(el) el.setAttribute('content', val); };
+  setMeta('meta[property="og:title"]', (p.name||'') + ' — Diamantina Lencería');
+  setMeta('meta[property="og:description"]', prodDesc || 'Lencería de diseño en Argentina');
+  setMeta('meta[property="og:url"]', prodUrl);
+  if (prodImg) setMeta('meta[property="og:image"]', prodImg);
+  setMeta('meta[name="twitter:title"]', (p.name||'') + ' — Diamantina Lencería');
+  setMeta('meta[name="twitter:description"]', prodDesc || 'Lencería de diseño en Argentina');
+  if (prodImg) setMeta('meta[name="twitter:image"]', prodImg);
   selectedTalla = null;
   carouselImgs = p.imgs && p.imgs.length > 0 ? p.imgs : (p.img ? [p.img] : []);
   carouselIdx = 0;
@@ -2726,6 +2741,28 @@ function renderRelacionados(prod) {
     </div>`;
   }).join('');
 }
+
+window.compartirProducto = async function() {
+  if (!currentProd) return;
+  // URL del backend — tiene meta tags correctos para WhatsApp
+  const BACKEND_URL = 'https://diamantina-backend.onrender.com/p/' + encodeURIComponent(currentProd.id);
+  const text = '🌸 ' + currentProd.name + '\n' + BACKEND_URL;
+  // Try native share (mobile)
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: currentProd.name, text: '¡Mirá esta prenda en Diamantina! 💖', url: BACKEND_URL });
+      return;
+    } catch(e) {}
+  }
+  // Fallback: copy to clipboard
+  try {
+    await navigator.clipboard.writeText(BACKEND_URL);
+    showToast('¡Link copiado! 📋 Pegalo en WhatsApp o donde quieras');
+  } catch(e) {
+    const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
+    window.open(waUrl, '_blank');
+  }
+};
 
 window.closeProdModal = function() {
   document.getElementById('prod-modal-bg').classList.remove('open');
@@ -5121,6 +5158,22 @@ function loadUser() {
 }
 loadUser();
 loadBanner();
+// Auto-open product from URL
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const prodId = params.get('producto');
+  if (prodId) {
+    // Wait for products to load, then open
+    const tryOpen = function(attempts) {
+      if (products.length > 0 || (window._allProducts && Object.keys(window._allProducts).length > 0)) {
+        setTimeout(function() { openProdModal(prodId); }, 300);
+      } else if (attempts > 0) {
+        setTimeout(function() { tryOpen(attempts - 1); }, 400);
+      }
+    };
+    tryOpen(15);
+  }
+})();
 // Set logo
 (function(){
   const logoUrl = 'https://res.cloudinary.com/dy1yckjcj/image/upload/v1780442730/6011F3D2-4EA7-4B2B-A4C8-9F217ADD2F2B_lmotkd.png';
