@@ -2134,10 +2134,12 @@ db.ref('productos').on('value', (snap) => {
     window._allProducts = data || {};
     products = allProds.filter(p => {
       if (p.estado === 'oculto') return false;
-      // Ocultar si todo el stock es 0
+      // Si stock es 0 pero estado no es agotado, marcarlo como agotado
       if (p.stock && Object.keys(p.stock).length > 0) {
         const totalStock = Object.values(p.stock).reduce((s, v) => s + (Number(v) || 0), 0);
-        if (totalStock === 0) return false;
+        if (totalStock === 0 && p.estado !== 'agotado') {
+          p.estado = 'agotado'; // local only, backend ya lo actualiza via webhook
+        }
       }
       return true;
     });
@@ -3755,16 +3757,118 @@ window.exportarClientes = async function() {
 };
 
 window.exportarPedidosExcel = async function() {
-  const pedidos = await getPedidos();
-  if (!pedidos.length) { showToast('No hay pedidos para exportar', 'error'); return; }
-  const rows = [['Fecha','Estado','Cliente','Total','Productos','Cupón','Envío']];
-  pedidos.forEach(p => rows.push([new Date(p.ts).toLocaleString('es-AR'), p.estado||'—', p.nombre||'—', p.total||0, (p.items||[]).map(i => { const t = i.talla&&i.talla!=='—'?' T.'+i.talla:''; const c = i.color&&i.color!==''?' '+i.color:''; return (i.title||i.name||'—')+t+c+' x'+(i.qty||1); }).join('; '), p.cupon||'', p.envio||'']));
-  const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const pedidos = window._pedidosCache.length > 0 ? window._pedidosCache : await getPedidos();
+  if (!pedidos.length) { showToast('No hay pedidos', 'error'); return; }
+
+  function esc(v) { return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  const CSS = [
+    'body{font-family:Arial,sans-serif;font-size:11px;padding:16px}',
+    'h2{color:#1565C0}',
+    'table{border-collapse:collapse;width:100%;margin-top:8px}',
+    'th{background:#1565C0;color:#fff;padding:6px 8px;text-align:center;font-size:10px;border:1px solid #0D47A1}',
+    'td{padding:5px 8px;border:1px solid #ccc;vertical-align:middle}',
+    'select.osel{font-size:10px;padding:2px;border-radius:3px;border:1px solid #ccc;cursor:pointer}',
+    '.ok td{background:#C6EFCE!important}',
+    '.nn td{background:#FFC7CE!important;color:#C00000!important;font-weight:bold}',
+    '.ea,.eentregado{background:#DDEBF7}.ee{background:#C6EFCE}.ep{background:#FFEB9C}.ef,.ec{background:#FFC7CE}',
+    '.cc{background:#FADDE1}',
+    '.cs{background:#FFC7CE}',
+    '.cs.done{background:#E0E0E0!important}',
+    '.tb{font-weight:bold}',
+    '@media print{.np{display:none}}'
+  ].join('');
+
+  const JS = [
+    'function ck(s,id){',
+    '  var r=document.getElementById(id);if(!r)return;',
+    '  r.classList.remove("ok","nn");',
+    '  if(s.value==="OK")r.classList.add("ok");',
+    '  else if(s.value==="NN")r.classList.add("nn");',
+    '}',
+    'function cs(cb,id){',
+    '  var t=document.getElementById(id);if(!t)return;',
+    '  if(cb.checked)t.classList.add("done");else t.classList.remove("done");',
+    '}'
+  ].join('');
+
+  const HEADERS = ['OK','Fecha','ID','Estado','Nombre','Tel','Email','CP','Envio','Total',
+    'Producto','Talle','Color','Cant','Precio','Stock','Observaciones'];
+
+  const thHTML = HEADERS.map(function(h,i){
+    const cls = (i===0||i===15) ? ' class="np"' : '';
+    return '<th'+cls+'>'+h+'</th>';
+  }).join('');
+
+  const LEGEND = [
+    ['#C6EFCE','OK — fila verde'],
+    ['#FFC7CE','NN — fila roja'],
+    ['#FADDE1','Columna Color — rosa'],
+    ['#FFC7CE','Stock sin verificar — rojo'],
+    ['#E0E0E0','Stock verificado — gris'],
+    ['#FFEB9C','Estado pendiente'],
+    ['#C6EFCE','Estado enviado']
+  ].map(function(x){
+    return '<tr><td style="background:'+x[0]+';padding:4px 10px;border:1px solid #ccc">'+x[0].replace('#','')+'</td>'
+          +'<td style="border:1px solid #ccc;padding:4px 10px">'+x[1]+'</td></tr>';
+  }).join('');
+
+  let rows = '';
+  let ri = 0;
+  pedidos.forEach(function(p) {
+    const items = (p.items && p.items.length) ? p.items : [{name:'—',talla:'—',color:'—',qty:1,price:0}];
+    const fecha = p.ts ? new Date(p.ts).toLocaleDateString('es-AR') : '—';
+    const est = (p.estado || 'pendiente').toLowerCase();
+    const estClass = {aprobado:'ea',enviado:'ee',pendiente:'ep',fallido:'ef',cancelado:'ec',entregado:'eentregado'}[est]||'ep';
+    items.forEach(function(item, idx) {
+      const isF = idx === 0;
+      const rid = 'r'+ri, sid = 's'+ri;
+      const cv = item.color && typeof item.color === 'object' ? (item.color.nombre||'') : (item.color||'—');
+      const selOpts = '<option value="">—</option><option>OK</option><option>NN</option>';
+      const okSel = '<select class="osel np" onchange="ck(this,\''+rid+'\')">'+selOpts+'</select>';
+      const stkCb = '<input type="checkbox" class="np" onchange="cs(this,\''+sid+'\')"> ';
+
+      rows += '<tr id="'+rid+'">';
+      rows += '<td class="np">'+okSel+'</td>';
+      rows += '<td>'+(isF?esc(fecha):'')+'</td>';
+      rows += '<td style="font-size:9px">'+(isF?esc((p.id||'').slice(-10)):'')+'</td>';
+      rows += '<td class="'+estClass+'">'+(isF?esc(est):'')+'</td>';
+      rows += '<td>'+(isF?esc(p.nombre||'—'):'')+'</td>';
+      rows += '<td>'+(isF?esc(p.telefono||p.tel||'—'):'')+'</td>';
+      rows += '<td>'+(isF?esc(p.email||'—'):'')+'</td>';
+      rows += '<td style="text-align:center">'+(isF?esc(p.cpDestino||'—'):'')+'</td>';
+      rows += '<td>'+(isF?esc(p.envio||'—'):'')+'</td>';
+      rows += '<td class="tb">'+(isF?'$'+(p.total||0).toLocaleString('es-AR'):'')+'</td>';
+      rows += '<td>'+esc(item.name||item.title||'—')+'</td>';
+      rows += '<td style="text-align:center">'+esc(item.talla||'—')+'</td>';
+      rows += '<td class="cc">'+esc(cv)+'</td>';
+      rows += '<td style="text-align:center">'+(item.qty||1)+'</td>';
+      rows += '<td>$'+((item.price||0).toLocaleString('es-AR'))+'</td>';
+      rows += '<td id="'+sid+'" class="cs np" style="text-align:center">'+stkCb+'</td>';
+      rows += '<td></td>';
+      rows += '</tr>';
+      ri++;
+    });
+  });
+
+  const fechaHoy = new Date().toLocaleDateString('es-AR');
+  const doc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pedidos Diamantina</title>'
+    + '<style>'+CSS+'</style>'
+    + '<scr'+'ipt>'+JS+'</scr'+'ipt>'
+    + '</head><body>'
+    + '<h2>Pedidos Diamantina — '+fechaHoy+'</h2>'
+    + '<table><tr>'+thHTML+'</tr>'+rows+'</table>'
+    + '<table style="margin-top:16px;border-collapse:collapse;font-size:11px;width:auto">'
+    + '<tr><th colspan="2" style="background:#1565C0;color:#fff;padding:5px 10px;text-align:left">Leyenda</th></tr>'
+    + LEGEND
+    + '</table></body></html>';
+
+  const blob = new Blob([doc], {type:'text/html;charset=utf-8'});
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'}));
-  a.download = 'pedidos-diamantina-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pedidos-diamantina-'+new Date().toISOString().slice(0,10)+'.html';
   a.click();
-  showToast('Pedidos exportados ✦');
+  showToast('Exportado: '+pedidos.length+' pedidos ✓');
 };
 
 window.exportarCatalogo = function() {
