@@ -2744,24 +2744,37 @@ function renderRelacionados(prod) {
 
 window.compartirProducto = async function() {
   if (!currentProd) return;
-  // URL del backend — tiene meta tags correctos para WhatsApp
   const BACKEND_URL = 'https://diamantina-backend.onrender.com/p/' + encodeURIComponent(currentProd.id);
-  const text = '🌸 ' + currentProd.name + '\n' + BACKEND_URL;
+
+  // Build rich WhatsApp message
+  const precio = (currentProd.descuento > 0 && currentProd.precioFinal) ? currentProd.precioFinal : currentProd.price;
+  const tallas = (currentProd.tallas || []).join(', ');
+  let cols = currentProd.colores || [];
+  if (!Array.isArray(cols)) cols = Object.values(cols);
+  const colores = cols.map(function(c){ return c.nombre||c; }).filter(Boolean).join(', ');
+
+  let msg = '💎 *' + (currentProd.name||'') + '*\n';
+  msg += '_' + (currentProd.cat||'') + ' — Diamantina Lencería_\n\n';
+  if (currentProd.descuento > 0) {
+    msg += '~~$' + Number(currentProd.price).toLocaleString('es-AR') + '~~ ';
+    msg += '*$' + Number(precio).toLocaleString('es-AR') + '* 🔥 -' + currentProd.descuento + '% OFF\n';
+  } else {
+    msg += '*$' + Number(precio).toLocaleString('es-AR') + '*\n';
+  }
+  if (tallas) msg += '\n📐 Talles: ' + tallas;
+  if (colores) msg += '\n🎨 Colores: ' + colores;
+  msg += '\n\n🛍️ Comprá online con envío a todo el país';
+  msg += '\n👉 ' + BACKEND_URL;
+
   // Try native share (mobile)
   if (navigator.share) {
     try {
-      await navigator.share({ title: currentProd.name, text: '¡Mirá esta prenda en Diamantina! 💖', url: BACKEND_URL });
+      await navigator.share({ title: currentProd.name, text: msg, url: BACKEND_URL });
       return;
     } catch(e) {}
   }
-  // Fallback: copy to clipboard
-  try {
-    await navigator.clipboard.writeText(BACKEND_URL);
-    showToast('¡Link copiado! 📋 Pegalo en WhatsApp o donde quieras');
-  } catch(e) {
-    const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
-    window.open(waUrl, '_blank');
-  }
+  // Open WhatsApp with rich message
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 };
 
 window.closeProdModal = function() {
@@ -4411,35 +4424,7 @@ window.hideBanner = async function() {
 };
 
 // ── COMPARTIR ──
-window.compartirProducto = function() {
-  if (!currentProd) return;
-  const precio = (currentProd.descuento > 0 && currentProd.precioFinal) ? currentProd.precioFinal : currentProd.price;
-  const precioOriginal = currentProd.descuento > 0 ? currentProd.price : null;
-  const tallas = (currentProd.tallas || []).join(', ');
-  const colores = (() => {
-    let cols = currentProd.colores || [];
-    if (!Array.isArray(cols)) cols = Object.values(cols);
-    return cols.map(c => c.nombre).filter(Boolean).join(', ');
-  })();
-  const cuotas = currentProd.cuotas > 1 ? `💳 ${currentProd.cuotas} cuotas sin interés de $${Math.round(precio / currentProd.cuotas).toLocaleString('es-AR')}` : '';
-
-  let msg = `💎 *${currentProd.name}*\n`;
-  msg += `_${currentProd.cat} — Diamantina Lencería_\n\n`;
-  if (currentProd.descuento > 0) {
-    msg += `~~$${Number(precioOriginal).toLocaleString('es-AR')}~~ `;
-    msg += `*$${Number(precio).toLocaleString('es-AR')}* 🔥 -${currentProd.descuento}% OFF\n`;
-  } else {
-    msg += `*$${Number(precio).toLocaleString('es-AR')}*\n`;
-  }
-  if (cuotas) msg += `${cuotas}\n`;
-  if (tallas) msg += `\n📐 Talles: ${tallas}`;
-  if (colores) msg += `\n🎨 Colores: ${colores}`;
-  if (currentProd.desc) msg += `\n\n${currentProd.desc.slice(0, 120)}${currentProd.desc.length > 120 ? '...' : ''}`;
-  msg += `\n\n🛍️ Comprá online con envío a todo el país\n👉 www.diamantina.shop`;
-
-  const encoded = encodeURIComponent(msg);
-  window.open('https://wa.me/?text=' + encoded, '_blank');
-};
+// compartirProducto ya definida arriba (usa backend URL con meta tags)
 
 // ── COLORES ──
 window.adminColores = [];
