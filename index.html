@@ -2744,7 +2744,7 @@ function renderRelacionados(prod) {
 
 window.compartirProducto = async function() {
   if (!currentProd) return;
-  const BACKEND_URL = 'https://diamantina-backend.onrender.com/p/' + encodeURIComponent(currentProd.id);
+  const PROD_URL = 'https://www.diamantina.shop/?producto=' + encodeURIComponent(currentProd.id);
 
   // Build rich WhatsApp message
   const precio = (currentProd.descuento > 0 && currentProd.precioFinal) ? currentProd.precioFinal : currentProd.price;
@@ -2764,17 +2764,22 @@ window.compartirProducto = async function() {
   if (tallas) msg += '\n📐 Talles: ' + tallas;
   if (colores) msg += '\n🎨 Colores: ' + colores;
   msg += '\n\n🛍️ Comprá online con envío a todo el país';
-  msg += '\n👉 ' + BACKEND_URL;
+  msg += '\n👉 ' + PROD_URL;
 
   // Try native share (mobile)
   if (navigator.share) {
     try {
-      await navigator.share({ title: currentProd.name, text: msg, url: BACKEND_URL });
+      await navigator.share({ title: currentProd.name, text: msg, url: PROD_URL });
       return;
     } catch(e) {}
   }
-  // Open WhatsApp with rich message
-  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  // Copy to clipboard or open WhatsApp
+  try {
+    await navigator.clipboard.writeText(PROD_URL);
+    showToast('¡Link copiado! 📋 Pegalo en Instagram o WhatsApp');
+  } catch(e) {
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  }
 };
 
 window.closeProdModal = function() {
