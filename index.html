@@ -763,6 +763,14 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
         <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780700355/accesoriosicon_f1umq8.png" alt="Accesorios" loading="lazy"></div>
         <div class="cat-label">Accesorios</div>
       </div>
+      <div class="cat-item" onclick="setFilter('Pijamas');document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
+        <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1781625544/pijamas_iuragv.png" alt="Pijamas" loading="lazy"></div>
+        <div class="cat-label">Pijamas</div>
+      </div>
+      <div class="cat-item" onclick="setFilter('Deportivos');document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
+        <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1781625757/deportivos_d1vnzj.png" alt="Deportivos" loading="lazy"></div>
+        <div class="cat-label">Deportivos</div>
+      </div>
     </div>
   </div>
 
@@ -1518,6 +1526,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
           <option value="Bikinis">Bikinis</option>
           <option value="Disfraces">Disfraces</option>
           <option value="Accesorios">Accesorios</option>
+          <option value="Pijamas">Pijamas</option>
+          <option value="Deportivos">Deportivos</option>
         </select>
       </div>
       <div class="form-field" style="display:flex;align-items:center;gap:10px">
@@ -1671,6 +1681,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
           <option value="Bikinis">Bikinis</option>
           <option value="Disfraces">Disfraces</option>
           <option value="Accesorios">Accesorios</option>
+          <option value="Pijamas">Pijamas</option>
+          <option value="Deportivos">Deportivos</option>
         </select>
         <select id="admin-estado-filter" onchange="renderAdminList()" style="padding:6px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink-mid);background:var(--surface-2);outline:none;cursor:pointer">
           <option value="">Todos los estados</option>
