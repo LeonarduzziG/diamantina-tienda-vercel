@@ -181,7 +181,26 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 .ofertas-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;font-style:italic;color:var(--ink)}
 .ofertas-count{font-size:13px;color:#E24B4A;font-weight:500}
 .ofertas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.skel-card{border-radius:var(--radius-sm);overflow:hidden;background:var(--surface-1, #fff)}
+.skel-img{width:100%;aspect-ratio:1/1;background:linear-gradient(110deg,#ececec 8%,#f5f5f5 18%,#ececec 33%);background-size:200% 100%;animation:skel-shimmer 1.5s linear infinite}
+.skel-line{height:12px;border-radius:4px;background:#ececec;margin:10px 10px 6px}
+.skel-line.short{width:60%}
+@keyframes skel-shimmer{to{background-position-x:-200%}}
 .ofertas-carousel-wrap{position:relative}
+.resenas-section{scroll-margin-top:120px;padding:0 2rem 1.5rem;background:#FFF9F5;border-bottom:1px solid rgba(201,79,124,0.12)}
+.resenas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.resena-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px;height:100%}
+.resena-quote{font-family:'Cormorant Garamond',serif;font-size:34px;line-height:0.5;color:var(--rose);opacity:0.5}
+.resena-stars{font-size:13px;color:#BA7517;letter-spacing:1px}
+.resena-text{font-size:13.5px;color:var(--ink-mid);line-height:1.5;flex:1;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.resena-footer{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-top:1px solid var(--border);padding-top:10px;margin-top:2px}
+.resena-name{font-size:12.5px;font-weight:600;color:var(--ink)}
+.resena-prod{font-size:11px;color:var(--ink-light);text-align:right}
+@media(max-width:768px){
+  .resenas-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .resenas-grid::-webkit-scrollbar{display:none}
+  .resenas-grid .resena-card{min-width:230px;max-width:230px;scroll-snap-align:start;flex-shrink:0}
+}
 .nuevos-section{padding:0 2rem 2rem;background:linear-gradient(135deg,#1a0a12 0%,#2d1020 50%,#1a0a12 100%);border-bottom:none;position:relative;overflow:hidden}
 .nuevos-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(201,79,124,0.18) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(201,79,124,0.12) 0%,transparent 50%);pointer-events:none}
 .nuevos-section::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,79,124,0.6),transparent)}
@@ -618,6 +637,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 }
 
 </style>
+  <link rel="preload" as="image" href="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1600,c_limit,q_auto,f_auto/v1780699131/diamantina/laqavbxqgax6h1kq0qz0.png" fetchpriority="high">
 </head>
 <body>
 
@@ -693,7 +713,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
   <div class="hero-v2 hero">
     <!-- Fondo imagen -->
     <div class="hero-v2-bg">
-      <img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1780699131/diamantina/laqavbxqgax6h1kq0qz0.png" alt="Diamantina Lencería" loading="eager">
+      <img src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1600,c_limit,q_auto,f_auto/v1780699131/diamantina/laqavbxqgax6h1kq0qz0.png" alt="Diamantina Lencería" loading="eager" fetchpriority="high" width="1600" height="900">
     </div>
     <!-- Contenido encima -->
     <div class="hero-v2-content">
@@ -781,14 +801,28 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
     </div>
     <div class="ofertas-carousel-wrap">
       <button class="ofertas-carousel-btn left" onclick="ofertasScroll(-1)" aria-label="Anterior">‹</button>
-      <div class="ofertas-grid" id="ofertas-grid"></div>
+      <div class="ofertas-grid" id="ofertas-grid"><div class="skel-card"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div></div><div class="skel-card"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div></div><div class="skel-card"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div></div><div class="skel-card"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div></div></div>
       <button class="ofertas-carousel-btn right" onclick="ofertasScroll(1)" aria-label="Siguiente">›</button>
+    </div>
+  </div>
+
+  <!-- RESEÑAS DESTACADAS -->
+  <div class="resenas-section" id="resenas-section" style="display:none">
+    <div class="ofertas-header">
+      <div class="ofertas-title">Lo que dicen nuestras clientas</div>
+      <div class="ofertas-count" id="resenas-count"></div>
+    </div>
+    <div class="ofertas-carousel-wrap">
+      <button class="ofertas-carousel-btn left" onclick="resenasScroll(-1)" aria-label="Anterior">‹</button>
+      <div class="resenas-grid" id="resenas-grid"></div>
+      <button class="ofertas-carousel-btn right" onclick="resenasScroll(1)" aria-label="Siguiente">›</button>
     </div>
   </div>
 
   <!-- NUEVOS LANZAMIENTOS -->
   <div class="nuevos-section" id="nuevos-section" style="display:none">
     <!-- Scan line effect -->
+
     <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0">
       <div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,79,124,0.4),transparent);animation:scan-line 4s linear infinite;opacity:0.5"></div>
     </div>
@@ -970,10 +1004,14 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
   </div>
 
   <div class="catalog" id="catalog">
-    <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--ink-light)">
-      <div style="font-family:Cormorant Garamond,serif;font-size:20px;font-style:italic;margin-bottom:8px">Cargando productos...</div>
-      <div style="font-size:13px">Conectando con Firebase</div>
-    </div>
+    <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-thumb"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
   </div>
 
 
@@ -2122,6 +2160,19 @@ window.closeMobileMenu = function() {
   if (menu) menu.style.display = 'none';
 };
 
+// ── OPTIMIZACION DE IMAGENES (Cloudinary) ──
+// Inserta transformaciones w_/h_/c_fill/q_auto/f_auto en URLs de Cloudinary
+// para que el navegador descargue solo el tamaño necesario (mejora LCP/CLS)
+function optimizeImg(url, width) {
+  if (!url || typeof url !== 'string') return url;
+  if (url.indexOf('res.cloudinary.com') === -1) return url;
+  if (url.indexOf('/upload/') === -1) return url;
+  const w = width || 500;
+  // Ya tiene transformaciones? no duplicar
+  if (/\/upload\/[^/]*w_/.test(url)) return url;
+  return url.replace('/upload/', '/upload/w_' + w + ',c_limit,q_auto,f_auto/');
+}
+
 // ── FIREBASE ──
 db.ref('productos').on('value', (snap) => {
   try {
@@ -2149,6 +2200,7 @@ db.ref('productos').on('value', (snap) => {
   renderArg();
   renderColorFilters();
   renderAdminList();
+  if (window._resenasDestacadasCache) renderResenasDestacadas(window._resenasDestacadasCache);
 }, (err) => {
   console.error('Firebase error:', err);
   // Show error in catalog
@@ -2247,9 +2299,10 @@ window.renderCatalog = function() {
   renderPage(list, el, true);
 };
 
-function buildCard(p) {
+function buildCard(p, idx) {
   const colores = Array.isArray(p.colores) ? p.colores : Object.values(p.colores||{});
-  const img = p.img || '';
+  const img = optimizeImg(p.img || '', 400);
+  const isAboveFold = (idx !== undefined && idx < 6);
   const div = document.createElement('div');
   div.className = 'prod-card';
   div.dataset.prodId = p.id;
@@ -2261,11 +2314,14 @@ function buildCard(p) {
   wrap.style.cssText = 'width:100%;height:100%;position:absolute;inset:0';
   const blur = document.createElement('div');
   blur.className = 'img-blur';
-  if (img) blur.style.backgroundImage = 'url(' + img + ')';
+  if (img) blur.style.backgroundImage = 'url(' + optimizeImg(p.img||'', 40) + ')';
   const imgEl = document.createElement('img');
   imgEl.src = img;
   imgEl.alt = p.name;
-  imgEl.loading = 'lazy';
+  imgEl.loading = isAboveFold ? 'eager' : 'lazy';
+  if (isAboveFold) imgEl.fetchPriority = 'high';
+  imgEl.width = 400;
+  imgEl.height = 400;
   imgEl.className = 'loading';
   imgEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
   imgEl.onload = function() { this.classList.remove('loading'); this.classList.add('loaded'); };
@@ -2343,7 +2399,7 @@ function renderPage(list, el, reset) {
   const pageStart = (catalogPage - 1) * PAGE_SIZE;
   const slice = list.slice(pageStart, pageStart + PAGE_SIZE);
   const frag = document.createDocumentFragment();
-  slice.forEach(p => frag.appendChild(buildCard(p)));
+  slice.forEach((p, idx) => frag.appendChild(buildCard(p, idx)));
   el.appendChild(frag);
   attachListeners(el);
   const remaining = list.length - (pageStart + PAGE_SIZE);
@@ -2379,7 +2435,7 @@ window.renderArg = function() {
   if(btnR) btnR.style.display = prods.length>1 ? 'flex' : 'none';
   el.innerHTML = prods.map((p,idx) => {
     const precio = precioHTML(p);
-    const img = (p.imgs && p.imgs[0]) || p.img || '';
+    const img = optimizeImg((p.imgs && p.imgs[0]) || p.img || '', 400);
     return '<div class="prod-card" data-prod-id="'+p.id+'" style="cursor:pointer;min-width:200px;max-width:200px;scroll-snap-align:start;flex-shrink:0;animation:float-up 0.5s '+(idx*0.1)+'s ease both;border:2px solid rgba(116,185,255,0.3);display:flex;flex-direction:column">'
       + '<div class="prod-img-wrap" style="position:relative;height:220px;overflow:hidden;flex-shrink:0">'
       + (img ? '<img src="'+img+'" alt="'+p.name+'" class="prod-img" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top">' : '<div class="prod-img-placeholder" style="height:100%;background:#eee"></div>')
@@ -2409,10 +2465,10 @@ window.renderNuevos = function() {
   if (countEl) countEl.textContent = nuevos.length + ' producto' + (nuevos.length !== 1 ? 's' : '');
   el.innerHTML = nuevos.map((p, idx) => {
     const precio = precioHTML(p);
-    const img = (p.imgs && p.imgs[0]) || p.img || '';
+    const img = optimizeImg((p.imgs && p.imgs[0]) || p.img || '', 400);
     return `<div class="prod-card" data-prod-id="${p.id}" style="cursor:pointer;animation:float-up 0.5s ${idx*0.1}s ease both">
       <div class="prod-img-wrap" style="position:relative">
-        ${img ? `<img src="${img}" alt="${p.name}" class="prod-img" loading="lazy">` : '<div class="prod-img-placeholder"></div>'}
+        ${img ? `<img src="${img}" alt="${p.name}" class="prod-img" loading="lazy" width="400" height="400">` : '<div class="prod-img-placeholder"></div>'}
         <div style="position:absolute;top:8px;left:8px;font-size:10px;padding:3px 10px;border-radius:999px;background:rgba(201,79,124,0.9);color:#fff;font-weight:600;letter-spacing:1px;backdrop-filter:blur(4px)">NUEVO ✦</div>
       </div>
       <div class="card-body"><div class="card-name">${p.name}</div><div class="prod-price-row">${precio}</div></div>
@@ -2439,12 +2495,16 @@ window.renderOfertas = function() {
   }
   section.style.display = 'block';
   countEl.textContent = ofertasList.length + ' producto' + (ofertasList.length !== 1 ? 's' : '') + ' en oferta';
-  el.innerHTML = ofertasList.map(p => `
+  el.innerHTML = ofertasList.map((p, idx) => {
+    const imgOpt = optimizeImg(p.img || '', 400);
+    const imgBlur = optimizeImg(p.img || '', 40);
+    const eager = idx < 3;
+    return `
     <div class="prod-card" data-prod-id="${p.id}">
       <div class="prod-img">
         <div class="img-wrap" style="width:100%;height:100%;position:absolute;inset:0">
-          <div class="img-blur" style="background-image:url('${p.img || ''}')"></div>
-          <img src="${p.img || ''}" alt="${p.name}" loading="lazy" class="loading" style="width:100%;height:100%;object-fit:cover;display:block" onload="this.classList.remove('loading');this.classList.add('loaded')">
+          <div class="img-blur" style="background-image:url('${imgBlur}')"></div>
+          <img src="${imgOpt}" alt="${p.name}" loading="${eager?'eager':'lazy'}" ${eager?'fetchpriority="high"':''} width="400" height="400" class="loading" style="width:100%;height:100%;object-fit:cover;display:block" onload="this.classList.remove('loading');this.classList.add('loaded')">
         </div>
         <span class="prod-badge badge-cat">${p.cat}</span>
         <span class="prod-badge badge-oferta">-${p.descuento}%</span>
@@ -2458,7 +2518,8 @@ window.renderOfertas = function() {
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   el.querySelectorAll('.prod-card').forEach(card => {
     card.addEventListener('click', () => openProdModal(card.dataset.prodId));
@@ -4178,7 +4239,56 @@ window.submitResena = async function() {
   showToast('¡Gracias por tu reseña! ✦');
 };
 
-// ── BUSCADOR ──
+// ── RESEÑAS DESTACADAS (carrusel home) ──
+window.resenasScroll = function(dir) {
+  const el = document.getElementById('resenas-grid');
+  if (el) el.scrollBy({ left: dir * 250, behavior: 'smooth' });
+};
+
+function loadResenasDestacadas() {
+  db.ref('resenas').on('value', (snap) => {
+    const data = snap.val();
+    const destacadas = [];
+    if (data) {
+      Object.entries(data).forEach(([prodId, resenasDeProd]) => {
+        Object.values(resenasDeProd || {}).forEach(r => {
+          if (r && r.stars >= 4 && r.texto && r.texto.trim().length >= 12) {
+            destacadas.push({ ...r, prodId });
+          }
+        });
+      });
+    }
+    destacadas.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    window._resenasDestacadasCache = destacadas.slice(0, 12);
+    renderResenasDestacadas(window._resenasDestacadasCache);
+  }, (err) => console.error('Error cargando reseñas destacadas:', err));
+}
+loadResenasDestacadas();
+
+function renderResenasDestacadas(lista) {
+  const section = document.getElementById('resenas-section');
+  const grid = document.getElementById('resenas-grid');
+  const countEl = document.getElementById('resenas-count');
+  if (!section || !grid) return;
+  if (!lista.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  if (countEl) countEl.textContent = lista.length + ' opinion' + (lista.length !== 1 ? 'es' : '');
+  grid.innerHTML = lista.map(r => {
+    const prod = (window._allProducts || {})[r.prodId];
+    const prodName = prod ? prod.name : '';
+    return `<div class="resena-card">
+      <div class="resena-quote">“</div>
+      <div class="resena-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+      <div class="resena-text">${r.texto}</div>
+      <div class="resena-footer">
+        <span class="resena-name">${r.nombre || 'Anónima'}</span>
+        ${prodName ? `<span class="resena-prod">${prodName}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+
 window.buscarProductos = function(q) { searchQuery = q.toLowerCase().trim(); renderCatalog(); renderOfertas(); };
 window.limpiarBusqueda = function() {
   const el = document.getElementById('buscador-tienda');
@@ -5181,7 +5291,12 @@ loadEnvioConfig();
 loadFavs();
 updateFavUI();
 updateCartUI();
-loadIgFeed();
+// Diferir carga del feed de Instagram hasta despues del LCP (mejora rendimiento)
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(loadIgFeed, { timeout: 3000 });
+} else {
+  setTimeout(loadIgFeed, 2000);
+}
 // Navigate to correct page after init
 // Navigate after DOM is fully ready
 if (document.readyState === 'loading') {
