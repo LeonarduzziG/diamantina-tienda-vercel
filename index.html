@@ -2561,10 +2561,11 @@ window.openProdModal = function(id) {
   setMeta('meta[name="twitter:description"]', prodDesc || 'Lencería de diseño en Argentina');
   if (prodImg) setMeta('meta[name="twitter:image"]', prodImg);
   selectedTalla = null;
-  carouselImgs = p.imgs && p.imgs.length > 0 ? p.imgs : (p.img ? [p.img] : []);
+  const rawImgs = p.imgs && p.imgs.length > 0 ? p.imgs : (p.img ? [p.img] : []);
+  carouselImgs = rawImgs.map(u => optimizeImg(u, 700));
   carouselIdx = 0;
-  // Update meta for sharing
-  const img = carouselImgs[0] || '';
+  // Update meta for sharing (use original, unresized image for better social preview quality)
+  const img = rawImgs[0] || '';
   // Meta Pixel: ViewContent
   if (typeof fbq !== 'undefined') {
     fbq('track', 'ViewContent', {
