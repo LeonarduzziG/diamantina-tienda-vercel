@@ -272,31 +272,11 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 .img-thumb-wrap img.principal{border:2px solid var(--rose)}
 .img-thumb-badge{position:absolute;bottom:0;left:0;right:0;background:var(--rose);color:#fff;font-size:8px;text-align:center;border-radius:0 0 5px 5px;padding:1px}
 .img-thumb-remove{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#E24B4A;border:none;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
-/* CAROUSEL */
-.carousel-wrap{position:relative;width:100%;height:100%;min-height:400px;background:var(--surface-2);overflow:hidden}
-.carousel-img{width:100%;height:100%;object-fit:contain;display:block;position:absolute;top:0;left:0;opacity:0;transition:opacity 0.3s ease}
-.carousel-img.active{opacity:1;position:relative}
-.carousel-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(26,17,24,0.45);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background var(--tr);z-index:10}
-.carousel-nav:hover{background:rgba(26,17,24,0.75)}
-.carousel-prev{left:8px}
-.carousel-next{right:8px}
-.carousel-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:10}
-.carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.5);cursor:pointer;transition:background var(--tr);border:none;padding:0}
-.carousel-dot.active{background:#fff}
 .img-thumb-wrap{position:relative;width:72px;height:72px;flex-shrink:0}
 .img-thumb-wrap img{width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);border:2px solid transparent;cursor:pointer;transition:border-color var(--tr)}
 .img-thumb-wrap img.principal{border-color:var(--rose)}
 .img-thumb-remove{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#E24B4A;color:#fff;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
 .img-thumb-badge{position:absolute;bottom:2px;left:2px;background:var(--rose);color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px}
-.carousel-wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.carousel-img{width:100%;max-height:520px;object-fit:contain;display:block;transition:opacity 0.2s ease}
-.carousel-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(26,17,24,0.55);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background var(--tr);z-index:2}
-.carousel-btn:hover{background:rgba(26,17,24,0.85)}
-.carousel-btn.prev{left:8px}
-.carousel-btn.next{right:8px}
-.carousel-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px}
-.carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.5);cursor:pointer;transition:background var(--tr)}
-.carousel-dot.active{background:#fff}
 /* PRODUCT MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(12,8,11,0.7);z-index:9998;align-items:center;justify-content:center;padding:1rem}
 .modal-bg.open{display:flex}
@@ -305,6 +285,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 .prod-modal-img{width:320px;flex-shrink:0;background:var(--surface-2);display:flex;align-items:center;justify-content:center;min-height:400px;position:relative;overflow:hidden}
 .prod-modal-img img{width:100%;height:100%;object-fit:contain;display:block;max-height:520px}
 .carousel-wrap{position:relative;width:100%;height:100%;min-height:400px;display:flex;align-items:center;justify-content:center}
+.carousel-img{width:100%;height:100%;max-height:520px;object-fit:contain;display:block;transition:opacity 0.2s ease}
 .carousel-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(26,17,24,0.5);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;z-index:10;transition:background var(--tr);line-height:1}
 .carousel-btn:hover{background:rgba(26,17,24,0.8)}
 .carousel-btn.prev{left:8px}
