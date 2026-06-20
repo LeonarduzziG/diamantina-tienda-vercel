@@ -1552,12 +1552,12 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
       </div>
       <div class="form-field">
         <label class="form-label">Precio (ARS)</label>
-        <input type="number" class="form-input" id="prod-price" placeholder="ej: 12500" oninput="calcDescuento();updateCuotasPreview()">
+        <input type="number" class="form-input" id="prod-price" placeholder="ej: 12500" oninput="calcDescuentoPreview();updateCuotasPreview()">
       </div>
       <div class="form-field">
         <label class="form-label">Descuento (%)</label>
         <div style="display:flex;align-items:center;gap:8px">
-          <input type="number" class="form-input" id="prod-descuento" placeholder="ej: 20" min="0" max="99" style="width:100px" oninput="calcDescuento();updateCuotasPreview()">
+          <input type="number" class="form-input" id="prod-descuento" placeholder="ej: 20" min="0" max="99" style="width:100px" oninput="calcDescuentoPreview();updateCuotasPreview()">
           <span style="font-size:13px;color:var(--ink-light)">% de descuento (opcional)</span>
         </div>
         <div class="discount-preview" id="discount-preview"></div>
@@ -3220,7 +3220,7 @@ window.updatePackPreview = function() {
   }
 };
 
-window.calcDescuento = function() {
+window.calcDescuentoPreview = function() {
   const price = parseFloat(document.getElementById('prod-price').value) || 0;
   const desc = parseFloat(document.getElementById('prod-descuento').value) || 0;
   const preview = document.getElementById('discount-preview');
@@ -3353,7 +3353,7 @@ window.editProduct = function(id) {
   document.querySelectorAll('.talla-cb').forEach(c => { c.checked = (p.tallas||[]).includes(c.value); });
   adminImgs = p.imgs ? [...p.imgs] : (p.img ? [p.img] : []);
   renderAdminThumbs();
-  calcDescuento();
+  calcDescuentoPreview();
   // stock puede tener claves "T__Color" o solo "T"
   window.currentStockEdit = p.stock || {};
   window.adminColores = p.colores ? [...p.colores] : [];
