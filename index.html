@@ -1482,27 +1482,22 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
     </div>
   </div>
   <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
       <div style="font-size:13px;font-weight:500;color:var(--ink)">Configuración de envíos</div>
       <button onclick="saveEnvios()" style="padding:6px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer">Guardar</button>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">
-      <div>
-        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">CABA ($)</label>
-        <input type="number" id="envio-caba" placeholder="3500" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
-      </div>
-      <div>
-        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">GBA ($)</label>
-        <input type="number" id="envio-gba" placeholder="4500" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
-      </div>
-      <div>
-        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Interior ($)</label>
-        <input type="number" id="envio-interior" placeholder="6000" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
-      </div>
-      <div>
-        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Zona Sur ($)</label>
-        <input type="number" id="envio-sur" placeholder="7000" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
-      </div>
+    <div style="font-size:11px;color:var(--ink-light);margin-bottom:12px">Peso y tamaño por categoría — esto es lo que usa el cotizador real para calcular el costo de envío (Correo Argentino / Andreani) según el código postal.</div>
+    <div id="dims-por-categoria" style="overflow-x:auto;margin-bottom:14px">
+      <table style="border-collapse:collapse;font-size:12px;width:100%">
+        <tr>
+          <th style="padding:4px 8px;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-mid);font-weight:500;text-align:left">Categoría</th>
+          <th style="padding:4px 8px;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-mid);font-weight:500">Peso (kg)</th>
+          <th style="padding:4px 8px;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-mid);font-weight:500">Alto (cm)</th>
+          <th style="padding:4px 8px;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-mid);font-weight:500">Ancho (cm)</th>
+          <th style="padding:4px 8px;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-mid);font-weight:500">Largo (cm)</th>
+        </tr>
+        <!-- filas generadas por JS en renderDimsPorCategoria() -->
+      </table>
     </div>
     <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border)">
       <label style="font-size:12px;color:var(--ink-mid)">Envío gratis desde $</label>
@@ -4407,18 +4402,12 @@ function loadEnvioConfig() {
     const data = snap.val();
     if (data) {
       window._envioConfig = data;
-      // Update policy page prices
+      // Update policy page prices (informational text only)
       const fmt = n => '$' + Number(n).toLocaleString('es-AR');
       const polCaba = document.getElementById('pol-caba'); if (polCaba && data.caba) polCaba.textContent = fmt(data.caba);
       const polGba = document.getElementById('pol-gba'); if (polGba && data.gba) polGba.textContent = fmt(data.gba);
       const polInt = document.getElementById('pol-interior'); if (polInt && data.interior) polInt.textContent = fmt(data.interior);
       const polSur = document.getElementById('pol-sur'); if (polSur && data.sur) polSur.textContent = fmt(data.sur);
-      // Update admin fields if open
-      const fields = ['caba','gba','interior','sur'];
-      fields.forEach(f => {
-        const el = document.getElementById('envio-' + f);
-        if (el && data[f]) el.value = data[f];
-      });
       const gMin = document.getElementById('envio-gratis-min');
       if (gMin && data.gratisMin) gMin.value = data.gratisMin;
       const gActivo = document.getElementById('envio-gratis-activo');
@@ -4427,17 +4416,77 @@ function loadEnvioConfig() {
   });
 }
 
+// ── DIMENSIONES POR CATEGORÍA (usadas por el cotizador real) ──
+const DIMS_DEFAULT_INICIAL = {
+  'Conjuntos':  {peso:0.30, alto:8,  ancho:15, largo:15},
+  'Tops':       {peso:0.20, alto:6,  ancho:12, largo:12},
+  'Bodys':      {peso:0.25, alto:6,  ancho:14, largo:14},
+  'Babydoll':   {peso:0.30, alto:8,  ancho:18, largo:18},
+  'Colaless':   {peso:0.15, alto:5,  ancho:10, largo:10},
+  'Bikinis':    {peso:0.25, alto:7,  ancho:14, largo:14},
+  'Disfraces':  {peso:0.40, alto:10, ancho:20, largo:20},
+  'Accesorios': {peso:0.15, alto:5,  ancho:10, largo:10},
+  'Pijamas':    {peso:0.40, alto:10, ancho:20, largo:20},
+  'Deportivos': {peso:0.35, alto:8,  ancho:16, largo:16},
+  'default':    {peso:0.30, alto:8,  ancho:15, largo:15}
+};
+window._dimsConfig = JSON.parse(JSON.stringify(DIMS_DEFAULT_INICIAL));
+
+function renderDimsPorCategoria() {
+  const table = document.querySelector('#dims-por-categoria table');
+  if (!table) return;
+  // Quitar filas viejas (todo excepto el header, primera <tr>)
+  Array.from(table.querySelectorAll('tr')).slice(1).forEach(tr => tr.remove());
+  const cats = Object.keys(DIMS_DEFAULT_INICIAL).filter(c => c !== 'default');
+  cats.forEach(cat => {
+    const d = (window._dimsConfig && window._dimsConfig[cat]) || DIMS_DEFAULT_INICIAL[cat];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="padding:4px 8px;border:1px solid var(--border);font-weight:500;color:var(--ink)">${cat}</td>
+      <td style="padding:3px 4px;border:1px solid var(--border)"><input type="number" step="0.01" min="0" id="dims-${cat}-peso" value="${d.peso}" style="width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;text-align:center"></td>
+      <td style="padding:3px 4px;border:1px solid var(--border)"><input type="number" min="0" id="dims-${cat}-alto" value="${d.alto}" style="width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;text-align:center"></td>
+      <td style="padding:3px 4px;border:1px solid var(--border)"><input type="number" min="0" id="dims-${cat}-ancho" value="${d.ancho}" style="width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;text-align:center"></td>
+      <td style="padding:3px 4px;border:1px solid var(--border)"><input type="number" min="0" id="dims-${cat}-largo" value="${d.largo}" style="width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;text-align:center"></td>`;
+    table.appendChild(tr);
+  });
+}
+
+function loadDimsConfig() {
+  db.ref('config/dimensiones').on('value', (snap) => {
+    const data = snap.val();
+    if (data) {
+      window._dimsConfig = { ...DIMS_DEFAULT_INICIAL, ...data };
+    }
+    renderDimsPorCategoria();
+  });
+}
+
 window.saveEnvios = async function() {
+  const prev = window._envioConfig || {};
   const cfg = {
-    caba: parseInt(document.getElementById('envio-caba').value) || 3500,
-    gba: parseInt(document.getElementById('envio-gba').value) || 4500,
-    interior: parseInt(document.getElementById('envio-interior').value) || 6000,
-    sur: parseInt(document.getElementById('envio-sur').value) || 7000,
+    ...prev,
     gratisMin: parseInt(document.getElementById('envio-gratis-min').value) || 80000,
     gratisActivo: document.getElementById('envio-gratis-activo').checked
   };
   await db.ref('config/envios').set(cfg);
   window._envioConfig = cfg;
+
+  // Guardar dimensiones por categoría
+  const dims = {};
+  Object.keys(DIMS_DEFAULT_INICIAL).filter(c => c !== 'default').forEach(cat => {
+    const peso = parseFloat(document.getElementById('dims-' + cat + '-peso')?.value);
+    const alto = parseFloat(document.getElementById('dims-' + cat + '-alto')?.value);
+    const ancho = parseFloat(document.getElementById('dims-' + cat + '-ancho')?.value);
+    const largo = parseFloat(document.getElementById('dims-' + cat + '-largo')?.value);
+    dims[cat] = {
+      peso: peso > 0 ? peso : DIMS_DEFAULT_INICIAL[cat].peso,
+      alto: alto > 0 ? alto : DIMS_DEFAULT_INICIAL[cat].alto,
+      ancho: ancho > 0 ? ancho : DIMS_DEFAULT_INICIAL[cat].ancho,
+      largo: largo > 0 ? largo : DIMS_DEFAULT_INICIAL[cat].largo
+    };
+  });
+  await db.ref('config/dimensiones').set(dims);
+  window._dimsConfig = { ...DIMS_DEFAULT_INICIAL, ...dims };
+
   showToast('Configuración de envíos guardada ✦');
   updateCartUI();
 };
@@ -4919,9 +4968,15 @@ window.cotizarEnvioCarrito = async function() {
 
   const resCont = document.getElementById('res-cotizador');
   resCont.style.display = 'block';
+
+  if (!cart || cart.length === 0) {
+    resCont.innerHTML = '<div style="font-size:12px;color:var(--ink-light);padding:6px 0">🛍️ Agregá al menos un producto al carrito para poder cotizar el envío</div>';
+    return;
+  }
+
   resCont.innerHTML = '<div style="font-size:12px;color:var(--ink-light);padding:6px 0">⏳ Consultando tarifas...</div>';
 
-  const DIMS_DEF = { 'Colaless': {peso:0.15,alto:5,ancho:10,largo:10}, 'default': {peso:0.30,alto:8,ancho:15,largo:15} };
+  const DIMS_DEF = window._dimsConfig || DIMS_DEFAULT_INICIAL;
   let totalPesoKg=0, maxAlto=0, maxAncho=0, maxLargo=0;
   cart.forEach(function(item) {
     const prod = products.find(function(p){ return p.id === (item.prodId||item.id); });
@@ -5286,6 +5341,7 @@ db.ref('config').once('value').then(snap => {
 });
 registrarVisita();
 loadEnvioConfig();
+loadDimsConfig();
 loadFavs();
 updateFavUI();
 updateCartUI();
