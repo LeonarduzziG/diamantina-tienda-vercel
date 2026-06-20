@@ -4371,7 +4371,7 @@ function renderStockFields() {
     tallas.forEach(t => {
       html += `<tr><td style="padding:4px 8px;background:var(--surface-2);border:1px solid var(--border);font-weight:500;color:var(--ink)">${t}</td>`;
       colores.forEach(c => {
-        const key = t + '__' + c;
+        const key = safeKey(t) + '__' + safeKey(c);
         const val = window.currentStockEdit && window.currentStockEdit[key] !== undefined ? window.currentStockEdit[key] : 10;
         html += `<td style="padding:3px 4px;border:1px solid var(--border)"><input type="number" id="stock-${key.replace(/[^a-zA-Z0-9_]/g,'_')}" data-talla="${t}" data-color="${c}" min="0" value="${val}" style="width:52px;padding:3px 4px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;text-align:center;background:#fff"></td>`;
       });
@@ -4382,10 +4382,11 @@ function renderStockFields() {
   } else {
     // Sin colores: solo por talla
     el.innerHTML = tallas.map(t => {
-      const val = window.currentStockEdit && window.currentStockEdit[t] !== undefined ? window.currentStockEdit[t] : 10;
+      const key = safeKey(t);
+      const val = window.currentStockEdit && window.currentStockEdit[key] !== undefined ? window.currentStockEdit[key] : 10;
       return `<div style="display:flex;align-items:center;gap:4px;background:var(--surface-2);padding:5px 8px;border-radius:var(--radius-sm);border:1px solid var(--border)">
         <span style="font-size:12px;font-weight:500;color:var(--ink);min-width:22px">${t}</span>
-        <input type="number" id="stock-${t}" min="0" value="${val}" style="width:52px;padding:3px 6px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;text-align:center;background:#fff">
+        <input type="number" id="stock-${key.replace(/[^a-zA-Z0-9_]/g,'_')}" min="0" value="${val}" style="width:52px;padding:3px 6px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;text-align:center;background:#fff">
       </div>`;
     }).join('');
   }
