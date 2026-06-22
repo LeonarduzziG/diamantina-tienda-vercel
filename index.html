@@ -4342,6 +4342,10 @@ const TALLAS_POR_CAT = {
 };
 
 window.autoSelectTallas = function(cat) {
+  // Si estamos EDITANDO un producto existente, no tocar tallas/stock ya cargados
+  const editId = document.getElementById('edit-id')?.value;
+  if (editId) return;
+
   const tallas = TALLAS_POR_CAT[cat] || [];
   // Uncheck all first
   document.querySelectorAll('.talla-cb').forEach(cb => { cb.checked = false; });
