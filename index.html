@@ -2151,6 +2151,20 @@ window.closeMobileMenu = function() {
   if (menu) menu.style.display = 'none';
 };
 
+// ── ORDEN ALEATORIO DIARIO (cambia una vez por día, igual para todas las visitas ese día) ──
+function _hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; }
+  return h;
+}
+function shuffleDiario(arr) {
+  const today = new Date();
+  const seed = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+  return arr.map(item => ({ item, k: _hashStr(seed + '__' + item.id) }))
+            .sort((a, b) => a.k - b.k)
+            .map(x => x.item);
+}
+
 // ── OPTIMIZACION DE IMAGENES (Cloudinary) ──
 // Inserta transformaciones w_/h_/c_fill/q_auto/f_auto en URLs de Cloudinary
 // para que el navegador descargue solo el tamaño necesario (mejora LCP/CLS)
@@ -2450,7 +2464,7 @@ window.renderNuevos = function() {
   const section = document.getElementById('nuevos-section');
   const countEl = document.getElementById('nuevos-count');
   if (!el) return;
-  const nuevos = products.filter(p => p.esNuevo && p.estado !== 'oculto');
+  const nuevos = shuffleDiario(products.filter(p => p.esNuevo && p.estado !== 'oculto'));
   if (nuevos.length === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   if (countEl) countEl.textContent = nuevos.length + ' producto' + (nuevos.length !== 1 ? 's' : '');
@@ -2475,7 +2489,7 @@ window.ofertasScroll = function(dir) {
   if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
 };
 window.renderOfertas = function() {
-  const ofertasList = products.filter(p => p.descuento > 0 && p.estado !== 'agotado' && (!searchQuery || p.name.toLowerCase().includes(searchQuery) || p.cat.toLowerCase().includes(searchQuery) || ((p.keywords||'')+','+(_CAT_KEYWORDS[p.cat]||'')).toLowerCase().includes(searchQuery)));
+  const ofertasList = shuffleDiario(products.filter(p => p.descuento > 0 && p.estado !== 'agotado' && (!searchQuery || p.name.toLowerCase().includes(searchQuery) || p.cat.toLowerCase().includes(searchQuery) || ((p.keywords||'')+','+(_CAT_KEYWORDS[p.cat]||'')).toLowerCase().includes(searchQuery))));
   const el = document.getElementById('ofertas-grid');
   const countEl = document.getElementById('ofertas-count');
   const section = document.getElementById('ofertas-section');
