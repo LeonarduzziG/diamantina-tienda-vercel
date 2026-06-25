@@ -3355,7 +3355,9 @@ window.editProduct = function(id) {
   calcDescuentoPreview();
   // stock puede tener claves "T__Color" o solo "T"
   window.currentStockEdit = p.stock || {};
-  window.adminColores = p.colores ? [...p.colores] : [];
+  // colores puede venir como array o como objeto desde Firebase (huecos en el array)
+  const _coloresNorm = Array.isArray(p.colores) ? p.colores : Object.values(p.colores || {});
+  window.adminColores = _coloresNorm.filter(Boolean).map(c => ({ ...c }));
   setTimeout(() => {
     renderStockFields();
     renderColorSwatchesAdmin();
