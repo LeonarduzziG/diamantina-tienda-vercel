@@ -3541,13 +3541,22 @@ window.calcularTalle = function() {
   const porCadera = findTalle(cadera, 'caderaMin', 'caderaMax', TABLA_TALLES);
   const porCorpino = findTalle(busto, 'bustoMin', 'bustoMax', TABLA_CORPINO);
 
+  // Si dos medidas sugieren talles distintos para una misma prenda, usar el más grande (mayor comodidad)
+  function mayorTalle(a, b) {
+    if (!a) return b;
+    if (!b) return a;
+    const idxA = TABLA_TALLES.findIndex(t => t.talle === a.talle);
+    const idxB = TABLA_TALLES.findIndex(t => t.talle === b.talle);
+    return idxB > idxA ? b : a;
+  }
+
   // Determine primary recommendation (prioritize bust, then waist, then hip)
   const primary = (busto ? porBusto : null) || (cintura ? porCintura : null) || (cadera ? porCadera : null);
 
   const cats = [
-    { cat: 'Tops y conjuntos', icon: '👙', talle: porBusto || porCintura },
-    { cat: 'Bodys y babydoll', icon: '🌸', talle: porCintura || porBusto },
-    { cat: 'Colaless', icon: '✨', talle: porCadera || porCintura },
+    { cat: 'Tops y conjuntos', icon: '👙', talle: mayorTalle(porBusto, porCintura) },
+    { cat: 'Bodys y babydoll', icon: '🌸', talle: mayorTalle(porCintura, porBusto) },
+    { cat: 'Colaless', icon: '✨', talle: mayorTalle(porCadera, porCintura) },
     { cat: 'Bikinis (corpiño)', icon: '🐚', talle: porCorpino },
   ];
 
@@ -3567,7 +3576,9 @@ window.calcularTalle = function() {
 
   // Tip
   const tips = [];
-  if (porBusto && porCadera && porBusto.talle !== porCadera.talle) {
+  if (porBusto && porCintura && porBusto.talle !== porCintura.talle) {
+    tips.push('Tu busto y tu cintura sugieren talles distintos. Te recomendamos elegir el mayor para mayor comodidad.');
+  } else if (porBusto && porCadera && porBusto.talle !== porCadera.talle) {
     tips.push('Tu busto y tu cadera sugieren talles distintos. Te recomendamos elegir el mayor para mayor comodidad.');
   }
   if (!primary?.exacto) {
