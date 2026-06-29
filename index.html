@@ -188,7 +188,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 @keyframes skel-shimmer{to{background-position-x:-200%}}
 .ofertas-carousel-wrap{position:relative}
 .resenas-section{scroll-margin-top:120px;padding:0 2rem 1.5rem;background:#FFF9F5;border-bottom:1px solid rgba(201,79,124,0.12)}
-.resenas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.resenas-carousel-wrap{position:relative}
+.resenas-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.resenas-grid::-webkit-scrollbar{display:none}
+.resenas-grid .resena-card{min-width:240px;max-width:240px;scroll-snap-align:start;flex-shrink:0;height:auto}
 .resena-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px;height:100%}
 .resena-quote{font-family:'Cormorant Garamond',serif;font-size:34px;line-height:0.5;color:var(--rose);opacity:0.5}
 .resena-stars{font-size:13px;color:#BA7517;letter-spacing:1px}
@@ -196,10 +199,13 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 .resena-footer{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-top:1px solid var(--border);padding-top:10px;margin-top:2px}
 .resena-name{font-size:12.5px;font-weight:600;color:var(--ink)}
 .resena-prod{font-size:11px;color:var(--ink-light);text-align:right}
+.resenas-carousel-btn{display:flex;position:absolute;top:50%;transform:translateY(-50%);z-index:10;background:#fff;border:1px solid var(--border);border-radius:50%;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:16px;color:var(--ink)}
+.resenas-carousel-btn.left{left:-12px}
+.resenas-carousel-btn.right{right:-12px}
 @media(max-width:768px){
-  .resenas-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-  .resenas-grid::-webkit-scrollbar{display:none}
-  .resenas-grid .resena-card{min-width:230px;max-width:230px;scroll-snap-align:start;flex-shrink:0}
+  .resenas-grid .resena-card{min-width:230px;max-width:230px}
+  .resenas-carousel-btn.left{left:-6px}
+  .resenas-carousel-btn.right{right:-6px}
 }
 .nuevos-section{padding:0 2rem 2rem;background:linear-gradient(135deg,#1a0a12 0%,#2d1020 50%,#1a0a12 100%);border-bottom:none;position:relative;overflow:hidden}
 .nuevos-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(201,79,124,0.18) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(201,79,124,0.12) 0%,transparent 50%);pointer-events:none}
@@ -804,10 +810,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
       <div class="ofertas-title">Lo que dicen nuestras clientas</div>
       <div class="ofertas-count" id="resenas-count"></div>
     </div>
-    <div class="ofertas-carousel-wrap">
-      <button class="ofertas-carousel-btn left" onclick="resenasScroll(-1)" aria-label="Anterior">‹</button>
+    <div class="resenas-carousel-wrap">
+      <button class="resenas-carousel-btn left" onclick="resenasScroll(-1)" aria-label="Anterior">‹</button>
       <div class="resenas-grid" id="resenas-grid"></div>
-      <button class="ofertas-carousel-btn right" onclick="resenasScroll(1)" aria-label="Siguiente">›</button>
+      <button class="resenas-carousel-btn right" onclick="resenasScroll(1)" aria-label="Siguiente">›</button>
     </div>
   </div>
 
