@@ -646,6 +646,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
   .quick-search{max-width:100%;padding:14px}
   .quick-search-chips{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;scrollbar-width:none}
   .quick-search-chips::-webkit-scrollbar{display:none}
+  .hero-btns-wrap{display:flex !important;width:100%;align-items:stretch}
+  .hero-btns-wrap .qs-toggle-btn{width:100%;justify-content:center}
 }
 
 </style>
@@ -743,7 +745,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
         <div class="hero-v2-badge">🔒 <span>Compra segura</span></div>
         <div class="hero-v2-badge">💬 <span>Atención personalizada por WhatsApp</span></div>
       </div>
-      <div style="display:inline-flex;flex-direction:column;gap:12px;align-items:center">
+      <div class="hero-btns-wrap" style="display:inline-flex;flex-direction:column;gap:12px;align-items:center">
         <div class="hero-v2-btns">
           <button class="hero-v2-btn-primary hero-btn" onclick="document.getElementById('cats-section').scrollIntoView({behavior:'smooth'})">Ver colección</button>
           <button class="hero-v2-btn-secondary" onclick="openGuiaModal()">
