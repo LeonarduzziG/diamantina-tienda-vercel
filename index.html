@@ -591,9 +591,26 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 .hero-v2-title em{font-style:italic;color:#FFD6E8}
 .hero-v2-sub{font-size:16px;color:rgba(255,255,255,0.85);line-height:1.7;margin-bottom:32px;max-width:420px;text-shadow:0 1px 8px rgba(0,0,0,0.4)}
 .hero-v2-btns{display:flex;gap:12px;flex-wrap:wrap}
+.quick-search{margin-top:1.5rem;max-width:640px;background:rgba(255,255,255,0.96);border-radius:var(--radius);padding:16px 18px;backdrop-filter:blur(8px)}
+.quick-search-tabs{display:flex;gap:4px;background:var(--surface-2);border-radius:999px;padding:4px;margin-bottom:12px;max-width:280px}
+.quick-search-tab{flex:1;padding:8px 14px;border-radius:999px;background:transparent;border:none;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s}
+.quick-search-tab.active{background:var(--rose);color:#fff}
+.quick-search-hint{font-size:11px;color:var(--ink-light);margin-bottom:10px}
+.quick-search-chips{display:flex;flex-wrap:wrap;gap:8px}
+.qs-chip{padding:8px 16px;border-radius:999px;border:1px solid var(--border-strong);background:#fff;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.qs-chip:hover{border-color:var(--rose-light);background:var(--rose-pale)}
+.qs-color-chip{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex-shrink:0}
+.qs-color-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);transition:all 0.2s}
+.qs-color-chip:hover .qs-color-dot{transform:scale(1.1);border-color:var(--rose-light)}
+.qs-color-label{font-size:10px;color:var(--ink-mid)}
 .hero-v2-btn-primary{padding:15px 36px;background:#fff;color:#1a0a12;border:none;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.25s;letter-spacing:0.5px}
 .hero-v2-btn-primary:hover{background:#FFD6E8;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2)}
 .hero-v2-btn-secondary{padding:14px 28px;background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.7);border-radius:999px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.25s;display:flex;align-items:center;gap:8px;backdrop-filter:blur(4px)}
+.qs-toggle-btn{position:relative;overflow:hidden;border-color:var(--rose-light)}
+.qs-toggle-btn::before{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-20deg);animation:qs-shine 3s ease-in-out infinite}
+@keyframes qs-shine{0%{left:-60%}50%{left:130%}100%{left:130%}}
+.qs-toggle-btn.active{background:var(--rose);border-color:var(--rose)}
+.qs-toggle-btn.active::before{display:none}
 .hero-v2-btn-secondary:hover{background:rgba(255,255,255,0.15);border-color:#fff}
 .hero-v2-badges{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
 .hero-v2-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.8);font-family:'DM Sans',sans-serif;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.2)}
@@ -626,6 +643,9 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
   .cat-img-wrap{width:60px;height:60px}
   .cat-label{font-size:10px}
   .trust-bar{gap:1rem;padding:10px 1rem}
+  .quick-search{max-width:100%;padding:14px}
+  .quick-search-chips{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;scrollbar-width:none}
+  .quick-search-chips::-webkit-scrollbar{display:none}
 }
 
 </style>
@@ -723,12 +743,34 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
         <div class="hero-v2-badge">🔒 <span>Compra segura</span></div>
         <div class="hero-v2-badge">💬 <span>Atención personalizada por WhatsApp</span></div>
       </div>
-      <div class="hero-v2-btns">
-        <button class="hero-v2-btn-primary hero-btn" onclick="document.getElementById('cats-section').scrollIntoView({behavior:'smooth'})">Ver colección</button>
-        <button class="hero-v2-btn-secondary" onclick="openGuiaModal()">
-          🔍 Encontrá tu talle
+      <div style="display:inline-flex;flex-direction:column;gap:12px;align-items:center">
+        <div class="hero-v2-btns">
+          <button class="hero-v2-btn-primary hero-btn" onclick="document.getElementById('cats-section').scrollIntoView({behavior:'smooth'})">Ver colección</button>
+          <button class="hero-v2-btn-secondary" onclick="openGuiaModal()">
+            🔍 Encontrá tu talle
+          </button>
+        </div>
+        <button class="hero-v2-btn-secondary qs-toggle-btn" id="qs-toggle-btn" onclick="toggleQuickSearch()">
+          ✨ Buscador rápido
         </button>
       </div>
+
+      <!-- BUSCADOR RÁPIDO POR TALLE / COLOR -->
+      <div class="quick-search" id="quick-search" style="display:none">
+        <div class="quick-search-tabs">
+          <button class="quick-search-tab active" id="qs-tab-talle" onclick="quickSearchTab('talle')">Por talle</button>
+          <button class="quick-search-tab" id="qs-tab-color" onclick="quickSearchTab('color')">Por color</button>
+        </div>
+        <div id="qs-panel-talle">
+          <div class="quick-search-hint">Elegí tu talle — agrupa equivalencias automáticamente</div>
+          <div class="quick-search-chips" id="qs-chips-talle"></div>
+        </div>
+        <div id="qs-panel-color" style="display:none">
+          <div class="quick-search-hint">Elegí tu color favorito</div>
+          <div class="quick-search-chips" id="qs-chips-color"></div>
+        </div>
+      </div>
+
     </div>
     <!-- Scroll indicator -->
     <div class="hero-scroll">
@@ -2304,6 +2346,7 @@ db.ref('productos').on('value', (snap) => {
   renderNuevos();
   renderArg();
   renderColorFilters();
+  renderQuickSearchChips();
   renderAdminList();
   if (window._resenasDestacadasCache) renderResenasDestacadas(window._resenasDestacadasCache);
 }, (err) => {
@@ -2373,6 +2416,11 @@ window.renderCatalog = function() {
     const _kw = ((p.keywords || '') + ',' + (_CAT_KEYWORDS[p.cat] || '')).toLowerCase();
     if (searchQuery && !p.name.toLowerCase().includes(searchQuery) && !p.cat.toLowerCase().includes(searchQuery) && !_kw.includes(searchQuery) && !(p.desc||'').toLowerCase().includes(searchQuery)) return false;
     if (filtroTalla && !(p.tallas||[]).includes(filtroTalla)) return false;
+    if (window.quickTallaGroup) {
+      const equivalentes = TALLE_EQUIVALENCIAS[window.quickTallaGroup] || [window.quickTallaGroup];
+      const ptallas = p.tallas || [];
+      if (!equivalentes.some(eq => ptallas.includes(eq))) return false;
+    }
     if (filtroColorGroup) {
       let pc = p.colores || [];
       if (!Array.isArray(pc)) pc = Object.values(pc);
@@ -4894,6 +4942,103 @@ function renderColorFilters() {
 
   updateColorBtn();
 }
+
+// ── BUSCADOR RÁPIDO POR TALLE / COLOR (hero) ──
+const TALLE_EQUIVALENCIAS = {
+  '1': ['1','S','85'],
+  '2': ['2','M','90'],
+  '3': ['3','L','95'],
+  '4': ['4','XL','100'],
+  '5': ['5','XXL','105'],
+};
+window.quickTallaGroup = '';
+
+window.toggleQuickSearch = function() {
+  const panel = document.getElementById('quick-search');
+  const btn = document.getElementById('qs-toggle-btn');
+  const isOpen = panel.style.display !== 'none';
+  if (isOpen) {
+    panel.style.display = 'none';
+    btn.classList.remove('active');
+  } else {
+    panel.style.display = 'block';
+    btn.classList.add('active');
+    renderQuickSearchChips();
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+};
+
+window.quickSearchTab = function(tab) {
+  document.getElementById('qs-tab-talle').classList.toggle('active', tab === 'talle');
+  document.getElementById('qs-tab-color').classList.toggle('active', tab === 'color');
+  document.getElementById('qs-panel-talle').style.display = tab === 'talle' ? 'block' : 'none';
+  document.getElementById('qs-panel-color').style.display = tab === 'color' ? 'block' : 'none';
+};
+
+function renderQuickSearchChips() {
+  const elTalla = document.getElementById('qs-chips-talle');
+  const elColor = document.getElementById('qs-chips-color');
+  if (!elTalla || !elColor) return;
+
+  // Chips de talle: solo mostrar grupos que existan en al menos un producto
+  const gruposPresentes = new Set();
+  products.forEach(p => {
+    (p.tallas || []).forEach(t => {
+      for (const [grupo, eqs] of Object.entries(TALLE_EQUIVALENCIAS)) {
+        if (eqs.includes(t)) gruposPresentes.add(grupo);
+      }
+    });
+  });
+  const labels = { '1':'1 / S / 85', '2':'2 / M / 90', '3':'3 / L / 95', '4':'4 / XL / 100', '5':'5 / XXL / 105' };
+  elTalla.innerHTML = Object.keys(labels)
+    .filter(g => gruposPresentes.has(g))
+    .map(g => '<div class="qs-chip" data-talla="' + g + '">' + labels[g] + '</div>')
+    .join('');
+  elTalla.querySelectorAll('[data-talla]').forEach(chip => {
+    chip.addEventListener('click', () => quickFilterByTalla(chip.dataset.talla));
+  });
+
+  // Chips de color: agrupar igual que renderColorFilters
+  const groups = {};
+  products.forEach(p => {
+    let colores = p.colores || [];
+    if (!Array.isArray(colores)) colores = Object.values(colores);
+    colores.forEach(c => {
+      const group = normalizeColorName(c.nombre);
+      if (!groups[group]) groups[group] = [];
+      if (!groups[group].find(x => x.hex === c.hex)) groups[group].push(c);
+    });
+  });
+  const sorted = Object.entries(groups).sort((a,b) => a[0].localeCompare(b[0]));
+  elColor.innerHTML = sorted.map(([groupName, colors]) => {
+    return '<div class="qs-color-chip" data-group="' + groupName + '">' +
+      '<div class="qs-color-dot" style="background:' + colors[0].hex + '"></div>' +
+      '<span class="qs-color-label">' + groupName + '</span>' +
+    '</div>';
+  }).join('');
+  elColor.querySelectorAll('[data-group]').forEach(chip => {
+    chip.addEventListener('click', () => quickFilterByColor(chip.dataset.group, groups[chip.dataset.group][0]?.hex));
+  });
+}
+
+function quickFilterByTalla(grupo) {
+  window.quickTallaGroup = grupo;
+  window.activeColorGroup = '';
+  window.activeColorFilter = '';
+  if (document.getElementById('filtro-talla')) document.getElementById('filtro-talla').value = '';
+  renderCatalog();
+  document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function quickFilterByColor(groupName, hex) {
+  window.quickTallaGroup = '';
+  window.activeColorGroup = groupName;
+  window.activeColorFilter = hex || '';
+  renderColorFilters();
+  renderCatalog();
+  document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 
 function updateColorBtn() {
   const btn = document.getElementById('btn-filtro-colores');
