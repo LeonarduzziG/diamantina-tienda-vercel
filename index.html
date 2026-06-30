@@ -592,12 +592,12 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 .hero-v2-title em{font-style:italic;color:#FFD6E8}
 .hero-v2-sub{font-size:16px;color:rgba(255,255,255,0.85);line-height:1.7;margin-bottom:32px;max-width:420px;text-shadow:0 1px 8px rgba(0,0,0,0.4)}
 .hero-v2-btns{display:flex;gap:12px;flex-wrap:wrap}
-.quick-search{margin-top:1.5rem;max-width:640px;background:rgba(255,255,255,0.96);border-radius:var(--radius);padding:16px 18px;backdrop-filter:blur(8px);overflow:hidden;box-sizing:border-box}
+.quick-search{margin-top:1.5rem;max-width:min(640px,calc(100vw - 3rem));background:rgba(255,255,255,0.96);border-radius:var(--radius);padding:16px 18px;backdrop-filter:blur(8px);overflow:hidden;box-sizing:border-box}
 .quick-search-tabs{display:flex;gap:4px;background:var(--surface-2);border-radius:999px;padding:4px;margin-bottom:12px;max-width:280px}
 .quick-search-tab{flex:1;padding:8px 14px;border-radius:999px;background:transparent;border:none;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all 0.2s}
 .quick-search-tab.active{background:var(--rose);color:#fff}
 .quick-search-hint{font-size:11px;color:var(--ink-light);margin-bottom:10px}
-.quick-search-chips{display:flex;flex-wrap:wrap;gap:8px}
+.quick-search-chips{display:flex;flex-wrap:wrap;gap:8px;width:100%;min-width:0;box-sizing:border-box}
 .qs-chip{padding:8px 16px;border-radius:999px;border:1px solid var(--border-strong);background:#fff;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0}
 .qs-chip:hover{border-color:var(--rose-light);background:var(--rose-pale)}
 .qs-color-chip{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex-shrink:0}
@@ -766,11 +766,11 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
           <button class="quick-search-tab active" id="qs-tab-talle" onclick="quickSearchTab('talle')">Por talle</button>
           <button class="quick-search-tab" id="qs-tab-color" onclick="quickSearchTab('color')">Por color</button>
         </div>
-        <div id="qs-panel-talle">
+        <div id="qs-panel-talle" style="width:100%;box-sizing:border-box">
           <div class="quick-search-hint">Elegí tu talle — agrupa equivalencias automáticamente</div>
           <div class="quick-search-chips" id="qs-chips-talle"></div>
         </div>
-        <div id="qs-panel-color" style="display:none">
+        <div id="qs-panel-color" style="display:none;width:100%;box-sizing:border-box">
           <div class="quick-search-hint">Elegí tu color favorito</div>
           <div class="quick-search-chips" id="qs-chips-color"></div>
         </div>
