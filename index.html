@@ -244,6 +244,9 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
   .ofertas-carousel-btn{display:flex}
   .ofertas-carousel-btn.left{left:-12px}
   .ofertas-carousel-btn.right{right:-12px}
+  #nuevos-grid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,1fr);overflow-x:auto;overflow-y:hidden;gap:10px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-wrap:initial}
+  #nuevos-grid::-webkit-scrollbar{display:none}
+  #nuevos-grid .prod-card{min-width:140px;max-width:140px;scroll-snap-align:start;flex-shrink:0}
 }
 .color-dot{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all var(--tr);flex-shrink:0}
 .color-dot:hover{transform:scale(1.15)}
