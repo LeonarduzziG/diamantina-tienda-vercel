@@ -791,7 +791,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 
   <!-- TRUST BAR -->
   <div class="trust-bar">
-    <div class="trust-item">🚚 <span><strong>Envío gratis</strong> en compras +$80.000</span></div>
+    <div class="trust-item">🚚 <span><strong>Envío gratis</strong> desde $65.000 CABA/GBA · $85.000 resto</span></div>
     <div class="trust-item">🔒 <span><strong>Pagá seguro</strong> con MercadoPago</span></div>
     <div class="trust-item">🔄 <span><strong>Cambios</strong> sin complicaciones</span></div>
     <div class="trust-item">💬 <span><strong>Atención</strong> por WhatsApp</span></div>
@@ -3116,8 +3116,11 @@ function updateCartUI() {
   }
   // Check free shipping
   const cfg = window._envioConfig || {};
-  const minGratis = cfg.gratisMin || 80000;
   const gratisActivo = cfg.gratisActivo || false;
+  const cpActual = parseInt(window._cpCotizador || '0');
+  const esCABAGBA = cpActual >= 1000 && cpActual <= 1999;
+  const minGratis = esCABAGBA ? 65000 : 85000;
+  const zonaLabel = esCABAGBA ? 'CABA y GBA' : 'todo el país';
   if (gratisActivo && total >= minGratis && typeof envioSeleccionado !== 'undefined' && envioSeleccionado) {
     envioSeleccionado = { ...envioSeleccionado, precio: 0 };
     const envioEl = document.getElementById('envio-result');
@@ -3125,8 +3128,8 @@ function updateCartUI() {
   }
   // Free shipping progress
   const cfg2 = window._envioConfig || {};
-  const minGratis2 = cfg2.gratisMin || 80000;
   const gratisActivo2 = cfg2.gratisActivo || false;
+  const minGratis2 = esCABAGBA ? 65000 : 85000;
   const bannerEl = document.getElementById('envio-gratis-banner');
   const progresoEl = document.getElementById('envio-gratis-progreso');
   if (gratisActivo2) {
@@ -3136,7 +3139,10 @@ function updateCartUI() {
     } else {
       if (bannerEl) bannerEl.style.display = 'none';
       const falta = minGratis2 - total;
-      if (progresoEl) { progresoEl.style.display = 'block'; progresoEl.textContent = 'Te faltan $' + falta.toLocaleString('es-AR') + ' para envío gratis'; }
+      const msg = cpActual > 0
+        ? 'Te faltan $' + falta.toLocaleString('es-AR') + ' para envío gratis (' + zonaLabel + ')'
+        : 'Te faltan $' + falta.toLocaleString('es-AR') + ' para envío gratis (desde $65.000 CABA/GBA · desde $85.000 resto del país)';
+      if (progresoEl) { progresoEl.style.display = 'block'; progresoEl.textContent = msg; }
     }
   } else {
     if (bannerEl) bannerEl.style.display = 'none';
