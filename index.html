@@ -1502,7 +1502,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
           <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:8px">Tus datos</div>
           <input type="text" id="envio-nombre" autocomplete="name" placeholder="Nombre y apellido *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
           <input type="tel" id="envio-tel" autocomplete="tel" placeholder="Teléfono / WhatsApp *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
-          <input type="email" id="envio-email" autocomplete="email" placeholder="Email (opcional)" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <input type="email" id="envio-email" autocomplete="email" placeholder="Correo electrónico *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
 
           <!-- Domicilio si eligió a domicilio -->
           <div id="campos-domicilio" style="display:none">
@@ -1535,9 +1535,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
         <div id="form-datos-retiro" style="display:none;margin-top:8px">
           <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:6px">Tus datos</div>
           <input type="text" id="retiro-nombre" autocomplete="name" placeholder="Nombre y apellido *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
-          <input type="text" id="retiro-cp" placeholder="Código postal *" autocomplete="postal-code" maxlength="8" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
           <input type="tel" id="retiro-tel" autocomplete="tel" placeholder="Teléfono / WhatsApp *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
-          <textarea id="retiro-obs" placeholder="Observaciones (opcional)" rows="2" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6pxresize:vertical"></textarea>
+          <textarea id="retiro-obs" placeholder="Observaciones (opcional)" rows="2" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px;resize:vertical"></textarea>
           <button onclick="confirmarDatosRetiro()" style="width:100%;padding:8px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-sizing:border-box">Confirmar datos ✓</button>
         </div>
         <div id="coord-ok" style="display:none;margin-top:6px;font-size:11px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:5px 8px">✓ Retiro en <span id="coord-zona-sel"></span> — te contactamos para coordinar</div>
@@ -5430,6 +5429,8 @@ window.confirmarDatosEnvio = function() {
   const email = document.getElementById('envio-email')?.value.trim();
   const cp = document.getElementById('cp-cotizador')?.value.trim();
   if (!nombre || !tel) { showToast('Completá nombre y teléfono', 'error'); return; }
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { showToast('Ingresá un correo electrónico válido', 'error'); return; }
+  if (!cp || cp.length < 4) { showToast('Ingresá tu código postal arriba (¿A qué CP enviamos?)', 'error'); return; }
   const tipo = window._tipoEnvio || 'sucursal';
   let direccion = '';
   if (tipo === 'domicilio') {
@@ -5438,7 +5439,7 @@ window.confirmarDatosEnvio = function() {
     const depto = document.getElementById('envio-depto')?.value.trim();
     const localidad = document.getElementById('envio-localidad')?.value.trim();
     const provincia = document.getElementById('envio-provincia')?.value.trim();
-    if (!calle || !localidad || !provincia) { showToast('Completá la dirección completa', 'error'); return; }
+    if (!calle || !localidad || !provincia) { showToast('Completá dirección, localidad y provincia', 'error'); return; }
     direccion = calle + (piso ? ' Piso ' + piso : '') + (depto ? ' Dpto ' + depto : '') + ', ' + localidad + ', ' + provincia;
   }
   const obs = document.getElementById('envio-obs')?.value.trim();
@@ -5455,11 +5456,10 @@ window.confirmarDatosEnvio = function() {
 
 window.confirmarDatosRetiro = function() {
   const nombre = document.getElementById('retiro-nombre')?.value.trim();
-  const cp = document.getElementById('retiro-cp')?.value.trim();
   const tel = document.getElementById('retiro-tel')?.value.trim();
-  if (!nombre || !cp || !tel) { showToast('Completá nombre, CP y teléfono', 'error'); return; }
+  if (!nombre || !tel) { showToast('Completá nombre y teléfono', 'error'); return; }
   const obs = document.getElementById('retiro-obs')?.value.trim();
-  window._datosBuyer = { nombre, cp, tel, obs, tipo: 'retiro' };
+  window._datosBuyer = { nombre, tel, obs, tipo: 'retiro' };
   const zonaEl = document.getElementById('coord-zona-sel');
   if (zonaEl) zonaEl.textContent = window._zonaRetiroSel || '';
   document.getElementById('form-datos-retiro').style.display = 'none';
@@ -5565,9 +5565,6 @@ window.seleccionarZonaCoordinar = function(zona) {
   const coordOk = document.getElementById('coord-ok');
   if (coordOk) coordOk.style.display = 'none';
   if (formRetiro) formRetiro.style.display = 'block';
-  // Precargar CP según zona
-  const cpInput = document.getElementById('retiro-cp');
-  if (cpInput && !cpInput.value) cpInput.value = (zona === 'Castelar') ? '1712' : (zona === 'Quilmes' ? '1878' : '');
   updateCartUI(); updateCheckoutBtn();
   showToast('Completá tus datos para el retiro en ' + zona);
 };
