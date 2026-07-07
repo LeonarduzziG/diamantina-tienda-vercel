@@ -5459,11 +5459,11 @@ window.confirmarDatosRetiro = function() {
   const tel = document.getElementById('retiro-tel')?.value.trim();
   if (!nombre || !cp || !tel) { showToast('Completá nombre, CP y teléfono', 'error'); return; }
   const obs = document.getElementById('retiro-obs')?.value.trim();
-  window._datosBuyer = { nombre, cp, tel, obs };
+  window._datosBuyer = { nombre, cp, tel, obs, tipo: 'retiro' };
   const zonaEl = document.getElementById('coord-zona-sel');
-  document.getElementById('form-datos-retiro').style.display = 'block';
-  document.getElementById('coord-ok').style.display = 'none';
+  if (zonaEl) zonaEl.textContent = window._zonaRetiroSel || '';
   document.getElementById('form-datos-retiro').style.display = 'none';
+  document.getElementById('coord-ok').style.display = 'block';
   if (envioSeleccionado) envioSeleccionado.datosBuyer = window._datosBuyer;
   updateCartUI();
   showToast('Datos confirmados ✓');
@@ -5559,12 +5559,17 @@ window.seleccionarZonaCoordinar = function(zona) {
   const sel = document.getElementById('zona-' + zona.toLowerCase());
   if (sel) { sel.style.borderColor='var(--rose)'; sel.style.background='var(--rose-pale)'; sel.style.color='var(--rose)'; }
   envioSeleccionado = { precio: 0, zona: 'Retiro en ' + zona, tipo: 'coordinar' };
+  window._zonaRetiroSel = zona;
+  // Mostrar el formulario de datos (no confirmar todavía)
+  const formRetiro = document.getElementById('form-datos-retiro');
   const coordOk = document.getElementById('coord-ok');
-  const coordZona = document.getElementById('coord-zona-sel');
-  if (coordZona) coordZona.textContent = zona;
-  if (coordOk) coordOk.style.display = 'block';
+  if (coordOk) coordOk.style.display = 'none';
+  if (formRetiro) formRetiro.style.display = 'block';
+  // Precargar CP según zona
+  const cpInput = document.getElementById('retiro-cp');
+  if (cpInput && !cpInput.value) cpInput.value = (zona === 'Castelar') ? '1712' : (zona === 'Quilmes' ? '1878' : '');
   updateCartUI(); updateCheckoutBtn();
-  showToast('Retiro en ' + zona + ' ✦ Sin costo');
+  showToast('Completá tus datos para el retiro en ' + zona);
 };
 
 window.selectZona = function(el, precio, zona) {
