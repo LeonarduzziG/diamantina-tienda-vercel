@@ -92,26 +92,25 @@ src="https://www.facebook.com/tr?id=793243080366510&ev=PageView&noscript=1"
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* 🇦🇷 TEMA MUNDIAL ARGENTINA — activo hasta 21 jul 2026 */
-  /* Originales: --rose:#C94F7C; --rose-dark:#8C2F54; --rose-pale:#FDF0F6; --rose-light:#F5D6E6; --ink:#1A1118; --ink-mid:#5A4558; --ink-light:#A090A0; --surface:#FEFBFD; --surface-2:#F7F0F5; --border:rgba(180,120,160,0.18); --border-strong:rgba(180,120,160,0.35); */
-  --rose: #1565C0;
-  --rose-dark: #0D47A1;
-  --rose-pale: #E3F2FD;
-  --rose-light: #BBDEFB;
-  --ink: #0D1B3E;
-  --ink-mid: #1E4A8A;
-  --ink-light: #7BADD6;
-  --surface: #F0F8FF;
-  --surface-2: #E3F2FD;
-  --border: rgba(21,101,192,0.15);
-  --border-strong: rgba(21,101,192,0.30);
+  /* Tema original de la marca (rosa) — tema Mundial desactivado */
+  --rose: #C94F7C;
+  --rose-dark: #8C2F54;
+  --rose-pale: #FDF0F6;
+  --rose-light: #F5D6E6;
+  --ink: #1A1118;
+  --ink-mid: #5A4558;
+  --ink-light: #A090A0;
+  --surface: #FEFBFD;
+  --surface-2: #F7F0F5;
+  --border: rgba(180,120,160,0.18);
+  --border-strong: rgba(180,120,160,0.35);
   --radius: 12px;
   --radius-sm: 7px;
   --tr: 0.22s cubic-bezier(.4,0,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{overflow-x:hidden}
-body{font-family:'DM Sans',sans-serif;background:#F0F8FF;color:#0D1B3E;min-height:100vh;overflow-x:hidden;max-width:100vw}
+body{font-family:'DM Sans',sans-serif;background:#FEFBFD;color:#1A1118;min-height:100vh;overflow-x:hidden;max-width:100vw}
 a{text-decoration:none;color:inherit}
 
 /* NAV */
@@ -122,7 +121,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
 .nav-link{font-size:13px;color:rgba(255,255,255,0.85);cursor:pointer;transition:color var(--tr);background:none;border:none;font-family:'DM Sans',sans-serif}
 .nav-link:hover{color:#FFD700}
 .nav-link.active{color:#FFD700;font-weight:500}
-.cart-btn{position:relative;background:#FFD700;color:#0D1B3E;border:none;border-radius:999px;padding:8px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background var(--tr)}
+.cart-btn{position:relative;background:var(--ink);color:#fff;border:none;border-radius:999px;padding:8px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background var(--tr)}
 .cart-btn:hover{background:var(--rose)}
 .cart-count{background:var(--rose);color:#fff;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
 .cart-btn:hover .cart-count{background:#fff;color:var(--rose)}
@@ -758,7 +757,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
     </div>
     <!-- Contenido encima -->
     <div class="hero-v2-content">
-      <div class="hero-v2-eyebrow"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:4px;border-radius:2px"><rect width="20" height="14" fill="#74ACDF"/><rect y="4.67" width="20" height="4.67" fill="white"/><circle cx="10" cy="7" r="1.8" fill="#F6B40E"/></svg> Colección Mundial 2026</div>
+      <div class="hero-v2-eyebrow">✦ Lencería de diseño</div>
       <div class="hero-v2-title hero-title">Sentite increíble,<br><em>todos los días.</em></div>
       <div class="hero-v2-sub hero-sub">Diseños exclusivos, talles reales y calidad que se siente. Lencería de diseño hecha en Argentina.</div>
       <div class="hero-v2-badges">
@@ -921,49 +920,6 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
   </div>
 
   
-<!-- MUNDIAL 2026 BANNER -->
-<div id="mundial-banner">
-  <div class="mundial-left">
-    <div class="mundial-flag">
-      <div class="cel"></div>
-      <div class="wh">☀️</div>
-      <div class="cel"></div>
-    </div>
-    <div class="mundial-trophy">🏆</div>
-    <div class="mundial-text">
-      <div class="mundial-title"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:4px;border-radius:2px"><rect width="20" height="14" fill="#74ACDF"/><rect y="4.67" width="20" height="4.67" fill="white"/><circle cx="10" cy="7" r="1.8" fill="#F6B40E"/></svg> ¡Vamos Argentina! — Mundial 2026</div>
-      <div class="mundial-sub">Celebrá con estilo ✨ Envíos a todo el país</div>
-    </div>
-  </div>
-  <div class="mundial-right">
-    <div class="sun-badge">☀️</div>
-    <button class="mundial-close" onclick="cerrarMundialBanner()">✕</button>
-  </div>
-</div>
-
-<!-- PELOTA RODANDO -->
-<div id="ball-runner">⚽</div>
-
-  <!-- COLECCION ARGENTINA -->
-  <div id="arg-section" style="display:none;padding:0 2rem 2rem;background:linear-gradient(135deg,#EBF5FF 0%,#fff 40%,#EBF5FF 100%);border-bottom:3px solid #FFD700;position:relative;overflow:hidden">
-    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#74B9FF,#fff,#74B9FF)"></div>
-    <div style="position:relative;z-index:1;padding-top:1.5rem">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;flex-wrap:wrap">
-        <div style="font-size:28px"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:4px;border-radius:2px"><rect width="20" height="14" fill="#74ACDF"/><rect y="4.67" width="20" height="4.67" fill="white"/><circle cx="10" cy="7" r="1.8" fill="#F6B40E"/></svg></div>
-        <div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:#1a3c6e">Colección Argentina</div>
-          <div style="font-size:12px;color:#5BA3F5;font-weight:500">Para celebrar el Mundial 2026 ⚽🏆</div>
-        </div>
-        <div id="arg-count" style="font-size:12px;color:#74B9FF;margin-left:auto"></div>
-      </div>
-      <div style="position:relative">
-        <button onclick="argScroll(-1)" style="display:none;position:absolute;top:50%;left:-12px;transform:translateY(-50%);z-index:10;background:#fff;border:1px solid #74B9FF;border-radius:50%;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#1a3c6e;box-shadow:0 2px 8px rgba(116,185,255,0.3)" id="arg-btn-l">‹</button>
-        <div id="arg-grid" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
-        <button onclick="argScroll(1)" style="display:none;position:absolute;top:50%;right:-12px;transform:translateY(-50%);z-index:10;background:#fff;border:1px solid #74B9FF;border-radius:50%;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#1a3c6e;box-shadow:0 2px 8px rgba(116,185,255,0.3)" id="arg-btn-r">›</button>
-      </div>
-    </div>
-  </div>
-
   <!-- BUSCADOR COLAPSABLE -->
   <div id="buscador-bar" style="display:block;padding:0.75rem 2rem;background:#fff;border-bottom:1px solid var(--border)">
     <div style="display:flex;gap:8px;max-width:600px;margin:0 auto">
@@ -2298,8 +2254,7 @@ function lanzarConfettiArg() {
   } else {
     sessionStorage.setItem('ball_done','1');
   }
-  // Confetti on load
-  setTimeout(lanzarConfettiArg, 800);
+  // Confetti del Mundial desactivado
 })();
 
 window.toggleMobileMenu = function() {
@@ -5738,7 +5693,7 @@ if (document.readyState === 'loading') {
 (function() {
   const hoy = new Date();
   const inicio = new Date('2026-01-01');
-  const fin = new Date('2026-07-22'); // hasta el 21 inclusive
+  const fin = new Date('2026-01-01'); // tema Mundial DESACTIVADO (fecha ya pasada)
 
   if (hoy < inicio || hoy >= fin) return; // fuera del período, no hace nada
 
