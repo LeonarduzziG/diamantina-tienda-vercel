@@ -109,12 +109,12 @@ src="https://www.facebook.com/tr?id=793243080366510&ev=PageView&noscript=1"
   --tr: 0.22s cubic-bezier(.4,0,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{overflow-x:hidden}
-body{font-family:'DM Sans',sans-serif;background:#FEFBFD;color:#1A1118;min-height:100vh;overflow-x:hidden;max-width:100vw}
+html{overflow-x:clip}
+body{font-family:'DM Sans',sans-serif;background:#FEFBFD;color:#1A1118;min-height:100vh;overflow-x:clip;max-width:100vw}
 a{text-decoration:none;color:inherit}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-filter:blur(12px);border-bottom:2px solid #FFD700;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px}
 .nav-brand{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;letter-spacing:3px;text-transform:uppercase;color:#fff;cursor:pointer}
 .nav-brand span{color:#FFD700}
 .nav-right{display:flex;align-items:center;gap:1rem}
@@ -753,7 +753,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
   <div class="hero-v2 hero">
     <!-- Fondo imagen -->
     <div class="hero-v2-bg">
-      <img src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1600,c_limit,q_auto,f_auto/v1780699131/diamantina/laqavbxqgax6h1kq0qz0.png" alt="Diamantina Lencería" loading="eager" fetchpriority="high" width="1600" height="900">
+      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1600,c_limit,q_auto,f_auto/v1780699131/diamantina/laqavbxqgax6h1kq0qz0.png" alt="Diamantina Lencería" loading="eager" fetchpriority="high" width="1600" height="900">
     </div>
     <!-- Contenido encima -->
     <div class="hero-v2-content">
@@ -925,7 +925,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(21,101,192,0.97);backdrop-
     <div style="display:flex;gap:8px;max-width:600px;margin:0 auto">
       <div style="position:relative;flex:1">
         <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-light);font-size:14px;pointer-events:none">⌕</span>
-        <input type="text" id="buscador-tienda" placeholder="Buscar productos..." oninput="buscarProductos(this.value)" autofocus style="width:100%;padding:9px 12px 9px 36px;border:1px solid var(--border-strong);border-radius:999px;background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color 0.2s">
+        <input type="text" id="buscador-tienda" placeholder="Buscar productos..." oninput="buscarProductos(this.value)" style="width:100%;padding:9px 12px 9px 36px;border:1px solid var(--border-strong);border-radius:999px;background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color 0.2s">
       </div>
       <button onclick="toggleBuscador()" style="padding:7px 16px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;white-space:nowrap">Cerrar</button>
     </div>
@@ -2140,8 +2140,18 @@ function applyHeroConfig(d) {
 }
 
 function applyApariencia(d) {
-  if (d.color) document.documentElement.style.setProperty('--rose', d.color);
-  if (d.heroBg) { const hero = document.querySelector('.hero'); if (hero) { hero.style.backgroundImage = 'url(' + d.heroBg + ')'; hero.style.backgroundSize = 'cover'; hero.style.backgroundPosition = 'center'; } }
+  if (d.color) {
+    // Ignorar el azul del tema Mundial que quedó guardado (revertir a rosa de marca)
+    const coloresMundial = ['#1565C0', '#1565c0', '#0D47A1', '#0d47a1'];
+    const colorFinal = coloresMundial.includes((d.color||'').trim()) ? '#C94F7C' : d.color;
+    document.documentElement.style.setProperty('--rose', colorFinal);
+  }
+  if (d.heroBg) {
+    const heroImg = document.getElementById('hero-v2-img');
+    if (heroImg) heroImg.src = d.heroBg;
+    const hero = document.querySelector('.hero');
+    if (hero) { hero.style.backgroundImage = 'url(' + d.heroBg + ')'; hero.style.backgroundSize = 'cover'; hero.style.backgroundPosition = 'center'; }
+  }
   if (d.wa) window._waNumber = d.wa;
 }
 
