@@ -919,7 +919,24 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
     </div>
   </div>
 
-  
+  <!-- COMBOS ESPECIALES -->
+  <div class="nuevos-section" id="combos-section" style="display:none">
+    <div style="position:relative;z-index:1;padding-top:1.8rem">
+      <div class="ofertas-header" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <div class="nuevos-badge" style="background:var(--rose);color:#fff">🎁 Ofertas combinadas</div>
+        <div class="nuevos-title-wrap" style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+          <div class="ofertas-title">Combos especiales</div>
+          <div class="ofertas-count" id="combos-count"></div>
+        </div>
+      </div>
+      <div class="ofertas-carousel-wrap" style="margin-top:1rem">
+        <button class="ofertas-carousel-btn left" onclick="combosScroll(-1)" aria-label="Anterior">‹</button>
+        <div class="ofertas-grid" id="combos-grid"></div>
+        <button class="ofertas-carousel-btn right" onclick="combosScroll(1)" aria-label="Siguiente">›</button>
+      </div>
+    </div>
+  </div>
+
   <!-- BUSCADOR COLAPSABLE -->
   <div id="buscador-bar" style="display:block;padding:0.75rem 2rem;background:#fff;border-bottom:1px solid var(--border)">
     <div style="display:flex;gap:8px;max-width:600px;margin:0 auto">
@@ -1666,8 +1683,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
         <label for="prod-es-nuevo" style="font-size:13px;color:var(--ink);cursor:pointer;font-weight:500">✨ Mostrar en "Nuevos lanzamientos"</label>
       </div>
       <div class="form-field" style="display:flex;align-items:center;gap:10px">
-        <input type="checkbox" id="prod-es-arg" style="width:16px;height:16px;accent-color:#74B9FF;cursor:pointer">
-        <label for="prod-es-arg" style="font-size:13px;color:#1a3c6e;cursor:pointer;font-weight:500"><svg width="16" height="11" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:3px;border-radius:1px"><rect width="20" height="14" fill="#74ACDF"/><rect y="4.67" width="20" height="4.67" fill="white"/><circle cx="10" cy="7" r="1.8" fill="#F6B40E"/></svg> Colección Argentina (Mundial 2026)</label>
+        <input type="checkbox" id="prod-es-combo" style="width:16px;height:16px;accent-color:var(--rose);cursor:pointer">
+        <label for="prod-es-combo" style="font-size:13px;color:var(--ink);cursor:pointer;font-weight:500">🎁 Mostrar en "Combos especiales"</label>
       </div>
       <div class="form-field">
         <label class="form-label">Precio (ARS)</label>
@@ -2341,7 +2358,7 @@ db.ref('productos').on('value', (snap) => {
   renderCatalog();
   renderOfertas();
   renderNuevos();
-  renderArg();
+  renderCombos();
   renderColorFilters();
   renderQuickSearchChips();
   renderAdminList();
@@ -2561,32 +2578,28 @@ function renderPage(list, el, reset) {
 }
 
 
-// ── OFERTAS ──
-window.argScroll = function(dir) {
-  const el = document.getElementById('arg-grid');
+// ── COMBOS ESPECIALES ──
+window.combosScroll = function(dir) {
+  const el = document.getElementById('combos-grid');
   if(el) el.scrollBy({left: dir*220, behavior:'smooth'});
 };
 
-window.renderArg = function() {
-  const el = document.getElementById('arg-grid');
-  const section = document.getElementById('arg-section');
-  const countEl = document.getElementById('arg-count');
-  const btnL = document.getElementById('arg-btn-l');
-  const btnR = document.getElementById('arg-btn-r');
+window.renderCombos = function() {
+  const el = document.getElementById('combos-grid');
+  const section = document.getElementById('combos-section');
+  const countEl = document.getElementById('combos-count');
   if(!el || !section) return;
-  const prods = products.filter(p => p.esArg && p.estado !== 'oculto');
+  const prods = products.filter(p => p.esCombo && p.estado !== 'oculto');
   if(prods.length === 0){ section.style.display='none'; return; }
   section.style.display = 'block';
   if(countEl) countEl.textContent = prods.length + ' producto' + (prods.length!==1?'s':'');
-  if(btnL) btnL.style.display = prods.length>1 ? 'flex' : 'none';
-  if(btnR) btnR.style.display = prods.length>1 ? 'flex' : 'none';
   el.innerHTML = prods.map((p,idx) => {
     const precio = precioHTML(p);
     const img = optimizeImg((p.imgs && p.imgs[0]) || p.img || '', 400);
-    return '<div class="prod-card" data-prod-id="'+p.id+'" style="cursor:pointer;min-width:200px;max-width:200px;scroll-snap-align:start;flex-shrink:0;animation:float-up 0.5s '+(idx*0.1)+'s ease both;border:2px solid rgba(116,185,255,0.3);display:flex;flex-direction:column">'
+    return '<div class="prod-card" data-prod-id="'+p.id+'" style="cursor:pointer;min-width:200px;max-width:200px;scroll-snap-align:start;flex-shrink:0;animation:float-up 0.5s '+(idx*0.1)+'s ease both;border:2px solid rgba(201,79,124,0.3);display:flex;flex-direction:column">'
       + '<div class="prod-img-wrap" style="position:relative;height:220px;overflow:hidden;flex-shrink:0">'
       + (img ? '<img src="'+img+'" alt="'+p.name+'" class="prod-img" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top">' : '<div class="prod-img-placeholder" style="height:100%;background:#eee"></div>')
-      + '<div class="badge-arg" style="position:absolute;top:8px;right:8px">🇦🇷 ARG</div>'
+      + '<div class="badge-arg" style="position:absolute;top:8px;right:8px;background:var(--rose);color:#fff">🎁 COMBO</div>'
       + '</div>'
       + '<div class="card-body"><div class="card-name">'+p.name+'</div><div class="prod-price-row">'+precio+'</div></div>'
       + '</div>';
@@ -3450,12 +3463,12 @@ window.saveProduct = async function() {
   const packQty = parseInt(document.getElementById('prod-pack-qty')?.value) || 0;
   const packPrice = parseInt(document.getElementById('prod-pack-price')?.value) || 0;
   const esNuevo = document.getElementById('prod-es-nuevo')?.checked || false;
-  const esArg = document.getElementById('prod-es-arg')?.checked || false;
+  const esCombo = document.getElementById('prod-es-combo')?.checked || false;
   // Si estado=agotado, poner todo el stock en 0
   if (estado === 'agotado') {
     Object.keys(stock).forEach(k => { stock[k] = 0; });
   }
-  const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas, esNuevo: esNuevo || null, esArg: esArg || null,
+  const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas, esNuevo: esNuevo || null, esCombo: esCombo || null,
     packQty: packQty >= 2 ? packQty : null,
     packPrice: packPrice > 0 && packQty >= 2 ? packPrice : null,
     keywords: keywords || null,
@@ -3535,7 +3548,7 @@ window.editProduct = function(id) {
     renderColorSwatchesAdmin();
     document.getElementById('prod-cuotas').value = p.cuotas || '0';
     if (document.getElementById('prod-es-nuevo')) document.getElementById('prod-es-nuevo').checked = !!p.esNuevo;
-    if (document.getElementById('prod-es-arg')) document.getElementById('prod-es-arg').checked = !!p.esArg;
+    if (document.getElementById('prod-es-combo')) document.getElementById('prod-es-combo').checked = !!p.esCombo;
     if (document.getElementById('prod-pack-qty')) document.getElementById('prod-pack-qty').value = p.packQty || '';
     if (document.getElementById('prod-pack-price')) document.getElementById('prod-pack-price').value = p.packPrice || '';
     updatePackPreview();
