@@ -1551,6 +1551,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
     <div style="display:flex">
     <button id="atab-admin" onclick="switchAdminTab('admin')" style="padding:10px 18px;border:none;border-bottom:3px solid var(--rose);background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--rose);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">⚙️ Administración</button>
     <button id="atab-pedidos" onclick="switchAdminTab('pedidos')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">📦 Pedidos</button>
+    <button id="atab-clientes" onclick="switchAdminTab('clientes')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">👥 Clientes</button>
     <button id="atab-config" onclick="switchAdminTab('config')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">🎨 Tienda</button>
     </div>
     <button id="admin-logout-btn" onclick="doLogout()" style="display:none;padding:7px 16px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink-mid);cursor:pointer">Cerrar sesión</button>
@@ -2179,7 +2180,7 @@ function applyApariencia(d) {
 }
 
 window.switchAdminTab = function(tab) {
-  const tabs = ['admin','pedidos','config'];
+  const tabs = ['admin','pedidos','clientes','config'];
   tabs.forEach(t => {
     const btn = document.getElementById('atab-' + t);
     const panel = document.getElementById('admin-tab-' + t);
@@ -2187,6 +2188,7 @@ window.switchAdminTab = function(tab) {
     if (panel) panel.style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'pedidos') renderPedidos();
+  if (tab === 'clientes') renderClientes();
   if (tab === 'config') loadConfig();
 };
 
@@ -4134,7 +4136,57 @@ window.exportarClientes = async function() {
   }
 };
 
-window.exportarPedidosExcel = async function() {
+window._clientesCache = [];
+window.renderClientes = async function() {
+  const cont = document.getElementById('clientes-list');
+  if (!cont) return;
+  try {
+    // Usar cache si ya se cargó, si no traer de Firebase
+    if (window._clientesCache.length === 0) {
+      const snap = await db.ref('clientes').get();
+      const data = snap.val() || {};
+      window._clientesCache = Object.values(data);
+    }
+    let clientes = window._clientesCache.slice().sort((a,b) => (b.ultimaCompra||0) - (a.ultimaCompra||0));
+
+    // Filtro de búsqueda
+    const q = (document.getElementById('buscador-clientes')?.value || '').toLowerCase().trim();
+    if (q) {
+      clientes = clientes.filter(c =>
+        (c.nombre||'').toLowerCase().includes(q) ||
+        (c.tel||'').toLowerCase().includes(q) ||
+        (c.email||'').toLowerCase().includes(q)
+      );
+    }
+
+    // Stats
+    const totalEl = document.getElementById('stat-total-clientes');
+    const recurEl = document.getElementById('stat-clientes-recurrentes');
+    if (totalEl) totalEl.textContent = window._clientesCache.length;
+    if (recurEl) recurEl.textContent = window._clientesCache.filter(c => (c.cantidadCompras||1) >= 2).length;
+
+    if (clientes.length === 0) {
+      cont.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">' + (q ? 'No se encontraron clientes con esa búsqueda' : 'Todavía no hay clientes guardados') + '</div>';
+      return;
+    }
+
+    cont.innerHTML = clientes.map(c => {
+      const fecha = c.ultimaCompra ? new Date(c.ultimaCompra).toLocaleDateString('es-AR') : '—';
+      const compras = c.cantidadCompras || 1;
+      const badge = compras >= 2 ? '<span style="background:#EAF3DE;color:#3B6D11;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:8px">Recurrente · ' + compras + ' compras</span>' : '';
+      const tel = c.tel ? ('<a href="https://wa.me/54' + String(c.tel).replace(/\D/g,'') + '" target="_blank" style="color:var(--rose);text-decoration:none">📱 ' + c.tel + '</a>') : '<span style="color:var(--ink-light)">Sin teléfono</span>';
+      const email = c.email ? ('<a href="mailto:' + c.email + '" style="color:var(--ink-mid);text-decoration:none">✉️ ' + c.email + '</a>') : '<span style="color:var(--ink-light)">Sin email</span>';
+      const cp = c.cp ? ('📍 CP ' + c.cp) : '';
+      return '<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px">'
+        + '<div style="display:flex;align-items:center;flex-wrap:wrap;margin-bottom:6px"><span style="font-size:15px;font-weight:600;color:var(--ink)">' + (c.nombre || 'Sin nombre') + '</span>' + badge + '</div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--ink-mid)">' + tel + email + (cp ? '<span>' + cp + '</span>' : '') + '</div>'
+        + '<div style="font-size:11px;color:var(--ink-light);margin-top:6px">Última compra: ' + fecha + '</div>'
+        + '</div>';
+    }).join('');
+  } catch(e) {
+    cont.innerHTML = '<div style="text-align:center;padding:2rem;color:#A32D2D">Error cargando clientes: ' + e.message + '</div>';
+  }
+};
   const pedidos = window._pedidosCache.length > 0 ? window._pedidosCache : await getPedidos();
   if (!pedidos.length) { showToast('No hay pedidos', 'error'); return; }
 
@@ -6086,6 +6138,29 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
     </div>
   </div>
 
+  <!-- TAB CLIENTES -->
+  <div id="admin-tab-clientes" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
+      <div class="admin-title" style="margin-bottom:0">👥 Clientes</div>
+      <button onclick="exportarClientes()" style="padding:8px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">↓ Exportar CSV</button>
+    </div>
+    <div style="margin-bottom:1rem">
+      <input type="text" id="buscador-clientes" placeholder="Buscar por nombre, teléfono o email..." oninput="renderClientes()" style="width:100%;box-sizing:border-box;padding:9px 14px;border:1px solid var(--border-strong);border-radius:999px;background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:14px;color:var(--ink);outline:none">
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem">
+      <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-size:22px;font-weight:500;color:var(--ink)" id="stat-total-clientes">0</div>
+        <div style="font-size:12px;color:var(--ink-light)">Total clientes</div>
+      </div>
+      <div style="background:#EAF3DE;border-radius:var(--radius-sm);padding:1rem;text-align:center">
+        <div style="font-size:22px;font-weight:500;color:#3B6D11" id="stat-clientes-recurrentes">0</div>
+        <div style="font-size:12px;color:#3B6D11">Compraron 2+ veces</div>
+      </div>
+    </div>
+    <div id="clientes-list" style="display:flex;flex-direction:column;gap:10px">
+      <div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">Cargando clientes...</div>
+    </div>
+  </div>
 
 <!-- GUÍA DE TALLES INTELIGENTE -->
 <div id="guia-modal-bg" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(26,17,24,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center">
