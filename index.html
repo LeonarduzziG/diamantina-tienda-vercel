@@ -1968,6 +1968,8 @@ loadVisitasAdmin();
         }).then(() => console.log('Pedido actualizado a aprobado:', pedidoPendiente.firebaseKey))
           .catch(e => console.warn('No se pudo actualizar pedido:', e));
         notificarPedidoPorMail({...pedidoPendiente, estado:'aprobado', payment_id: pedidoId});
+        // Guardar cliente
+        if (window._datosBuyer) guardarCliente(window._datosBuyer);
         // Bajar stock via backend
         fetch(BACKEND + '/bajar-stock', {
           method: 'POST',
@@ -2188,7 +2190,7 @@ window.switchAdminTab = function(tab) {
     if (panel) panel.style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'pedidos') renderPedidos();
-  if (tab === 'clientes') renderClientes();
+  if (tab === 'clientes') renderClientes(true);
   if (tab === 'config') loadConfig();
 };
 
@@ -3277,6 +3279,7 @@ window.checkout = async function() {
       estado: 'pendiente',
       nombre: (window._datosBuyer?.nombre) || myName || 'Cliente',
       telefono: window._datosBuyer?.tel || null,
+      email: window._datosBuyer?.email || null,
       cpDestino: window._datosBuyer?.cp || null,
       direccion: window._datosBuyer?.direccion || null,
       tipoEnvio: window._datosBuyer?.tipo || null,
@@ -4137,12 +4140,12 @@ window.exportarClientes = async function() {
 };
 
 window._clientesCache = [];
-window.renderClientes = async function() {
+window.renderClientes = async function(forceRefresh) {
   const cont = document.getElementById('clientes-list');
   if (!cont) return;
   try {
-    // Usar cache si ya se cargó, si no traer de Firebase
-    if (window._clientesCache.length === 0) {
+    // Traer de Firebase al abrir la pestaña o si el cache está vacío
+    if (forceRefresh === true || window._clientesCache.length === 0) {
       const snap = await db.ref('clientes').get();
       const data = snap.val() || {};
       window._clientesCache = Object.values(data);
