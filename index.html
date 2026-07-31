@@ -1893,6 +1893,8 @@ const BACKEND = "https://diamantina-backend.onrender.com";
 
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+// Desactivar la restauración automática de scroll del navegador (la manejamos nosotros)
+try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch(e){}
 
 products = [];
 cart = JSON.parse(localStorage.getItem('diamantina_cart') || '[]');
@@ -2373,30 +2375,47 @@ db.ref('productos').on('value', (snap) => {
       const raw = sessionStorage.getItem('diamantina_catalogo_estado');
       if (raw) {
         const e = JSON.parse(raw);
-        // Solo restaurar si es reciente (últimos 5 minutos)
-        if (e && e.ts && (Date.now() - e.ts) < 300000) estadoGuardado = e;
+        // Solo restaurar si es reciente (últimos 10 minutos)
+        if (e && e.ts && (Date.now() - e.ts) < 600000) estadoGuardado = e;
       }
     } catch(err){}
     if (estadoGuardado) {
       if (estadoGuardado.filtro) activeFilter = estadoGuardado.filtro;
+      // Sincronizar botones de filtro con el filtro restaurado
+      try {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === estadoGuardado.filtro));
+        document.querySelectorAll('.cat-card').forEach(c => c.classList.toggle('active', c.dataset.cat === estadoGuardado.filtro));
+      } catch(e){}
       renderCatalog(estadoGuardado.page || 1);
-      // Restaurar scroll después de renderizar
+      // Restaurar scroll: esperar a que la página tenga altura suficiente (imágenes cargadas)
       const yTarget = estadoGuardado.scroll || 0;
       let intentos = 0;
       const restaurarScroll = function() {
-        window.scrollTo(0, yTarget);
         intentos++;
-        if (Math.abs((window.scrollY||0) - yTarget) > 40 && intentos < 10) {
-          setTimeout(restaurarScroll, 60);
+        // Solo scrollear cuando la página ya es lo bastante alta para llegar al target
+        if (document.body.scrollHeight >= yTarget + window.innerHeight - 50 || intentos > 40) {
+          window.scrollTo(0, yTarget);
+          // Reintentar un par de veces más por si siguen cargando imágenes
+          if (intentos < 40 && Math.abs((window.scrollY||0) - yTarget) > 40) {
+            setTimeout(restaurarScroll, 100);
+          }
+        } else {
+          setTimeout(restaurarScroll, 100);
         }
       };
-      setTimeout(restaurarScroll, 80);
+      setTimeout(restaurarScroll, 100);
       try { sessionStorage.removeItem('diamantina_catalogo_estado'); } catch(err){}
     } else {
       renderCatalog();
     }
   } else {
-    renderCatalog();
+    // Re-disparo del listener (cambió algún producto en Firebase).
+    // No re-renderizar el catálogo si el modal está abierto o si el usuario ya cargó más productos,
+    // para no perder el "Ver más" ni saltar el scroll. Los datos ya se actualizaron en memoria.
+    const modalAbierto = document.getElementById('prod-modal-bg')?.classList.contains('open');
+    if (!modalAbierto && catalogPage <= 1) {
+      renderCatalog();
+    }
   }
   renderOfertas();
   renderNuevos();
