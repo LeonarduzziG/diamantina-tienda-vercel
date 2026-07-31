@@ -1893,22 +1893,6 @@ const BACKEND = "https://diamantina-backend.onrender.com";
 
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-// ── DIAGNÓSTICO TEMPORAL ──
-window._dbg = function(msg) {
-  try {
-    let box = document.getElementById('debug-box');
-    if (!box) {
-      box = document.createElement('div');
-      box.id = 'debug-box';
-      box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:rgba(0,0,0,0.85);color:#0f0;font:11px monospace;padding:6px 8px;max-height:140px;overflow:auto;white-space:pre-wrap;line-height:1.4';
-      document.addEventListener('DOMContentLoaded', () => document.body.appendChild(box));
-      if (document.body) document.body.appendChild(box);
-    }
-    const t = new Date().toLocaleTimeString('es-AR', {hour12:false}) + '.' + String(Date.now()%1000).padStart(3,'0');
-    box.textContent = '[' + t + '] ' + msg + '\n' + box.textContent;
-  } catch(e){}
-};
-window._dbg('PAGE LOAD — nav type: ' + (performance.getEntriesByType('navigation')[0]?.type || '?') + ' | URL: ' + location.pathname + location.search);
 // Desactivar la restauración automática de scroll del navegador (la manejamos nosotros)
 try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch(e){}
 
@@ -2426,8 +2410,9 @@ db.ref('productos').on('value', (snap) => {
     }
   } else {
     // Re-disparo del listener (cambió algún producto en Firebase).
+    // No re-renderizar el catálogo si el modal está abierto o si el usuario ya cargó más productos,
+    // para no perder el "Ver más" ni saltar el scroll. Los datos ya se actualizaron en memoria.
     const modalAbierto = document.getElementById('prod-modal-bg')?.classList.contains('open');
-    window._dbg('FIREBASE re-fire — modalAbierto=' + modalAbierto + ' catalogPage=' + catalogPage + (!modalAbierto && catalogPage <= 1 ? ' → RE-RENDER' : ' → SKIP'));
     if (!modalAbierto && catalogPage <= 1) {
       renderCatalog();
     }
@@ -2496,7 +2481,6 @@ const PAGE_SIZE = 12;
 window.resetCatalogPage = function() { catalogPage = 1; };
 
 window.renderCatalog = function(restaurarPage) {
-  window._dbg('renderCatalog(' + restaurarPage + ') — antes catalogPage=' + catalogPage);
   catalogPage = (typeof restaurarPage === 'number' && restaurarPage > 0) ? restaurarPage : 1;
   const sort = document.getElementById('sort-select').value;
   const filtroTalla = document.getElementById('filtro-talla')?.value || '';
@@ -2825,7 +2809,6 @@ window.openProdModal = function(id) {
   } catch(e){}
   // Push a history entry so the back button closes the modal instead of leaving the page
   try { history.pushState({ modal: true, prod: id }, '', '/?producto='+encodeURIComponent(id)); } catch(e){}
-  window._dbg('OPEN MODAL — guardé page=' + catalogPage + ' scroll=' + window._scrollAntesModal);
   // Update meta tags for sharing
   const prodUrl = window.location.origin + '/?producto=' + encodeURIComponent(id);
   const prodImg = (p.imgs && p.imgs[0]) || p.img || '';
@@ -3131,7 +3114,6 @@ window.closeProdModal = function(fromPopstate) {
 // Botón "atrás" del navegador (mobile): cerrar el modal si está abierto, en vez de salir de la página
 window.addEventListener('popstate', function() {
   const bg = document.getElementById('prod-modal-bg');
-  window._dbg('POPSTATE — modal abierto: ' + (bg && bg.classList.contains('open')) + ' | catalogPage=' + catalogPage);
   if (bg && bg.classList.contains('open')) {
     closeProdModal(true);
   }
