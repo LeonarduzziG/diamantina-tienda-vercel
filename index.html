@@ -2723,8 +2723,10 @@ window.openProdModal = function(id) {
   const p = products.find(x => x.id === id) || (window._allProducts && window._allProducts[id] ? Object.assign({id}, window._allProducts[id]) : null);
   if (!p) return;
   currentProd = p;
-  // Update URL without reload
-  try { history.replaceState(null,'','/?producto='+encodeURIComponent(id)); } catch(e){}
+  // Guardar posición del scroll para restaurarla al cerrar
+  window._scrollAntesModal = window.scrollY || window.pageYOffset || 0;
+  // Push a history entry so the back button closes the modal instead of leaving the page
+  try { history.pushState({ modal: true, prod: id }, '', '/?producto='+encodeURIComponent(id)); } catch(e){}
   // Update meta tags for sharing
   const prodUrl = window.location.origin + '/?producto=' + encodeURIComponent(id);
   const prodImg = (p.imgs && p.imgs[0]) || p.img || '';
@@ -3010,13 +3012,30 @@ window.compartirProducto = async function() {
   }
 };
 
-window.closeProdModal = function() {
+window.closeProdModal = function(fromPopstate) {
   document.getElementById('prod-modal-bg').classList.remove('open');
   currentProd = null; selectedTalla = null;
   document.querySelector('meta[property="og:title"]').setAttribute('content', 'Diamantina Lencería | Lencería de Diseño en Argentina');
   document.querySelector('meta[property="og:description"]').setAttribute('content', 'Tienda online de lencería fina en Argentina. Conjuntos, tops, bodys, babydoll y más. Envío a todo el país.');
   document.title = 'Diamantina Lencería | Lencería de Diseño en Argentina';
+  // Si el cierre NO vino del botón atrás, retroceder en el historial para limpiar la entrada del modal
+  if (fromPopstate !== true) {
+    try { if (history.state && history.state.modal) history.back(); else history.replaceState(null,'','/'); } catch(e){}
+  }
+  // Restaurar la posición del scroll donde estaba antes de abrir
+  if (typeof window._scrollAntesModal === 'number') {
+    const y = window._scrollAntesModal;
+    requestAnimationFrame(() => window.scrollTo(0, y));
+  }
 };
+
+// Botón "atrás" del navegador (mobile): cerrar el modal si está abierto, en vez de salir de la página
+window.addEventListener('popstate', function() {
+  const bg = document.getElementById('prod-modal-bg');
+  if (bg && bg.classList.contains('open')) {
+    closeProdModal(true);
+  }
+});
 
 window.selectPackOption = function(option) {
   window._packOption = option;
@@ -5750,6 +5769,8 @@ loadBanner();
   const params = new URLSearchParams(window.location.search);
   const prodId = params.get('producto');
   if (prodId) {
+    // Dejar la home como base para que al cerrar el modal quede la tienda limpia
+    try { history.replaceState(null, '', '/'); } catch(e){}
     // Wait for products to load, then open
     const tryOpen = function(attempts) {
       if (products.length > 0 || (window._allProducts && Object.keys(window._allProducts).length > 0)) {
