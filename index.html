@@ -4187,6 +4187,8 @@ window.renderClientes = async function() {
     cont.innerHTML = '<div style="text-align:center;padding:2rem;color:#A32D2D">Error cargando clientes: ' + e.message + '</div>';
   }
 };
+
+window.exportarPedidosExcel = async function() {
   const pedidos = window._pedidosCache.length > 0 ? window._pedidosCache : await getPedidos();
   if (!pedidos.length) { showToast('No hay pedidos', 'error'); return; }
 
