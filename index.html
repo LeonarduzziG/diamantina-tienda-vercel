@@ -1981,7 +1981,13 @@ loadVisitasAdmin();
           payment_id: _sanStr(pedidoId),
           ts: Date.now(),
           estado: 'aprobado',
-          nombre: _sanStr(myName || 'Cliente'),
+          nombre: _sanStr((window._datosBuyer && window._datosBuyer.nombre) || myName || 'Cliente'),
+          telefono: _sanStr(window._datosBuyer && window._datosBuyer.tel) || null,
+          email: _sanStr(window._datosBuyer && window._datosBuyer.email) || null,
+          cpDestino: _sanStr(window._datosBuyer && window._datosBuyer.cp) || null,
+          direccion: _sanStr(window._datosBuyer && window._datosBuyer.direccion) || null,
+          tipoEnvio: _sanStr(window._datosBuyer && window._datosBuyer.tipo) || null,
+          observaciones: _sanStr(window._datosBuyer && window._datosBuyer.obs) || null,
           items: cart.map(i => ({
             title: _sanStr(i.name),
             talla: _sanStr(i.talla || '—'),
@@ -3253,6 +3259,17 @@ window.checkout = async function() {
       currency_id: 'ARS'
     }));
 
+    // Agregar el costo de envío como ítem si corresponde
+    const envioPrecioReal = (envioSeleccionado && !isNaN(envioSeleccionado.precio)) ? Math.round(Number(envioSeleccionado.precio)) : 0;
+    if (envioPrecioReal > 0) {
+      items.push({
+        title: 'Envío' + (envioSeleccionado.zona ? ' - ' + envioSeleccionado.zona : ''),
+        quantity: 1,
+        unit_price: envioPrecioReal,
+        currency_id: 'ARS'
+      });
+    }
+
     const pedidoCompleto = {
       ts: Date.now(),
       estado: 'pendiente',
@@ -3268,14 +3285,14 @@ window.checkout = async function() {
         color: i.color ? (typeof i.color === 'object' ? (i.color.nombre || i.color.hex || '') : i.color) : '',
         qty: i.qty, price: i.price
       })),
-      total: cart.reduce((s,i) => s + (Number(i.price)||0) * (Number(i.qty)||1), 0),
+      total: cart.reduce((s,i) => s + (Number(i.price)||0) * (Number(i.qty)||1), 0) + envioPrecioReal,
       cupon: cuponActivo ? cuponActivo.code : null,
       envio: envioSeleccionado.zona,
       envio_tipo: envioSeleccionado.tipo,
       envio_servicio: envioSeleccionado.servicioEnvio || null,
       contacto_tipo: envioSeleccionado.contactoTipo || null,
       contacto_dato: envioSeleccionado.contactoDato || null,
-      envio_precio: 0
+      envio_precio: envioPrecioReal
     };
 
     const res = await fetch(BACKEND + '/crear-preferencia', {
@@ -3886,6 +3903,12 @@ async function notificarPedidoPorMail(pedido) {
       to_email: 'gel340@gmail.com',
       order_id: pedido.payment_id || String(Date.now()),
       cliente: pedido.nombre || 'Cliente',
+      telefono: pedido.telefono || 'No especificado',
+      email_cliente: pedido.email || 'No especificado',
+      direccion: pedido.direccion || 'No especificada',
+      cp: pedido.cpDestino || 'No especificado',
+      tipo_envio: pedido.tipoEnvio || 'No especificado',
+      observaciones: pedido.observaciones || 'Sin observaciones',
       total: '$' + (Number(pedido.total) || 0).toLocaleString('es-AR'),
       items: items,
       estado: pedido.estado || 'aprobado',
