@@ -2367,7 +2367,7 @@ db.ref('productos').on('value', (snap) => {
     products = [];
     console.error('Error procesando productos:', e);
   }
-  // Primera carga: restaurar estado del catálogo si volvés de ver un producto
+  // Primera carga: restaurar scroll si volvés de ver un producto (por si el navegador recargó)
   if (!window._catalogoRestaurado) {
     window._catalogoRestaurado = true;
     let estadoGuardado = null;
@@ -2375,47 +2375,30 @@ db.ref('productos').on('value', (snap) => {
       const raw = sessionStorage.getItem('diamantina_catalogo_estado');
       if (raw) {
         const e = JSON.parse(raw);
-        // Solo restaurar si es reciente (últimos 10 minutos)
         if (e && e.ts && (Date.now() - e.ts) < 600000) estadoGuardado = e;
       }
     } catch(err){}
-    if (estadoGuardado) {
-      if (estadoGuardado.filtro) activeFilter = estadoGuardado.filtro;
-      // Sincronizar botones de filtro con el filtro restaurado
-      try {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === estadoGuardado.filtro));
-        document.querySelectorAll('.cat-card').forEach(c => c.classList.toggle('active', c.dataset.cat === estadoGuardado.filtro));
-      } catch(e){}
-      renderCatalog(estadoGuardado.page || 1);
-      // Restaurar scroll: esperar a que la página tenga altura suficiente (imágenes cargadas)
-      const yTarget = estadoGuardado.scroll || 0;
+    if (estadoGuardado && estadoGuardado.filtro) activeFilter = estadoGuardado.filtro;
+    renderCatalog();
+    if (estadoGuardado && estadoGuardado.scroll) {
+      const yTarget = estadoGuardado.scroll;
       let intentos = 0;
       const restaurarScroll = function() {
         intentos++;
-        // Solo scrollear cuando la página ya es lo bastante alta para llegar al target
         if (document.body.scrollHeight >= yTarget + window.innerHeight - 50 || intentos > 40) {
           window.scrollTo(0, yTarget);
-          // Reintentar un par de veces más por si siguen cargando imágenes
-          if (intentos < 40 && Math.abs((window.scrollY||0) - yTarget) > 40) {
-            setTimeout(restaurarScroll, 100);
-          }
+          if (intentos < 40 && Math.abs((window.scrollY||0) - yTarget) > 40) setTimeout(restaurarScroll, 100);
         } else {
           setTimeout(restaurarScroll, 100);
         }
       };
       setTimeout(restaurarScroll, 100);
-      try { sessionStorage.removeItem('diamantina_catalogo_estado'); } catch(err){}
-    } else {
-      renderCatalog();
     }
+    try { sessionStorage.removeItem('diamantina_catalogo_estado'); } catch(err){}
   } else {
-    // Re-disparo del listener (cambió algún producto en Firebase).
-    // No re-renderizar el catálogo si el modal está abierto o si el usuario ya cargó más productos,
-    // para no perder el "Ver más" ni saltar el scroll. Los datos ya se actualizaron en memoria.
+    // Re-disparo del listener (cambió algún producto en Firebase): no re-renderizar si el modal está abierto
     const modalAbierto = document.getElementById('prod-modal-bg')?.classList.contains('open');
-    if (!modalAbierto && catalogPage <= 1) {
-      renderCatalog();
-    }
+    if (!modalAbierto) renderCatalog();
   }
   renderOfertas();
   renderNuevos();
@@ -2480,8 +2463,8 @@ let catalogPage = 1;
 const PAGE_SIZE = 12;
 window.resetCatalogPage = function() { catalogPage = 1; };
 
-window.renderCatalog = function(restaurarPage) {
-  catalogPage = (typeof restaurarPage === 'number' && restaurarPage > 0) ? restaurarPage : 1;
+window.renderCatalog = function() {
+  catalogPage = 1;
   const sort = document.getElementById('sort-select').value;
   const filtroTalla = document.getElementById('filtro-talla')?.value || '';
   const filtroColor = window.activeColorFilter || '';
@@ -2521,29 +2504,7 @@ window.renderCatalog = function(restaurarPage) {
   }
 
   window._currentList = list;
-  if (catalogPage > 1) {
-    // Restaurar: renderizar todas las páginas hasta la guardada de una vez
-    el.innerHTML = '';
-    const oldBtn = el.querySelector('.load-more-btn');
-    if (oldBtn) oldBtn.remove();
-    const total = catalogPage * PAGE_SIZE;
-    const slice = list.slice(0, total);
-    const frag = document.createDocumentFragment();
-    slice.forEach((p, idx) => frag.appendChild(buildCard(p, idx)));
-    el.appendChild(frag);
-    attachListeners(el);
-    const remaining = list.length - total;
-    if (remaining > 0) {
-      const btn = document.createElement('button');
-      btn.className = 'load-more-btn';
-      btn.style.gridColumn = '1 / -1';
-      btn.textContent = 'Ver más (' + remaining + ' productos)';
-      btn.addEventListener('click', () => { catalogPage++; renderPage(list, el, false); });
-      el.appendChild(btn);
-    }
-  } else {
-    renderPage(list, el, true);
-  }
+  renderPage(list, el, true);
 };
 
 function buildCard(p, idx) {
@@ -2640,24 +2601,14 @@ function attachListeners(container) {
 }
 
 function renderPage(list, el, reset) {
-  if (reset) { el.innerHTML = ''; catalogPage = 1; }
+  // Sin paginación: mostrar todos los productos de una vez (lazy loading maneja las imágenes)
+  el.innerHTML = '';
   const oldBtn = el.querySelector('.load-more-btn');
   if (oldBtn) oldBtn.remove();
-  const pageStart = (catalogPage - 1) * PAGE_SIZE;
-  const slice = list.slice(pageStart, pageStart + PAGE_SIZE);
   const frag = document.createDocumentFragment();
-  slice.forEach((p, idx) => frag.appendChild(buildCard(p, idx)));
+  list.forEach((p, idx) => frag.appendChild(buildCard(p, idx)));
   el.appendChild(frag);
   attachListeners(el);
-  const remaining = list.length - (pageStart + PAGE_SIZE);
-  if (remaining > 0) {
-    const btn = document.createElement('button');
-    btn.className = 'load-more-btn';
-    btn.style.gridColumn = '1 / -1';
-    btn.textContent = 'Ver más (' + remaining + ' productos)';
-    btn.addEventListener('click', () => { catalogPage++; renderPage(list, el, false); });
-    el.appendChild(btn);
-  }
 }
 
 
