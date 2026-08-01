@@ -2600,15 +2600,50 @@ function attachListeners(container) {
   });
 }
 
+const CHUNK_SIZE = 16;
+let _ioObserver = null;
 function renderPage(list, el, reset) {
-  // Sin paginación: mostrar todos los productos de una vez (lazy loading maneja las imágenes)
+  // Scroll infinito: renderizar de a bloques para no colgar el celular
   el.innerHTML = '';
   const oldBtn = el.querySelector('.load-more-btn');
   if (oldBtn) oldBtn.remove();
-  const frag = document.createDocumentFragment();
-  list.forEach((p, idx) => frag.appendChild(buildCard(p, idx)));
-  el.appendChild(frag);
-  attachListeners(el);
+  // Desconectar observer anterior si existía
+  if (_ioObserver) { try { _ioObserver.disconnect(); } catch(e){} _ioObserver = null; }
+
+  let rendered = 0;
+  const renderChunk = function() {
+    const frag = document.createDocumentFragment();
+    const end = Math.min(rendered + CHUNK_SIZE, list.length);
+    for (let i = rendered; i < end; i++) {
+      frag.appendChild(buildCard(list[i], i));
+    }
+    el.appendChild(frag);
+    attachListeners(el);
+    rendered = end;
+    // Colocar el centinela al final para detectar cuándo cargar más
+    colocarCentinela();
+  };
+
+  const colocarCentinela = function() {
+    // Quitar centinela viejo
+    const viejo = el.querySelector('.scroll-sentinel');
+    if (viejo) viejo.remove();
+    if (rendered >= list.length) return; // ya está todo
+    const sentinel = document.createElement('div');
+    sentinel.className = 'scroll-sentinel';
+    sentinel.style.cssText = 'grid-column:1 / -1;height:1px';
+    el.appendChild(sentinel);
+    if (_ioObserver) { try { _ioObserver.disconnect(); } catch(e){} }
+    _ioObserver = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        _ioObserver.disconnect();
+        renderChunk();
+      }
+    }, { rootMargin: '600px' }); // cargar antes de llegar al final
+    _ioObserver.observe(sentinel);
+  };
+
+  renderChunk();
 }
 
 
