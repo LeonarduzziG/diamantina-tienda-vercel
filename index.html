@@ -1946,7 +1946,6 @@ loadVisitasAdmin();
     document.getElementById('page-favoritos').style.display = 'block';
     renderFavoritos();
   } else if (page === 'success') {
-    alert('1️⃣ Entró a SUCCESS');
     const _sel = document.getElementById('page-success');
     if (_sel) { _sel.style.display = 'block'; _sel.classList.add('open'); }
     console.log('SUCCESS PAGE triggered, URL:', window.location.href);
@@ -1957,14 +1956,12 @@ loadVisitasAdmin();
     const pedidoId = urlPsS.get('payment_id') || urlPsS.get('collection_id') || ('sim-' + Date.now());
     console.log('PedidoId:', pedidoId, 'Cart:', cart.length, 'items');
     const pedidoKey = 'pedido_guardado_' + pedidoId;
-    alert('2️⃣ pedidoId=' + pedidoId + ' | cart=' + cart.length + ' items | yaGuardado=' + (localStorage.getItem(pedidoKey) ? 'SÍ' : 'NO'));
     if (!localStorage.getItem(pedidoKey)) {
       localStorage.setItem(pedidoKey, '1');
       const subtotal = cart.reduce((s,i) => s + i.price * i.qty, 0);
       const pedidoPendienteStr = localStorage.getItem('diamantina_pedido_pendiente');
       const pedidoPendiente = pedidoPendienteStr ? JSON.parse(pedidoPendienteStr) : null;
       console.log('Pedido pendiente firebaseKey:', pedidoPendiente ? pedidoPendiente.firebaseKey : 'ninguno');
-      alert('3️⃣ pedidoPendiente=' + (pedidoPendiente ? 'existe, nombre=' + pedidoPendiente.nombre + ', firebaseKey=' + (pedidoPendiente.firebaseKey||'NINGUNO') : 'NULL — no hay datos guardados'));
       if (pedidoPendiente && pedidoPendiente.firebaseKey) {
         // Actualizar pedido en Firebase (frontend fallback por si webhook no llegó)
         db.ref('pedidos/' + pedidoPendiente.firebaseKey).update({
@@ -1982,7 +1979,6 @@ loadVisitasAdmin();
           tipo: pedidoPendiente.tipoEnvio
         };
         console.log('Guardando cliente (rama if):', _dcP.nombre, _dcP.tel);
-        alert('4️⃣ Rama IF — voy a guardar cliente: nombre=' + _dcP.nombre + ' tel=' + _dcP.tel + ' | items=' + (pedidoPendiente.items ? pedidoPendiente.items.length : 0));
         if (_dcP && _dcP.nombre && _dcP.nombre !== 'Cliente') guardarCliente(_dcP, pedidoPendiente.items, pedidoPendiente.total);
         // Bajar stock via backend
         fetch(BACKEND + '/bajar-stock', {
@@ -4051,7 +4047,6 @@ async function guardarCliente(datos, items, totalCompra) {
     console.log('Cliente guardado OK:', datos.nombre, '| uid:', uid);
   } catch(e) {
     console.warn('Error guardando cliente:', e.message);
-    alert('Error guardando cliente: ' + e.message);
   }
 }
 
