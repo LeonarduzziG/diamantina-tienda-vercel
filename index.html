@@ -1971,7 +1971,7 @@ loadVisitasAdmin();
           .catch(e => console.warn('No se pudo actualizar pedido:', e));
         notificarPedidoPorMail({...pedidoPendiente, estado:'aprobado', payment_id: pedidoId});
         // Guardar cliente
-        if (window._datosBuyer) guardarCliente(window._datosBuyer);
+        if (window._datosBuyer) guardarCliente(window._datosBuyer, pedidoPendiente.items, pedidoPendiente.total);
         // Bajar stock via backend
         fetch(BACKEND + '/bajar-stock', {
           method: 'POST',
@@ -2015,7 +2015,7 @@ loadVisitasAdmin();
           .catch(e => console.warn('Error guardando pedido:', e));
         notificarPedidoPorMail(pedidoNuevo);
   // Guardar cliente
-  if (window._datosBuyer) guardarCliente(window._datosBuyer);
+  if (window._datosBuyer) guardarCliente(window._datosBuyer, pedidoNuevo.items, pedidoNuevo.total);
         // Bajar stock via backend
         fetch(BACKEND + '/bajar-stock', {
           method: 'POST',
@@ -3970,7 +3970,7 @@ window.simularCompraPrueba = async function() {
   };
   try {
     // 1) Guardar cliente (misma función que usa una compra real)
-    await guardarCliente(datosPrueba);
+    await guardarCliente(datosPrueba, [{ title: 'Producto de prueba', talla: 'M', color: 'Rosa', name: 'Producto de prueba', qty: 1, price: 9999 }], 9999);
     // 2) Guardar un pedido de ejemplo en Firebase
     const pedidoPrueba = {
       payment_id: 'test-' + ts,
@@ -3996,7 +3996,7 @@ window.simularCompraPrueba = async function() {
   }
 };
 
-async function guardarCliente(datos) {
+async function guardarCliente(datos, items, totalCompra) {
   if (!datos || !datos.nombre) return;
   try {
     // Use tel or email as unique key
@@ -4005,6 +4005,20 @@ async function guardarCliente(datos) {
     const ref = db.ref('clientes/' + uid);
     const snap = await ref.get();
     const existing = snap.val() || {};
+    // Historial de compras: agregar los items de esta compra
+    let historial = Array.isArray(existing.historial) ? existing.historial : [];
+    if (items && items.length) {
+      const resumen = items.map(i => {
+        const talla = i.talla && i.talla !== '—' ? ' (T.' + i.talla + ')' : '';
+        const colorVal = i.color && typeof i.color === 'object' ? (i.color.nombre || i.color.hex || '') : (i.color || '');
+        const color = colorVal ? ' · ' + colorVal : '';
+        const qty = (i.qty && i.qty > 1) ? ' x' + i.qty : '';
+        return (i.title || i.name || 'Producto') + talla + color + qty;
+      });
+      historial.push({ fecha: Date.now(), productos: resumen, total: totalCompra || null });
+      // Mantener solo las últimas 30 compras
+      if (historial.length > 30) historial = historial.slice(-30);
+    }
     await ref.set({
       nombre: datos.nombre,
       tel: datos.tel || existing.tel || null,
@@ -4012,7 +4026,8 @@ async function guardarCliente(datos) {
       cp: datos.cp || existing.cp || null,
       ultimaCompra: Date.now(),
       cantidadCompras: (existing.cantidadCompras || 0) + 1,
-      primeraCompra: existing.primeraCompra || Date.now()
+      primeraCompra: existing.primeraCompra || Date.now(),
+      historial: historial
     });
     console.log('Cliente guardado:', datos.nombre);
   } catch(e) {
@@ -4304,10 +4319,23 @@ window.renderClientes = async function(forceRefresh) {
       const tel = c.tel ? ('<a href="https://wa.me/54' + String(c.tel).replace(/\D/g,'') + '" target="_blank" style="color:var(--rose);text-decoration:none">📱 ' + c.tel + '</a>') : '<span style="color:var(--ink-light)">Sin teléfono</span>';
       const email = c.email ? ('<a href="mailto:' + c.email + '" style="color:var(--ink-mid);text-decoration:none">✉️ ' + c.email + '</a>') : '<span style="color:var(--ink-light)">Sin email</span>';
       const cp = c.cp ? ('📍 CP ' + c.cp) : '';
+      // Historial de compras
+      let historialHTML = '';
+      if (Array.isArray(c.historial) && c.historial.length) {
+        const entradas = c.historial.slice().reverse().map(h => {
+          const fh = h.fecha ? new Date(h.fecha).toLocaleDateString('es-AR') : '';
+          const prods = (h.productos || []).map(p => '<div style="padding:1px 0">• ' + p + '</div>').join('');
+          const tot = h.total ? ' <span style="color:var(--ink-light)">($' + Number(h.total).toLocaleString('es-AR') + ')</span>' : '';
+          return '<div style="margin-bottom:6px"><div style="font-size:11px;color:var(--rose);font-weight:600">' + fh + tot + '</div><div style="font-size:12px;color:var(--ink-mid)">' + prods + '</div></div>';
+        }).join('');
+        historialHTML = '<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--rose);font-weight:500;outline:none">🛍️ Ver qué compró (' + c.historial.length + ')</summary>'
+          + '<div style="margin-top:6px;padding:8px 10px;background:var(--surface-2);border-radius:var(--radius-sm)">' + entradas + '</div></details>';
+      }
       return '<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px">'
         + '<div style="display:flex;align-items:center;flex-wrap:wrap;margin-bottom:6px"><span style="font-size:15px;font-weight:600;color:var(--ink)">' + (c.nombre || 'Sin nombre') + '</span>' + badge + '</div>'
         + '<div style="display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--ink-mid)">' + tel + email + (cp ? '<span>' + cp + '</span>' : '') + '</div>'
         + '<div style="font-size:11px;color:var(--ink-light);margin-top:6px">Última compra: ' + fecha + '</div>'
+        + historialHTML
         + '</div>';
     }).join('');
   } catch(e) {
