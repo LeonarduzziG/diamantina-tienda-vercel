@@ -1970,8 +1970,16 @@ loadVisitasAdmin();
         }).then(() => console.log('Pedido actualizado a aprobado:', pedidoPendiente.firebaseKey))
           .catch(e => console.warn('No se pudo actualizar pedido:', e));
         notificarPedidoPorMail({...pedidoPendiente, estado:'aprobado', payment_id: pedidoId});
-        // Guardar cliente
-        if (window._datosBuyer) guardarCliente(window._datosBuyer);
+        // Guardar cliente — reconstruir desde pedidoPendiente (sobrevive a la recarga)
+        const _dcP = window._datosBuyer || {
+          nombre: pedidoPendiente.nombre,
+          tel: pedidoPendiente.telefono,
+          email: pedidoPendiente.email,
+          cp: pedidoPendiente.cpDestino,
+          tipo: pedidoPendiente.tipoEnvio
+        };
+        console.log('Guardando cliente (rama if):', _dcP.nombre, _dcP.tel);
+        if (_dcP && _dcP.nombre && _dcP.nombre !== 'Cliente') guardarCliente(_dcP, pedidoPendiente.items, pedidoPendiente.total);
         // Bajar stock via backend
         fetch(BACKEND + '/bajar-stock', {
           method: 'POST',
@@ -2014,8 +2022,16 @@ loadVisitasAdmin();
         }).then(r => r.json()).then(d => console.log('Pedido guardado via backend:', d.key))
           .catch(e => console.warn('Error guardando pedido:', e));
         notificarPedidoPorMail(pedidoNuevo);
-  // Guardar cliente
-  if (window._datosBuyer) guardarCliente(window._datosBuyer);
+  // Guardar cliente — usar los datos del propio pedido
+  const _dcN = window._datosBuyer || {
+    nombre: pedidoNuevo.nombre,
+    tel: pedidoNuevo.telefono,
+    email: pedidoNuevo.email,
+    cp: pedidoNuevo.cpDestino,
+    tipo: pedidoNuevo.tipoEnvio
+  };
+  console.log('Guardando cliente (rama else):', _dcN.nombre, _dcN.tel);
+  if (_dcN && _dcN.nombre && _dcN.nombre !== 'Cliente') guardarCliente(_dcN, pedidoNuevo.items, pedidoNuevo.total);
         // Bajar stock via backend
         fetch(BACKEND + '/bajar-stock', {
           method: 'POST',
@@ -3996,7 +4012,7 @@ window.simularCompraPrueba = async function() {
   }
 };
 
-async function guardarCliente(datos) {
+async function guardarCliente(datos, items, totalCompra) {
   if (!datos || !datos.nombre) return;
   try {
     // Use tel or email as unique key
@@ -4005,6 +4021,19 @@ async function guardarCliente(datos) {
     const ref = db.ref('clientes/' + uid);
     const snap = await ref.get();
     const existing = snap.val() || {};
+    // Historial de compras
+    let historial = Array.isArray(existing.historial) ? existing.historial : [];
+    if (items && items.length) {
+      const resumen = items.map(i => {
+        const talla = i.talla && i.talla !== '—' ? ' (T.' + i.talla + ')' : '';
+        const colorVal = i.color && typeof i.color === 'object' ? (i.color.nombre || i.color.hex || '') : (i.color || '');
+        const color = colorVal ? ' · ' + colorVal : '';
+        const qty = (i.qty && i.qty > 1) ? ' x' + i.qty : '';
+        return (i.title || i.name || 'Producto') + talla + color + qty;
+      });
+      historial.push({ fecha: Date.now(), productos: resumen, total: totalCompra || null });
+      if (historial.length > 30) historial = historial.slice(-30);
+    }
     await ref.set({
       nombre: datos.nombre,
       tel: datos.tel || existing.tel || null,
@@ -4012,11 +4041,13 @@ async function guardarCliente(datos) {
       cp: datos.cp || existing.cp || null,
       ultimaCompra: Date.now(),
       cantidadCompras: (existing.cantidadCompras || 0) + 1,
-      primeraCompra: existing.primeraCompra || Date.now()
+      primeraCompra: existing.primeraCompra || Date.now(),
+      historial: historial
     });
-    console.log('Cliente guardado:', datos.nombre);
+    console.log('Cliente guardado OK:', datos.nombre, '| uid:', uid);
   } catch(e) {
     console.warn('Error guardando cliente:', e.message);
+    alert('Error guardando cliente: ' + e.message);
   }
 }
 
