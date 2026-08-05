@@ -3959,6 +3959,43 @@ window.testEmail = async function() {
 };
 
 // ── GUARDAR CLIENTE ─────────────────────────────────────────────────────────
+window.simularCompraPrueba = async function() {
+  const ts = Date.now();
+  const datosPrueba = {
+    nombre: 'Cliente Prueba ' + new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'}),
+    tel: '+54911' + String(ts).slice(-8),
+    email: 'prueba' + String(ts).slice(-5) + '@ejemplo.com',
+    cp: '1712',
+    tipo: 'sucursal'
+  };
+  try {
+    // 1) Guardar cliente (misma función que usa una compra real)
+    await guardarCliente(datosPrueba);
+    // 2) Guardar un pedido de ejemplo en Firebase
+    const pedidoPrueba = {
+      payment_id: 'test-' + ts,
+      ts: ts,
+      estado: 'aprobado',
+      nombre: datosPrueba.nombre,
+      telefono: datosPrueba.tel,
+      email: datosPrueba.email,
+      cpDestino: datosPrueba.cp,
+      tipoEnvio: datosPrueba.tipo,
+      observaciones: 'Pedido de prueba (simulado)',
+      items: [{ title: 'Producto de prueba', talla: 'M', color: 'Rosa', name: 'Producto de prueba', qty: 1, price: 9999 }],
+      total: 9999,
+      envio: 'Correo - Sucursal (prueba)'
+    };
+    await db.ref('pedidos').push(pedidoPrueba);
+    showToast('✓ Compra de prueba creada — revisá abajo');
+    // Refrescar la lista de clientes
+    window._clientesCache = [];
+    if (typeof renderClientes === 'function') renderClientes(true);
+  } catch(e) {
+    showToast('Error en la simulación: ' + e.message, 'error');
+  }
+};
+
 async function guardarCliente(datos) {
   if (!datos || !datos.nombre) return;
   try {
@@ -6237,7 +6274,10 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
   <div id="admin-tab-clientes" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
       <div class="admin-title" style="margin-bottom:0">👥 Clientes</div>
-      <button onclick="exportarClientes()" style="padding:8px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">↓ Exportar CSV</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="simularCompraPrueba()" style="padding:8px 16px;border:1px solid #3B6D11;border-radius:var(--radius-sm);background:#EAF3DE;font-family:DM Sans,sans-serif;font-size:13px;color:#3B6D11;cursor:pointer">🧪 Simular compra de prueba</button>
+        <button onclick="exportarClientes()" style="padding:8px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer">↓ Exportar CSV</button>
+      </div>
     </div>
     <div style="margin-bottom:1rem">
       <input type="text" id="buscador-clientes" placeholder="Buscar por nombre, teléfono o email..." oninput="renderClientes()" style="width:100%;box-sizing:border-box;padding:9px 14px;border:1px solid var(--border-strong);border-radius:999px;background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:14px;color:var(--ink);outline:none">
