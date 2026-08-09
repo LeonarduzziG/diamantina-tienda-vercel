@@ -2479,6 +2479,15 @@ let catalogPage = 1;
 const PAGE_SIZE = 12;
 window.resetCatalogPage = function() { catalogPage = 1; };
 
+const _CAT_KEYWORDS = {
+  'Colaless': 'colaless, less, bombacha, tanga, bombis, ropa interior, calza, culotte',
+  'Conjuntos': 'conjunto, set, lencería, ropa interior, juego',
+  'Tops': 'top, corpiño, sujetador, bralette, corset, bustier, sostén',
+  'Bodys': 'body, enterito, bodysuit, malla, mono, catsuit',
+  'Babydoll': 'babydoll, camisón, vestido, negligé, lencería sexy, pijama',
+  'Bikinis': 'bikini, malla, traje de baño, bañador, trikini, verano'
+};
+
 window.renderCatalog = function() {
   catalogPage = 1;
   const sort = document.getElementById('sort-select').value;
@@ -2782,6 +2791,7 @@ window.carouselMove = function(dir) {
 
 window.updateCarousel = function() {
   const img = document.getElementById('pm-img');
+  if (!img) return;
   img.style.opacity = '0';
   setTimeout(() => {
     img.src = carouselImgs[carouselIdx];
@@ -3525,15 +3535,6 @@ window.setPrincipal = i => {
 window.removeImg = i => {
   adminImgs.splice(i, 1);
   renderAdminThumbs();
-};
-
-const _CAT_KEYWORDS = {
-  'Colaless': 'colaless, less, bombacha, tanga, bombis, ropa interior, calza, culotte',
-  'Conjuntos': 'conjunto, set, lencería, ropa interior, juego',
-  'Tops': 'top, corpiño, sujetador, bralette, corset, bustier, sostén',
-  'Bodys': 'body, enterito, bodysuit, malla, mono, catsuit',
-  'Babydoll': 'babydoll, camisón, vestido, negligé, lencería sexy, pijama',
-  'Bikinis': 'bikini, malla, traje de baño, bañador, trikini, verano'
 };
 
 window.precargarKeywords = function(cat) {
