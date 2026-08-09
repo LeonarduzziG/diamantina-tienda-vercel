@@ -2427,7 +2427,7 @@ db.ref('productos').on('value', (snap) => {
   setTimeout(function() {
     iniciarAutoScroll('ofertas-grid', 2);
     iniciarAutoScroll('combos-grid', 3);
-    iniciarAutoScroll('nuevos-grid', 4);
+    iniciarScrollFluido('nuevos-grid', 0.5); // movimiento continuo y fluido
   }, 1200);
 }, (err) => {
   console.error('Firebase error:', err);
@@ -2706,6 +2706,38 @@ function iniciarAutoScroll(gridId, segundos) {
 }
 function detenerAutoScroll(gridId) {
   if (_autoScrollTimers[gridId]) { clearInterval(_autoScrollTimers[gridId]); _autoScrollTimers[gridId] = null; }
+}
+
+// Scroll fluido continuo (para Nuevos lanzamientos): se mueve constante y se pausa al interactuar
+const _fluidoState = {};
+function iniciarScrollFluido(gridId, velocidad) {
+  const el = document.getElementById(gridId);
+  if (!el) return;
+  if (el.scrollWidth <= el.clientWidth + 10) return; // no hay para scrollear
+  // Cancelar animación previa
+  if (_fluidoState[gridId] && _fluidoState[gridId].raf) cancelAnimationFrame(_fluidoState[gridId].raf);
+  _fluidoState[gridId] = { vel: velocidad || 0.5, raf: null };
+  const paso = function() {
+    const g = document.getElementById(gridId);
+    if (!g) return;
+    // Si el usuario está interactuando (pausa activa), no mover pero seguir el loop
+    if (!(_autoScrollPause[gridId] && Date.now() < _autoScrollPause[gridId])) {
+      if (g.scrollLeft + g.clientWidth >= g.scrollWidth - 1) {
+        g.scrollLeft = 0; // volver al principio
+      } else {
+        g.scrollLeft += _fluidoState[gridId].vel;
+      }
+    }
+    _fluidoState[gridId].raf = requestAnimationFrame(paso);
+  };
+  _fluidoState[gridId].raf = requestAnimationFrame(paso);
+  // Pausar mientras el usuario toca o scrollea manualmente
+  if (!el.dataset.autoBound) {
+    el.dataset.autoBound = '1';
+    ['touchstart','pointerdown','wheel'].forEach(ev =>
+      el.addEventListener(ev, () => pausarAutoScroll(gridId), { passive: true })
+    );
+  }
 }
 function pausarAutoScroll(gridId) {
   // Pausa el auto-scroll por 5 segundos tras una interacción manual
