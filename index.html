@@ -2427,7 +2427,7 @@ db.ref('productos').on('value', (snap) => {
   setTimeout(function() {
     iniciarAutoScroll('ofertas-grid', 2);
     iniciarAutoScroll('combos-grid', 3);
-    iniciarAutoScroll('nuevos-grid', 1);
+    iniciarAutoScroll('nuevos-grid', 2.5);
   }, 1200);
 }, (err) => {
   console.error('Firebase error:', err);
