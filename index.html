@@ -2427,10 +2427,8 @@ db.ref('productos').on('value', (snap) => {
   setTimeout(function() {
     iniciarAutoScroll('ofertas-grid', 2);
     iniciarAutoScroll('combos-grid', 3);
-    iniciarScrollFluido('nuevos-grid', 0.5); // movimiento continuo y fluido
+    iniciarAutoScroll('nuevos-grid', 1);
   }, 1200);
-  // Reintento por si el contenido tardó en cargar
-  setTimeout(function() { iniciarScrollFluido('nuevos-grid', 0.5); }, 3500);
 }, (err) => {
   console.error('Firebase error:', err);
   // Show error in catalog
