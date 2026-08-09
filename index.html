@@ -2479,16 +2479,6 @@ let catalogPage = 1;
 const PAGE_SIZE = 12;
 window.resetCatalogPage = function() { catalogPage = 1; };
 
-let _favs = [];
-const _CAT_KEYWORDS = {
-  'Colaless': 'colaless, less, bombacha, tanga, bombis, ropa interior, calza, culotte',
-  'Conjuntos': 'conjunto, set, lencería, ropa interior, juego',
-  'Tops': 'top, corpiño, sujetador, bralette, corset, bustier, sostén',
-  'Bodys': 'body, enterito, bodysuit, malla, mono, catsuit',
-  'Babydoll': 'babydoll, camisón, vestido, negligé, lencería sexy, pijama',
-  'Bikinis': 'bikini, malla, traje de baño, bañador, trikini, verano'
-};
-
 window.renderCatalog = function() {
   catalogPage = 1;
   const sort = document.getElementById('sort-select').value;
@@ -2805,35 +2795,6 @@ window.updateCarousel = function() {
   if (dots) dots.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i === carouselIdx));
 }
 
-// Swipe táctil para el carrusel de imágenes del producto (mobile)
-(function() {
-  let startX = 0, startY = 0, swiping = false;
-  document.addEventListener('DOMContentLoaded', function() {
-    const carousel = document.getElementById('pm-carousel');
-    if (!carousel) return;
-    carousel.addEventListener('touchstart', function(e) {
-      if (!e.touches || e.touches.length !== 1) return;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      swiping = true;
-    }, { passive: true });
-    carousel.addEventListener('touchend', function(e) {
-      if (!swiping) return;
-      swiping = false;
-      const endX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : startX;
-      const endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : startY;
-      const dx = endX - startX;
-      const dy = endY - startY;
-      // Solo si el gesto es más horizontal que vertical y supera un umbral
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-        if (typeof carouselImgs !== 'undefined' && carouselImgs.length > 1) {
-          carouselMove(dx < 0 ? 1 : -1);
-        }
-      }
-    }, { passive: true });
-  });
-})();
-
 window.openProdModal = function(id) {
   const p = products.find(x => x.id === id) || (window._allProducts && window._allProducts[id] ? Object.assign({id}, window._allProducts[id]) : null);
   if (!p) return;
@@ -3019,6 +2980,29 @@ window.openProdModal = function(id) {
   }
 
   document.getElementById('prod-modal-bg').classList.add('open');
+
+  // Swipe táctil para las imágenes del producto (se engancha una sola vez)
+  const _carousel = document.getElementById('pm-carousel');
+  if (_carousel && !_carousel.dataset.swipeBound) {
+    _carousel.dataset.swipeBound = '1';
+    let _sx = 0, _sy = 0, _sw = false;
+    _carousel.addEventListener('touchstart', function(e) {
+      if (!e.touches || e.touches.length !== 1) return;
+      _sx = e.touches[0].clientX; _sy = e.touches[0].clientY; _sw = true;
+    }, { passive: true });
+    _carousel.addEventListener('touchend', function(e) {
+      if (!_sw) return;
+      _sw = false;
+      const t = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : null;
+      if (!t) return;
+      const dx = t.clientX - _sx, dy = t.clientY - _sy;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        if (typeof carouselImgs !== 'undefined' && carouselImgs.length > 1) {
+          carouselMove(dx < 0 ? 1 : -1);
+        }
+      }
+    }, { passive: true });
+  }
 };
 
 window.renderTallasConStock = function(p) {
@@ -3536,6 +3520,15 @@ window.setPrincipal = i => {
 window.removeImg = i => {
   adminImgs.splice(i, 1);
   renderAdminThumbs();
+};
+
+const _CAT_KEYWORDS = {
+  'Colaless': 'colaless, less, bombacha, tanga, bombis, ropa interior, calza, culotte',
+  'Conjuntos': 'conjunto, set, lencería, ropa interior, juego',
+  'Tops': 'top, corpiño, sujetador, bralette, corset, bustier, sostén',
+  'Bodys': 'body, enterito, bodysuit, malla, mono, catsuit',
+  'Babydoll': 'babydoll, camisón, vestido, negligé, lencería sexy, pijama',
+  'Bikinis': 'bikini, malla, traje de baño, bañador, trikini, verano'
 };
 
 window.precargarKeywords = function(cat) {
@@ -4643,6 +4636,7 @@ function getFavSessionKey() {
   return k;
 }
 
+let _favs = [];
 function getFavs() { return _favs; }
 function isFav(id) { return _favs.includes(id); }
 
