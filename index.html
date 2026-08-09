@@ -2429,6 +2429,8 @@ db.ref('productos').on('value', (snap) => {
     iniciarAutoScroll('combos-grid', 3);
     iniciarScrollFluido('nuevos-grid', 0.5); // movimiento continuo y fluido
   }, 1200);
+  // Reintento por si el contenido tardó en cargar
+  setTimeout(function() { iniciarScrollFluido('nuevos-grid', 0.5); }, 3500);
 }, (err) => {
   console.error('Firebase error:', err);
   // Show error in catalog
@@ -2713,15 +2715,16 @@ const _fluidoState = {};
 function iniciarScrollFluido(gridId, velocidad) {
   const el = document.getElementById(gridId);
   if (!el) return;
-  if (el.scrollWidth <= el.clientWidth + 10) return; // no hay para scrollear
   // Cancelar animación previa
   if (_fluidoState[gridId] && _fluidoState[gridId].raf) cancelAnimationFrame(_fluidoState[gridId].raf);
   _fluidoState[gridId] = { vel: velocidad || 0.5, raf: null };
   const paso = function() {
     const g = document.getElementById(gridId);
     if (!g) return;
-    // Si el usuario está interactuando (pausa activa), no mover pero seguir el loop
-    if (!(_autoScrollPause[gridId] && Date.now() < _autoScrollPause[gridId])) {
+    // Solo mover si hay contenido para scrollear y no está en pausa por interacción
+    const hayScroll = g.scrollWidth > g.clientWidth + 5;
+    const enPausa = _autoScrollPause[gridId] && Date.now() < _autoScrollPause[gridId];
+    if (hayScroll && !enPausa) {
       if (g.scrollLeft + g.clientWidth >= g.scrollWidth - 1) {
         g.scrollLeft = 0; // volver al principio
       } else {
