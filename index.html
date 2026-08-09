@@ -2479,6 +2479,7 @@ let catalogPage = 1;
 const PAGE_SIZE = 12;
 window.resetCatalogPage = function() { catalogPage = 1; };
 
+let _favs = [];
 const _CAT_KEYWORDS = {
   'Colaless': 'colaless, less, bombacha, tanga, bombis, ropa interior, calza, culotte',
   'Conjuntos': 'conjunto, set, lencería, ropa interior, juego',
@@ -4642,7 +4643,6 @@ function getFavSessionKey() {
   return k;
 }
 
-let _favs = [];
 function getFavs() { return _favs; }
 function isFav(id) { return _favs.includes(id); }
 
