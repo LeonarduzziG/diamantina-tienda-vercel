@@ -2423,6 +2423,12 @@ db.ref('productos').on('value', (snap) => {
   renderQuickSearchChips();
   renderAdminList();
   if (window._resenasDestacadasCache) renderResenasDestacadas(window._resenasDestacadasCache);
+  // Iniciar auto-scroll de carruseles (cada uno a su ritmo)
+  setTimeout(function() {
+    iniciarAutoScroll('ofertas-grid', 2);
+    iniciarAutoScroll('combos-grid', 3);
+    iniciarAutoScroll('nuevos-grid', 4);
+  }, 1200);
 }, (err) => {
   console.error('Firebase error:', err);
   // Show error in catalog
@@ -2667,7 +2673,44 @@ function renderPage(list, el, reset) {
 window.combosScroll = function(dir) {
   const el = document.getElementById('combos-grid');
   if(el) el.scrollBy({left: dir*220, behavior:'smooth'});
+  pausarAutoScroll('combos-grid');
 };
+
+// ── AUTO-SCROLL de carruseles de la home ──
+const _autoScrollTimers = {};
+const _autoScrollPause = {};
+function iniciarAutoScroll(gridId, segundos) {
+  detenerAutoScroll(gridId);
+  const el = document.getElementById(gridId);
+  if (!el) return;
+  // Solo si hay suficiente contenido para scrollear
+  if (el.scrollWidth <= el.clientWidth + 10) return;
+  _autoScrollTimers[gridId] = setInterval(function() {
+    const g = document.getElementById(gridId);
+    if (!g) { detenerAutoScroll(gridId); return; }
+    if (_autoScrollPause[gridId] && Date.now() < _autoScrollPause[gridId]) return; // pausado por interacción
+    // Si llegó (casi) al final, volver al principio
+    if (g.scrollLeft + g.clientWidth >= g.scrollWidth - 10) {
+      g.scrollTo({ left: 0, behavior: 'smooth' });
+    } else {
+      g.scrollBy({ left: 220, behavior: 'smooth' });
+    }
+  }, segundos * 1000);
+  // Pausar mientras el usuario toca o scrollea manualmente
+  if (!el.dataset.autoBound) {
+    el.dataset.autoBound = '1';
+    ['touchstart','pointerdown','wheel'].forEach(ev =>
+      el.addEventListener(ev, () => pausarAutoScroll(gridId), { passive: true })
+    );
+  }
+}
+function detenerAutoScroll(gridId) {
+  if (_autoScrollTimers[gridId]) { clearInterval(_autoScrollTimers[gridId]); _autoScrollTimers[gridId] = null; }
+}
+function pausarAutoScroll(gridId) {
+  // Pausa el auto-scroll por 5 segundos tras una interacción manual
+  _autoScrollPause[gridId] = Date.now() + 5000;
+}
 
 window.renderCombos = function() {
   const el = document.getElementById('combos-grid');
@@ -2697,6 +2740,7 @@ window.renderCombos = function() {
 window.nuevosScroll = function(dir) {
   const el = document.getElementById('nuevos-grid');
   if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
+  pausarAutoScroll('nuevos-grid');
 };
 
 window.renderNuevos = function() {
@@ -2727,6 +2771,7 @@ window.renderNuevos = function() {
 window.ofertasScroll = function(dir) {
   const el = document.getElementById('ofertas-grid');
   if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
+  pausarAutoScroll('ofertas-grid');
 };
 window.renderOfertas = function() {
   const ofertasList = shuffleDiario(products.filter(p => p.descuento > 0 && p.estado !== 'agotado' && (!searchQuery || p.name.toLowerCase().includes(searchQuery) || p.cat.toLowerCase().includes(searchQuery) || ((p.keywords||'')+','+(_CAT_KEYWORDS[p.cat]||'')).toLowerCase().includes(searchQuery))));
