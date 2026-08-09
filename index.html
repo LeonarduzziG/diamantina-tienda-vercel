@@ -2775,9 +2775,28 @@ window.renderOfertas = function() {
 let carouselImgs = [];
 let carouselIdx = 0;
 
+let _carouselAutoTimer = null;
+function iniciarCarouselAuto() {
+  detenerCarouselAuto();
+  if (typeof carouselImgs === 'undefined' || carouselImgs.length <= 1) return;
+  _carouselAutoTimer = setInterval(function() {
+    if (typeof carouselImgs === 'undefined' || carouselImgs.length <= 1) { detenerCarouselAuto(); return; }
+    carouselIdx = (carouselIdx + 1) % carouselImgs.length;
+    updateCarousel();
+  }, 2000);
+}
+function detenerCarouselAuto() {
+  if (_carouselAutoTimer) { clearInterval(_carouselAutoTimer); _carouselAutoTimer = null; }
+}
+function reiniciarCarouselAuto() {
+  // Al navegar manualmente, reiniciar el temporizador para no saltar enseguida
+  if (_carouselAutoTimer) iniciarCarouselAuto();
+}
+
 window.carouselMove = function(dir) {
   carouselIdx = (carouselIdx + dir + carouselImgs.length) % carouselImgs.length;
   updateCarousel();
+  reiniciarCarouselAuto();
 };
 
 window.updateCarousel = function() {
@@ -2981,6 +3000,9 @@ window.openProdModal = function(id) {
 
   document.getElementById('prod-modal-bg').classList.add('open');
 
+  // Iniciar pase automático de imágenes cada 2 segundos
+  iniciarCarouselAuto();
+
   // Swipe táctil para las imágenes del producto (se engancha una sola vez)
   const _carousel = document.getElementById('pm-carousel');
   if (_carousel && !_carousel.dataset.swipeBound) {
@@ -3122,6 +3144,7 @@ window.compartirProducto = async function() {
 
 window.closeProdModal = function(fromPopstate) {
   document.getElementById('prod-modal-bg').classList.remove('open');
+  detenerCarouselAuto();
   currentProd = null; selectedTalla = null;
   document.querySelector('meta[property="og:title"]').setAttribute('content', 'Diamantina Lencería | Lencería de Diseño en Argentina');
   document.querySelector('meta[property="og:description"]').setAttribute('content', 'Tienda online de lencería fina en Argentina. Conjuntos, tops, bodys, babydoll y más. Envío a todo el país.');
