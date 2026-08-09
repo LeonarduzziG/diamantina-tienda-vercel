@@ -187,6 +187,16 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
 .skel-line.short{width:60%}
 @keyframes skel-shimmer{to{background-position-x:-200%}}
 .ofertas-carousel-wrap{position:relative}
+.ofertas-carousel-wrap::before,.ofertas-carousel-wrap::after,.resenas-carousel-wrap::before,.resenas-carousel-wrap::after{content:'';position:absolute;top:0;bottom:12px;width:28px;z-index:5;pointer-events:none;opacity:0;transition:opacity .2s}
+.ofertas-carousel-wrap::before,.resenas-carousel-wrap::before{left:0;background:linear-gradient(to right,#fff,transparent)}
+.ofertas-carousel-wrap::after,.resenas-carousel-wrap::after{right:0;background:linear-gradient(to left,#fff,transparent)}
+.nuevos-section .ofertas-carousel-wrap::before{background:linear-gradient(to right,#1a0a12,transparent)}
+.nuevos-section .ofertas-carousel-wrap::after{background:linear-gradient(to left,#1a0a12,transparent)}
+.carousel-dots{display:none;justify-content:center;gap:6px;margin-top:6px}
+.carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,0.15);border:none;padding:0;cursor:pointer;transition:background .2s,width .2s}
+.carousel-dot.active{background:var(--rose);width:16px;border-radius:3px}
+.nuevos-section .carousel-dot{background:rgba(255,255,255,0.3)}
+.nuevos-section .carousel-dot.active{background:#fff}
 .resenas-section{scroll-margin-top:120px;padding:0 2rem 1.5rem;background:#FFF9F5;border-bottom:1px solid rgba(201,79,124,0.12)}
 .resenas-carousel-wrap{position:relative}
 .resenas-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -233,8 +243,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
 .nuevos-section .prod-price-original{color:rgba(255,255,255,0.3) !important}
 .nuevos-section .prod-img{filter:brightness(0.92)}
 .nuevos-section .prod-card:hover .prod-img{filter:brightness(1)}
-.nuevos-section .ofertas-carousel-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff}
-.nuevos-section .ofertas-carousel-btn:hover{background:rgba(201,79,124,0.3)}
+.nuevos-section .ofertas-carousel-btn{background:#fff;border:1px solid rgba(0,0,0,0.06);color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,0.45)}
+.nuevos-section .ofertas-carousel-btn:hover{background:#fff}
 .ofertas-carousel-btn{display:none;position:absolute;top:50%;transform:translateY(-50%);z-index:10;background:#fff;border:1px solid var(--border);border-radius:50%;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:16px;color:var(--ink)}
 @media(max-width:768px){
   .ofertas-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -246,6 +256,9 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
   #nuevos-grid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,1fr);overflow-x:auto;overflow-y:hidden;gap:10px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-wrap:initial}
   #nuevos-grid::-webkit-scrollbar{display:none}
   #nuevos-grid .prod-card{min-width:140px;max-width:140px;scroll-snap-align:start;flex-shrink:0}
+  .carousel-dots{display:flex}
+  .ofertas-carousel-wrap.has-fade-left::before,.resenas-carousel-wrap.has-fade-left::before{opacity:1}
+  .ofertas-carousel-wrap.has-fade-right::after,.resenas-carousel-wrap.has-fade-right::after{opacity:1}
 }
 .color-dot{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all var(--tr);flex-shrink:0}
 .color-dot:hover{transform:scale(1.15)}
@@ -866,6 +879,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
       <div class="ofertas-grid" id="ofertas-grid"><div class="skel-card"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div></div><div class="skel-card"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div></div><div class="skel-card"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div></div><div class="skel-card"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div></div></div>
       <button class="ofertas-carousel-btn right" onclick="ofertasScroll(1)" aria-label="Siguiente">›</button>
     </div>
+    <div class="carousel-dots" data-for="ofertas-grid"></div>
   </div>
 
   <!-- RESEÑAS DESTACADAS -->
@@ -879,6 +893,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
       <div class="resenas-grid" id="resenas-grid"></div>
       <button class="resenas-carousel-btn right" onclick="resenasScroll(1)" aria-label="Siguiente">›</button>
     </div>
+    <div class="carousel-dots" data-for="resenas-grid"></div>
   </div>
 
   <!-- NUEVOS LANZAMIENTOS -->
@@ -916,6 +931,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
         <div class="ofertas-grid" id="nuevos-grid"></div>
         <button class="ofertas-carousel-btn right" onclick="nuevosScroll(1)" aria-label="Siguiente">›</button>
       </div>
+      <div class="carousel-dots" data-for="nuevos-grid"></div>
     </div>
   </div>
 
@@ -934,6 +950,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
         <div class="ofertas-grid" id="combos-grid"></div>
         <button class="ofertas-carousel-btn right" onclick="combosScroll(1)" aria-label="Siguiente">›</button>
       </div>
+      <div class="carousel-dots" data-for="combos-grid"></div>
     </div>
   </div>
 
@@ -2745,6 +2762,40 @@ function pausarAutoScroll(gridId) {
   _autoScrollPause[gridId] = Date.now() + 5000;
 }
 
+// ── DOTS Y FADES DE CARRUSEL ──
+function setupCarouselDots(gridId) {
+  const grid = document.getElementById(gridId);
+  const dots = document.querySelector('.carousel-dots[data-for="' + gridId + '"]');
+  if (!grid) return;
+  const wrap = grid.closest('.ofertas-carousel-wrap, .resenas-carousel-wrap');
+  function update() {
+    if (dots) {
+      const pageWidth = grid.clientWidth || 1;
+      const pages = Math.max(1, Math.round(grid.scrollWidth / pageWidth));
+      if (dots.childElementCount !== pages) {
+        dots.innerHTML = Array.from({ length: pages }).map((_, i) =>
+          '<button class="carousel-dot" aria-label="Ir a la página ' + (i + 1) + '"></button>'
+        ).join('');
+        Array.from(dots.children).forEach((d, i) => {
+          d.addEventListener('click', () => grid.scrollTo({ left: i * pageWidth, behavior: 'smooth' }));
+        });
+      }
+      const activePage = Math.round(grid.scrollLeft / pageWidth);
+      Array.from(dots.children).forEach((d, i) => d.classList.toggle('active', i === activePage));
+    }
+    if (wrap) {
+      wrap.classList.toggle('has-fade-left', grid.scrollLeft > 8);
+      wrap.classList.toggle('has-fade-right', grid.scrollLeft < grid.scrollWidth - grid.clientWidth - 8);
+    }
+  }
+  update();
+  if (!grid._dotsWired) {
+    grid._dotsWired = true;
+    grid.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
+    window.addEventListener('resize', update);
+  }
+}
+
 window.renderCombos = function() {
   const el = document.getElementById('combos-grid');
   const section = document.getElementById('combos-section');
@@ -2768,6 +2819,7 @@ window.renderCombos = function() {
   el.querySelectorAll('.prod-card').forEach(card => {
     card.addEventListener('click', () => openProdModal(card.dataset.prodId));
   });
+  setupCarouselDots('combos-grid');
 };
 
 window.nuevosScroll = function(dir) {
@@ -2799,6 +2851,7 @@ window.renderNuevos = function() {
   el.querySelectorAll('.prod-card').forEach(card => {
     card.addEventListener('click', () => openProdModal(card.dataset.prodId));
   });
+  setupCarouselDots('nuevos-grid');
 };
 
 window.ofertasScroll = function(dir) {
@@ -2847,6 +2900,7 @@ window.renderOfertas = function() {
   el.querySelectorAll('.prod-card').forEach(card => {
     card.addEventListener('click', () => openProdModal(card.dataset.prodId));
   });
+  setupCarouselDots('ofertas-grid');
 };
 
 // ── PRODUCT MODAL ──
@@ -4912,6 +4966,7 @@ function renderResenasDestacadas(lista) {
       </div>
     </div>`;
   }).join('');
+  setupCarouselDots('resenas-grid');
 }
 
 
