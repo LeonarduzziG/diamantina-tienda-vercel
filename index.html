@@ -2911,9 +2911,8 @@ let carouselIdx = 0;
 let _carouselTopLayer = 'pm-img';
 
 const CAROUSEL_AUTO_INTERVAL = 2500;
-const CAROUSEL_RESUME_DELAY = 5000;
 let _carouselAutoTimer = null;
-function iniciarCarouselAuto(primerDelay) {
+function iniciarCarouselAuto() {
   detenerCarouselAuto();
   if (typeof carouselImgs === 'undefined' || carouselImgs.length <= 1) return;
   const avanzar = () => {
@@ -2922,20 +2921,16 @@ function iniciarCarouselAuto(primerDelay) {
     updateCarousel();
     _carouselAutoTimer = setTimeout(avanzar, CAROUSEL_AUTO_INTERVAL);
   };
-  _carouselAutoTimer = setTimeout(avanzar, primerDelay != null ? primerDelay : CAROUSEL_AUTO_INTERVAL);
+  _carouselAutoTimer = setTimeout(avanzar, CAROUSEL_AUTO_INTERVAL);
 }
 function detenerCarouselAuto() {
   if (_carouselAutoTimer) { clearTimeout(_carouselAutoTimer); _carouselAutoTimer = null; }
-}
-function reiniciarCarouselAuto() {
-  // Al navegar manualmente, dejar la imagen elegida 5s antes de retomar el pase automático
-  if (_carouselAutoTimer !== null) iniciarCarouselAuto(CAROUSEL_RESUME_DELAY);
 }
 
 window.carouselMove = function(dir) {
   carouselIdx = (carouselIdx + dir + carouselImgs.length) % carouselImgs.length;
   updateCarousel();
-  reiniciarCarouselAuto();
+  detenerCarouselAuto();
 };
 
 window.updateCarousel = function() {
@@ -3029,7 +3024,7 @@ window.openProdModal = function(id) {
   document.getElementById('pm-next').style.display = showNav ? 'flex' : 'none';
   const dotsEl = document.getElementById('pm-dots');
   dotsEl.innerHTML = showNav ? carouselImgs.map((_,i) =>
-    `<div class="carousel-dot${i===0?' active':''}" onclick="carouselIdx=${i};updateCarousel();reiniciarCarouselAuto()"></div>`
+    `<div class="carousel-dot${i===0?' active':''}" onclick="carouselIdx=${i};updateCarousel();detenerCarouselAuto()"></div>`
   ).join('') : '';
 
   document.getElementById('pm-cat').textContent = p.cat;
