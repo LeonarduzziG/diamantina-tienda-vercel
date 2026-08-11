@@ -307,9 +307,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
 .prod-modal-img{width:320px;flex-shrink:0;height:100%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .prod-modal-img img{width:320px;max-height:600px;object-fit:contain;display:block}
 .carousel-wrap{position:relative;display:flex;align-items:center;justify-content:center}
-.carousel-img{width:320px;max-height:600px;object-fit:contain;display:block;transition:opacity 0.2s ease}
-.carousel-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(26,17,24,0.5);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;z-index:10;transition:background var(--tr);line-height:1}
-.carousel-btn:hover{background:rgba(26,17,24,0.8)}
+.carousel-img{width:320px;max-height:600px;object-fit:contain;display:block;transition:opacity 0.4s ease-in-out}
+.carousel-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(26,17,24,0.5);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;z-index:10;transition:background var(--tr);line-height:1;-webkit-tap-highlight-color:transparent;outline:none}
+@media (hover:hover){.carousel-btn:hover{background:rgba(26,17,24,0.8)}}
+.carousel-btn:active{background:rgba(26,17,24,0.85)}
 .carousel-btn.prev{left:8px}
 .carousel-btn.next{right:8px}
 .carousel-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10}
@@ -2907,22 +2908,26 @@ window.renderOfertas = function() {
 let carouselImgs = [];
 let carouselIdx = 0;
 
+const CAROUSEL_AUTO_INTERVAL = 2500;
+const CAROUSEL_RESUME_DELAY = 5000;
 let _carouselAutoTimer = null;
-function iniciarCarouselAuto() {
+function iniciarCarouselAuto(primerDelay) {
   detenerCarouselAuto();
   if (typeof carouselImgs === 'undefined' || carouselImgs.length <= 1) return;
-  _carouselAutoTimer = setInterval(function() {
+  const avanzar = () => {
     if (typeof carouselImgs === 'undefined' || carouselImgs.length <= 1) { detenerCarouselAuto(); return; }
     carouselIdx = (carouselIdx + 1) % carouselImgs.length;
     updateCarousel();
-  }, 2000);
+    _carouselAutoTimer = setTimeout(avanzar, CAROUSEL_AUTO_INTERVAL);
+  };
+  _carouselAutoTimer = setTimeout(avanzar, primerDelay != null ? primerDelay : CAROUSEL_AUTO_INTERVAL);
 }
 function detenerCarouselAuto() {
-  if (_carouselAutoTimer) { clearInterval(_carouselAutoTimer); _carouselAutoTimer = null; }
+  if (_carouselAutoTimer) { clearTimeout(_carouselAutoTimer); _carouselAutoTimer = null; }
 }
 function reiniciarCarouselAuto() {
-  // Al navegar manualmente, reiniciar el temporizador para no saltar enseguida
-  if (_carouselAutoTimer) iniciarCarouselAuto();
+  // Al navegar manualmente, dejar la imagen elegida 5s antes de retomar el pase automático
+  if (_carouselAutoTimer !== null) iniciarCarouselAuto(CAROUSEL_RESUME_DELAY);
 }
 
 window.carouselMove = function(dir) {
@@ -2934,14 +2939,15 @@ window.carouselMove = function(dir) {
 window.updateCarousel = function() {
   const img = document.getElementById('pm-img');
   if (!img) return;
+  const nextSrc = carouselImgs[carouselIdx];
+  const blurEl = document.getElementById('pm-img-blur');
   img.style.opacity = '0';
   setTimeout(() => {
-    img.src = carouselImgs[carouselIdx];
-    img.style.opacity = '0';
-    const blurEl = document.getElementById('pm-img-blur');
-    if (blurEl) { blurEl.style.backgroundImage = 'url(' + carouselImgs[carouselIdx] + ')'; blurEl.style.opacity = '1'; }
-    img.onload = () => { img.style.opacity = '1'; if (blurEl) blurEl.style.opacity = '0'; };
-  }, 150);
+    img.src = nextSrc;
+    if (blurEl) { blurEl.style.backgroundImage = 'url(' + nextSrc + ')'; blurEl.style.opacity = '1'; }
+    const mostrar = () => { img.style.opacity = '1'; if (blurEl) blurEl.style.opacity = '0'; };
+    if (img.complete) { requestAnimationFrame(mostrar); } else { img.onload = mostrar; }
+  }, 380);
   const dots = document.getElementById('pm-dots');
   if (dots) dots.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i === carouselIdx));
 }
@@ -3011,7 +3017,7 @@ window.openProdModal = function(id) {
   document.getElementById('pm-next').style.display = showNav ? 'flex' : 'none';
   const dotsEl = document.getElementById('pm-dots');
   dotsEl.innerHTML = showNav ? carouselImgs.map((_,i) =>
-    `<div class="carousel-dot${i===0?' active':''}" onclick="carouselIdx=${i};updateCarousel()"></div>`
+    `<div class="carousel-dot${i===0?' active':''}" onclick="carouselIdx=${i};updateCarousel();reiniciarCarouselAuto()"></div>`
   ).join('') : '';
 
   document.getElementById('pm-cat').textContent = p.cat;
@@ -6285,9 +6291,9 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
     <button onclick="closeProdModal()" aria-label="Volver" style="position:absolute;top:12px;left:12px;z-index:20;background:rgba(255,255,255,0.95);border:none;border-radius:999px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.15);font-size:20px;color:var(--ink)">‹</button>
     <div class="prod-modal-img">
       <div class="carousel-wrap" id="pm-carousel">
-        <img class="carousel-img active" id="pm-img" src="" alt="" style="transition:opacity 0.2s ease">
-        <button class="carousel-btn prev" id="pm-prev" onclick="carouselMove(-1)" style="display:none">&#8249;</button>
-        <button class="carousel-btn next" id="pm-next" onclick="carouselMove(1)" style="display:none">&#8250;</button>
+        <img class="carousel-img active" id="pm-img" src="" alt="" style="transition:opacity 0.4s ease-in-out">
+        <button class="carousel-btn prev" id="pm-prev" onclick="carouselMove(-1);this.blur()" style="display:none">&#8249;</button>
+        <button class="carousel-btn next" id="pm-next" onclick="carouselMove(1);this.blur()" style="display:none">&#8250;</button>
         <div class="carousel-dots" id="pm-dots"></div>
       </div>
     </div>
