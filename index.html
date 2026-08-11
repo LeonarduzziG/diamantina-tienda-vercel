@@ -307,7 +307,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
 .prod-modal-img{width:320px;flex-shrink:0;height:100%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .prod-modal-img img{width:320px;max-height:600px;object-fit:contain;display:block}
 .carousel-wrap{position:relative;display:flex;align-items:center;justify-content:center}
-.carousel-img{width:320px;max-height:600px;object-fit:contain;display:block;transition:opacity 0.4s ease-in-out}
+.carousel-img{width:320px;max-height:600px;object-fit:contain;display:block;transition:opacity 0.5s ease-in-out;will-change:opacity}
+.carousel-img.layer-top{position:absolute;inset:0;margin:auto;z-index:2}
 .carousel-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(26,17,24,0.5);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;z-index:10;transition:background var(--tr);line-height:1;-webkit-tap-highlight-color:transparent;outline:none}
 @media (hover:hover){.carousel-btn:hover{background:rgba(26,17,24,0.8)}}
 .carousel-btn:active{background:rgba(26,17,24,0.85)}
@@ -2907,6 +2908,7 @@ window.renderOfertas = function() {
 // ── PRODUCT MODAL ──
 let carouselImgs = [];
 let carouselIdx = 0;
+let _carouselTopLayer = 'pm-img';
 
 const CAROUSEL_AUTO_INTERVAL = 2500;
 const CAROUSEL_RESUME_DELAY = 5000;
@@ -2937,17 +2939,25 @@ window.carouselMove = function(dir) {
 };
 
 window.updateCarousel = function() {
-  const img = document.getElementById('pm-img');
-  if (!img) return;
   const nextSrc = carouselImgs[carouselIdx];
-  const blurEl = document.getElementById('pm-img-blur');
-  img.style.opacity = '0';
-  setTimeout(() => {
-    img.src = nextSrc;
-    if (blurEl) { blurEl.style.backgroundImage = 'url(' + nextSrc + ')'; blurEl.style.opacity = '1'; }
-    const mostrar = () => { img.style.opacity = '1'; if (blurEl) blurEl.style.opacity = '0'; };
-    if (img.complete) { requestAnimationFrame(mostrar); } else { img.onload = mostrar; }
-  }, 380);
+  const topId = _carouselTopLayer;
+  const botId = topId === 'pm-img' ? 'pm-img2' : 'pm-img';
+  const topEl = document.getElementById(topId);
+  const botEl = document.getElementById(botId);
+  if (!topEl || !botEl) return;
+  // botEl es la capa oculta: le cargamos la nueva imagen y la cruzamos con la visible
+  botEl.style.zIndex = '2';
+  topEl.style.zIndex = '1';
+  botEl.style.opacity = '0';
+  botEl.src = nextSrc;
+  const crossfade = () => {
+    requestAnimationFrame(() => {
+      botEl.style.opacity = '1';
+      topEl.style.opacity = '0';
+    });
+  };
+  if (botEl.complete && botEl.currentSrc) { crossfade(); } else { botEl.onload = crossfade; }
+  _carouselTopLayer = botId;
   const dots = document.getElementById('pm-dots');
   if (dots) dots.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i === carouselIdx));
 }
@@ -3006,12 +3016,14 @@ window.openProdModal = function(id) {
 
   // Setup carousel
   const pmImg = document.getElementById('pm-img');
-  const pmBlur = document.getElementById('pm-img-blur');
-  pmImg.style.opacity = '0';
+  const pmImg2 = document.getElementById('pm-img2');
+  _carouselTopLayer = 'pm-img';
+  pmImg.style.zIndex = '1';
+  pmImg.style.opacity = '1';
   pmImg.src = carouselImgs[0] || '';
-  if (pmBlur && carouselImgs[0]) { pmBlur.style.backgroundImage = 'url(' + carouselImgs[0] + ')'; pmBlur.style.opacity = '1'; }
-  pmImg.onload = () => { pmImg.style.opacity = '1'; if (pmBlur) pmBlur.style.opacity = '0'; };
-  document.getElementById('pm-img').style.opacity = '1';
+  pmImg2.style.zIndex = '2';
+  pmImg2.style.opacity = '0';
+  pmImg2.src = '';
   const showNav = carouselImgs.length > 1;
   document.getElementById('pm-prev').style.display = showNav ? 'flex' : 'none';
   document.getElementById('pm-next').style.display = showNav ? 'flex' : 'none';
@@ -6291,7 +6303,8 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
     <button onclick="closeProdModal()" aria-label="Volver" style="position:absolute;top:12px;left:12px;z-index:20;background:rgba(255,255,255,0.95);border:none;border-radius:999px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.15);font-size:20px;color:var(--ink)">‹</button>
     <div class="prod-modal-img">
       <div class="carousel-wrap" id="pm-carousel">
-        <img class="carousel-img active" id="pm-img" src="" alt="" style="transition:opacity 0.4s ease-in-out">
+        <img class="carousel-img" id="pm-img" src="" alt="" style="position:relative;z-index:1;opacity:1">
+        <img class="carousel-img layer-top" id="pm-img2" src="" alt="" style="opacity:0">
         <button class="carousel-btn prev" id="pm-prev" onclick="carouselMove(-1);this.blur()" style="display:none">&#8249;</button>
         <button class="carousel-btn next" id="pm-next" onclick="carouselMove(1);this.blur()" style="display:none">&#8250;</button>
         <div class="carousel-dots" id="pm-dots"></div>
