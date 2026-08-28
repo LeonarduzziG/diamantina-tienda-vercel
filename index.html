@@ -2208,8 +2208,10 @@ function applyApariencia(d) {
   if (d.heroBg) {
     const heroImg = document.getElementById('hero-v2-img');
     if (heroImg) heroImg.src = d.heroBg;
+    // El fondo del banner ahora es una imagen normal (<img>), no un background-image;
+    // nos aseguramos de limpiar cualquier fondo viejo que haya quedado seteado.
     const hero = document.querySelector('.hero');
-    if (hero) { hero.style.backgroundImage = 'url(' + d.heroBg + ')'; hero.style.backgroundSize = 'cover'; hero.style.backgroundPosition = 'center'; }
+    if (hero) hero.style.backgroundImage = 'none';
   }
   if (d.wa) window._waNumber = d.wa;
 }
