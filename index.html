@@ -775,21 +775,29 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
 <!-- TIENDA -->
 <div id="page-tienda">
   <!-- HERO V2 FULLSCREEN -->
-  <div class="hero-v2 hero banner-mode">
-    <!-- Banner de vacaciones -->
-    <div class="hero-banner-img-wrap">
-      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/v1784604897/vacaciones-banner.jpg" alt="Nos tomamos vacaciones - Diamantina. Reservá tu pedido, lo entregamos después del 9 de septiembre 2026" loading="eager" fetchpriority="high" width="1774" height="887">
+  <div class="hero-v2 hero">
+    <!-- Fondo imagen -->
+    <div class="hero-v2-bg">
+      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/v1784604897/mirando_1_gcsitk.png" alt="Diamantina Lencería" loading="eager" fetchpriority="high" width="1600" height="900">
     </div>
-    <!-- Botones debajo del banner -->
-    <div class="hero-banner-actions">
+    <!-- Contenido encima -->
+    <div class="hero-v2-content">
+      <div class="hero-v2-eyebrow">✦ Lencería de diseño</div>
+      <div class="hero-v2-title hero-title">Tu mejor versión<br><em>empieza</em><br>por Vos. 💎</div>
+      <div class="hero-v2-sub hero-sub">Conjuntos exclusivos que combinan diseño, comodidad y calidad.</div>
+      <div class="hero-v2-badges">
+        <div class="hero-v2-badge">🚚 <span>Envíos a todo el país</span></div>
+        <div class="hero-v2-badge">🔒 <span>Compra segura</span></div>
+        <div class="hero-v2-badge">💬 <span>Atención personalizada por WhatsApp</span></div>
+      </div>
       <div class="hero-btns-wrap" style="display:inline-flex;flex-direction:column;gap:12px;align-items:center">
         <div class="hero-v2-btns">
-          <button class="hero-v2-btn-primary hero-btn on-light" onclick="document.getElementById('cats-section').scrollIntoView({behavior:'smooth'})">Ver colección</button>
-          <button class="hero-v2-btn-secondary on-light" onclick="openGuiaModal()">
+          <button class="hero-v2-btn-primary hero-btn" onclick="document.getElementById('cats-section').scrollIntoView({behavior:'smooth'})">Ver colección</button>
+          <button class="hero-v2-btn-secondary" onclick="openGuiaModal()">
             🔍 Encontrá tu talle
           </button>
         </div>
-        <button class="hero-v2-btn-secondary on-light qs-toggle-btn" id="qs-toggle-btn" onclick="toggleQuickSearch()">
+        <button class="hero-v2-btn-secondary qs-toggle-btn" id="qs-toggle-btn" onclick="toggleQuickSearch()">
           ✨ Buscador rápido
         </button>
       </div>
@@ -809,7 +817,14 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
           <div class="quick-search-chips" id="qs-chips-color"></div>
         </div>
       </div>
+
     </div>
+    <!-- Scroll indicator -->
+    <div class="hero-scroll">
+      <span>Explorar</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+  </div>
   </div>
 
   <!-- TRUST BAR -->
@@ -2208,10 +2223,8 @@ function applyApariencia(d) {
   if (d.heroBg) {
     const heroImg = document.getElementById('hero-v2-img');
     if (heroImg) heroImg.src = d.heroBg;
-    // El fondo del banner ahora es una imagen normal (<img>), no un background-image;
-    // nos aseguramos de limpiar cualquier fondo viejo que haya quedado seteado.
     const hero = document.querySelector('.hero');
-    if (hero) hero.style.backgroundImage = 'none';
+    if (hero) { hero.style.backgroundImage = 'url(' + d.heroBg + ')'; hero.style.backgroundSize = 'cover'; hero.style.backgroundPosition = 'center'; }
   }
   if (d.wa) window._waNumber = d.wa;
 }
