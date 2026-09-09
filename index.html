@@ -748,7 +748,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
     <button onclick="showPage('nosotras')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Guía de talles</button>
     <button onclick="showPage('politicas')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Políticas</button>
 
-    <button onclick="showAdminPrompt()" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Admin</button>
+    <button onclick="openAdminTab()" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Admin</button>
     <button onclick="showPage('favoritos')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:18px;color:var(--ink-mid);cursor:pointer;line-height:1" title="Favoritos">♡</button>
     <button onclick="toggleCart()" style="display:flex;align-items:center;gap:6px;background:var(--ink);border:none;border-radius:999px;padding:8px 16px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer">
       🛍️ Carrito <span id="cart-count-nav" style="background:var(--rose);border-radius:999px;padding:1px 6px;font-size:11px">0</span>
@@ -769,7 +769,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
   <button onclick="showPage('nosotras');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Guía de talles</button>
   <button onclick="showPage('politicas');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Políticas</button>
 
-  <button onclick="showAdminPrompt();closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;text-align:left;width:100%;background:none;border:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Admin</button>
+  <button onclick="openAdminTab();closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;text-align:left;width:100%;background:none;border:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Admin</button>
 </div>
 
 <!-- TIENDA -->
@@ -2096,6 +2096,11 @@ loadVisitasAdmin();
     document.getElementById('page-error').classList.add('open');
   }
   window.scrollTo(0, 0);
+};
+
+window.openAdminTab = function() {
+  const url = window.location.origin + window.location.pathname + '?page=admin';
+  window.open(url, '_blank');
 };
 
 window.showAdminPrompt = function() {
@@ -6082,6 +6087,14 @@ const _returnPage = (() => {
 // Clean URL if coming from MercadoPago
 if (_returnPage !== 'tienda' && window.location.search) {
   window.history.replaceState({}, '', window.location.pathname);
+}
+
+// ── Apertura directa del admin en pestaña nueva (?page=admin) ──
+if (params.get('page') === 'admin') {
+  window.history.replaceState({}, '', window.location.pathname);
+  firebase.auth().onAuthStateChanged(function _adminTabAutoCheck(user) {
+    if (user) { showPage('admin'); } else { showAdminPrompt(); }
+  });
 }
 
 // ── SEO: PRODUCT SCHEMA ──
