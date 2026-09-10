@@ -673,6 +673,12 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
 
 /* Trust bar */
 .trust-bar{background:var(--surface-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 2rem;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap}
+.home-size-filter{padding:1.25rem 2rem;background:#fff;border-bottom:1px solid var(--border);text-align:center}
+.home-size-filter-title{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink-mid);margin-bottom:12px}
+.home-size-chips{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.home-size-chip{min-width:52px;height:44px;padding:0 10px;border-radius:999px;border:1.5px solid var(--border-strong);background:#fff;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s}
+.home-size-chip:hover{border-color:var(--rose)}
+.home-size-chip.active{background:var(--rose);border-color:var(--rose);color:#fff}
 .trust-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-mid);font-family:'DM Sans',sans-serif}
 .trust-item strong{color:var(--ink);font-weight:600}
 
@@ -832,6 +838,12 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
     <div class="trust-item">🔒 <span><strong>Pagá seguro</strong> con MercadoPago</span></div>
     <div class="trust-item">🔄 <span><strong>Cambios</strong> sin complicaciones</span></div>
     <div class="trust-item">💬 <span><strong>Atención</strong> por WhatsApp</span></div>
+  </div>
+
+  <!-- COMPRÁ POR TALLE -->
+  <div class="home-size-filter">
+    <div class="home-size-filter-title">Comprá por talle</div>
+    <div class="home-size-chips" id="home-size-chips"></div>
   </div>
 
   <!-- CATEGORÍAS VISUALES -->
@@ -2423,6 +2435,7 @@ db.ref('productos').on('value', (snap) => {
     products = [];
     console.error('Error procesando productos:', e);
   }
+  if (typeof renderHomeSizeFilter === 'function') renderHomeSizeFilter();
   // Primera carga: restaurar scroll si volvés de ver un producto (por si el navegador recargó)
   if (!window._catalogoRestaurado) {
     window._catalogoRestaurado = true;
@@ -2570,6 +2583,7 @@ window.renderCatalog = function() {
 
   window._currentList = list;
   renderPage(list, el, true);
+  if (typeof updateHomeSizeActiveState === 'function') updateHomeSizeActiveState();
 };
 
 function buildCard(p, idx) {
@@ -5457,6 +5471,45 @@ const TALLE_EQUIVALENCIAS = {
   '5': ['5','XXL','105'],
 };
 window.quickTallaGroup = '';
+
+// ── COMPRÁ POR TALLE (fila visible en la home) ──
+function renderHomeSizeFilter() {
+  const el = document.getElementById('home-size-chips');
+  if (!el) return;
+  const gruposPresentes = new Set();
+  products.forEach(p => {
+    (p.tallas || []).forEach(t => {
+      for (const [grupo, eqs] of Object.entries(TALLE_EQUIVALENCIAS)) {
+        if (eqs.includes(t)) gruposPresentes.add(grupo);
+      }
+    });
+  });
+  const labels = { '1':'S', '2':'M', '3':'L', '4':'XL', '5':'XXL' };
+  el.innerHTML = Object.keys(labels)
+    .filter(g => gruposPresentes.has(g))
+    .map(g => '<button type="button" class="home-size-chip" data-grupo="' + g + '">' + labels[g] + '</button>')
+    .join('');
+  el.querySelectorAll('[data-grupo]').forEach(chip => {
+    chip.addEventListener('click', () => window.homeSizeFilterClick(chip.dataset.grupo));
+  });
+  updateHomeSizeActiveState();
+}
+
+function updateHomeSizeActiveState() {
+  document.querySelectorAll('.home-size-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.grupo === window.quickTallaGroup);
+  });
+}
+
+window.homeSizeFilterClick = function(grupo) {
+  window.quickTallaGroup = (window.quickTallaGroup === grupo) ? '' : grupo;
+  window.activeColorGroup = '';
+  window.activeColorFilter = '';
+  if (document.getElementById('filtro-talla')) document.getElementById('filtro-talla').value = '';
+  renderCatalog();
+  updateHomeSizeActiveState();
+  document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
 
 window.toggleQuickSearch = function() {
   const panel = document.getElementById('quick-search');
