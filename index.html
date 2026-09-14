@@ -1995,7 +1995,14 @@ window.showPage = function(page) {
       try { cart = JSON.parse(localStorage.getItem('diamantina_cart_pending') || '[]'); } catch(e) {}
     }
     const urlPsS = new URLSearchParams(window.location.search);
-    const pedidoId = urlPsS.get('payment_id') || urlPsS.get('collection_id') || ('sim-' + Date.now());
+    const _pedidoPendienteRaw = localStorage.getItem('diamantina_pedido_pendiente');
+    const _hayPagoReal = urlPsS.get('payment_id') || urlPsS.get('collection_id');
+    // Si no hay ID real de MercadoPago NI un pedido pendiente guardado NI carrito,
+    // no hay evidencia de una compra real: no generamos un pedido fantasma.
+    if (!_hayPagoReal && !_pedidoPendienteRaw && !cart.length) {
+      console.warn('Página de éxito abierta sin evidencia de compra real. No se genera ningún pedido.');
+    } else {
+    const pedidoId = _hayPagoReal || ('sim-' + Date.now());
     console.log('PedidoId:', pedidoId, 'Cart:', cart.length, 'items');
     const pedidoKey = 'pedido_guardado_' + pedidoId;
     if (!localStorage.getItem(pedidoKey)) {
@@ -2102,6 +2109,7 @@ window.showPage = function(page) {
     }
     cart = []; saveCart(); updateCartUI();
     localStorage.removeItem('diamantina_cart_pending');
+    } // cierre del guard de evidencia real
   } else if (page === 'error') {
     const _eel = document.getElementById('page-error');
     if (_eel) { _eel.style.display = 'block'; }
@@ -6106,7 +6114,13 @@ const _returnPage = (() => {
   const status = params.get('status');
   const extRef = params.get('external_reference');
   console.log('MP params:', {pago, page, colStatus, status, extRef});
-  if (pago === 'aprobado' || page === 'success' || colStatus === 'approved' || status === 'approved' || colStatus === 'in_process') {
+  // Evidencia real de que hubo un pago: un ID de MercadoPago en la URL, o un pedido
+  // pendiente guardado en este navegador (se guarda ANTES de ir a MercadoPago).
+  const hayEvidenciaReal = !!(params.get('payment_id') || params.get('collection_id') || localStorage.getItem('diamantina_pedido_pendiente'));
+  if (
+    pago === 'aprobado' || colStatus === 'approved' || status === 'approved' || colStatus === 'in_process' ||
+    (page === 'success' && hayEvidenciaReal)
+  ) {
     // Meta Pixel: Purchase
     try {
       const pendingCart = JSON.parse(localStorage.getItem('diamantina_cart_pending') || '[]');
