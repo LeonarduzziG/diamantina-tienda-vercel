@@ -1642,6 +1642,20 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
         </div>
         <button onclick="crearCupon()" style="padding:7px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">Crear</button>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;align-items:end">
+        <div>
+          <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Válido desde (opcional)</label>
+          <input type="date" id="new-cupon-desde" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Válido hasta (opcional)</label>
+          <input type="date" id="new-cupon-hasta" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-mid);padding-bottom:7px">
+          <input type="checkbox" id="new-cupon-ununico" style="width:16px;height:16px">
+          Un solo uso (se desactiva solo tras usarse)
+        </label>
+      </div>
       <div id="cupones-lista" style="font-size:12px;color:var(--ink-mid)">Cargando cupones...</div>
     </div>
   </div>
@@ -2019,6 +2033,7 @@ window.showPage = function(page) {
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify({ items: (pedidoPendiente.items||[]).map(i => ({ prodId: i.prodId||i.id, talla: i.talla||'—', color: i.color||'', qty: i.qty||1 })) })
         }).catch(e => console.warn('Stock backend error:', e));
+        if (pedidoPendiente.cupon) marcarCuponUsadoSiCorresponde(pedidoPendiente.cupon);
         localStorage.removeItem('diamantina_pedido_pendiente');
       } else {
         const _sanNum = v => (isNaN(v) || v === null || v === undefined) ? 0 : Number(v);
@@ -2071,6 +2086,7 @@ window.showPage = function(page) {
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify({ items: cart.map(i => ({ prodId: i.prodId||i.id, talla: i.talla||'—', color: i.color||'', qty: i.qty||1 })) })
         }).then(() => console.log('Stock bajado via backend')).catch(e => console.warn('Stock backend error:', e));
+        if (pedidoNuevo.cupon) marcarCuponUsadoSiCorresponde(pedidoNuevo.cupon);
       }
       cart.forEach(item => {
         if (!item.prodId) return;
@@ -5674,34 +5690,55 @@ async function loadCuponesAdmin() {
   const snap = await db.ref('config/cupones').get();
   const data = snap.val();
   if (!data) { lista.textContent = 'No hay cupones creados.'; return; }
-  lista.innerHTML = Object.entries(data).map(([code, c]) => 
-    `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--surface-2);border-radius:var(--radius-sm);margin-bottom:4px">
-      <span style="font-weight:600;color:var(--ink)">${code}</span>
+  const hoy = new Date().toISOString().slice(0,10);
+  lista.innerHTML = Object.entries(data).map(([code, c]) => {
+    const vencido = c.fechaFin && c.fechaFin < hoy;
+    const noEmpezo = c.fechaInicio && c.fechaInicio > hoy;
+    const usado = c.unUso && c.usado;
+    let estadoLabel = c.activo ? 'Activo' : 'Inactivo';
+    let estadoColor = c.activo ? { bg:'#EAF3DE', fg:'#2e7d32' } : { bg:'#f5e6e6', fg:'#c62828' };
+    if (c.activo && vencido) { estadoLabel = 'Vencido'; estadoColor = { bg:'#f5e6e6', fg:'#c62828' }; }
+    else if (c.activo && noEmpezo) { estadoLabel = 'Aún no empieza'; estadoColor = { bg:'#fff3cd', fg:'#8a6d00' }; }
+    else if (c.activo && usado) { estadoLabel = 'Ya usado'; estadoColor = { bg:'#f5e6e6', fg:'#c62828' }; }
+    const rango = (c.fechaInicio || c.fechaFin) ? `<div style="font-size:10px;color:var(--ink-light)">${c.fechaInicio ? 'desde ' + c.fechaInicio : ''}${c.fechaInicio && c.fechaFin ? ' · ' : ''}${c.fechaFin ? 'hasta ' + c.fechaFin : ''}${c.unUso ? ' · un solo uso' : ''}</div>` : (c.unUso ? `<div style="font-size:10px;color:var(--ink-light)">un solo uso</div>` : '');
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--surface-2);border-radius:var(--radius-sm);margin-bottom:4px;flex-wrap:wrap;gap:4px">
+      <span>
+        <span style="font-weight:600;color:var(--ink)">${code}</span>
+        ${rango}
+      </span>
       <span style="color:var(--ink-mid)">${c.tipo === 'porcentaje' ? c.valor + '%' : '$' + Number(c.valor).toLocaleString('es-AR')}</span>
-      <span style="padding:2px 8px;border-radius:999px;font-size:10px;background:${c.activo ? '#EAF3DE' : '#f5e6e6'};color:${c.activo ? '#2e7d32' : '#c62828'}">${c.activo ? 'Activo' : 'Inactivo'}</span>
+      <span style="padding:2px 8px;border-radius:999px;font-size:10px;background:${estadoColor.bg};color:${estadoColor.fg}">${estadoLabel}</span>
       <div style="display:flex;gap:4px">
         <button onclick="toggleCupon('${code}',${!c.activo})" style="padding:3px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-size:11px;cursor:pointer;color:var(--ink-mid)">${c.activo ? 'Desactivar' : 'Activar'}</button>
         <button onclick="borrarCupon('${code}')" style="padding:3px 8px;border:1px solid #E24B4A;border-radius:var(--radius-sm);background:transparent;font-size:11px;cursor:pointer;color:#E24B4A">✕</button>
       </div>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
 }
 
 window.crearCupon = async function() {
   const code = document.getElementById('new-cupon-code').value.trim().toUpperCase();
   const tipo = document.getElementById('new-cupon-tipo').value;
   const valor = parseFloat(document.getElementById('new-cupon-valor').value);
+  const fechaInicio = document.getElementById('new-cupon-desde')?.value || null;
+  const fechaFin = document.getElementById('new-cupon-hasta')?.value || null;
+  const unUso = !!document.getElementById('new-cupon-ununico')?.checked;
   if (!code || !valor) { showToast('Completá todos los campos', 'error'); return; }
-  await db.ref('config/cupones/' + code).set({ tipo, valor, activo: true });
+  await db.ref('config/cupones/' + code).set({ tipo, valor, activo: true, fechaInicio, fechaFin, unUso, usado: false });
   document.getElementById('new-cupon-code').value = '';
   document.getElementById('new-cupon-valor').value = '';
+  document.getElementById('new-cupon-desde').value = '';
+  document.getElementById('new-cupon-hasta').value = '';
+  document.getElementById('new-cupon-ununico').checked = false;
   loadCuponesAdmin();
 loadVisitasAdmin();
   showToast('Cupón ' + code + ' creado ✦');
 };
 
 window.toggleCupon = async function(code, activo) {
-  await db.ref('config/cupones/' + code).update({ activo });
+  const update = { activo };
+  if (activo) update.usado = false; // al reactivar manualmente, permite usarlo de nuevo
+  await db.ref('config/cupones/' + code).update(update);
   loadCuponesAdmin();
 loadVisitasAdmin();
 };
@@ -5725,15 +5762,19 @@ window.aplicarCupon = async function() {
   try {
     const snap = await db.ref('config/cupones/' + code).get();
     const data = snap.val();
-    if (!data || !data.activo) {
+    const hoy = new Date().toISOString().slice(0,10);
+    const vencido = data && data.fechaFin && data.fechaFin < hoy;
+    const noEmpezo = data && data.fechaInicio && data.fechaInicio > hoy;
+    const yaUsado = data && data.unUso && data.usado;
+    if (!data || !data.activo || vencido || noEmpezo || yaUsado) {
       msg.style.color = '#E24B4A';
-      msg.textContent = '❌ Código inválido o vencido';
+      msg.textContent = yaUsado ? '❌ Este cupón ya fue utilizado' : (vencido ? '❌ Este cupón venció' : (noEmpezo ? '❌ Este cupón todavía no está vigente' : '❌ Código inválido o vencido'));
       msg.style.display = 'block';
       cuponActivo = null;
       updateCartUI();
       return;
     }
-    cuponActivo = { code, tipo: data.tipo, valor: data.valor };
+    cuponActivo = { code, tipo: data.tipo, valor: data.valor, unUso: !!data.unUso };
     msg.style.color = '#2e7d32';
     msg.textContent = '✓ Cupón aplicado: ' + (data.tipo === 'porcentaje' ? data.valor + '% de descuento' : '$' + Number(data.valor).toLocaleString('es-AR') + ' de descuento');
     msg.style.display = 'block';
@@ -5745,6 +5786,18 @@ window.aplicarCupon = async function() {
     msg.style.display = 'block';
   }
 };
+
+// Marca un cupón de un solo uso como usado, para que no pueda volver a aplicarse
+async function marcarCuponUsadoSiCorresponde(code) {
+  if (!code) return;
+  try {
+    const snap = await db.ref('config/cupones/' + code).get();
+    const data = snap.val();
+    if (data && data.unUso) {
+      await db.ref('config/cupones/' + code).update({ usado: true, activo: false });
+    }
+  } catch(e) { console.warn('No se pudo marcar el cupón como usado:', e); }
+}
 
 function calcDescuento(subtotal) {
   if (!cuponActivo) return 0;
