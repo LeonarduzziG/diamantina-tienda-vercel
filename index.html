@@ -817,6 +817,9 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
     </div>
   </div>
 
+  <!-- Aviso temporal (configurable desde el admin, en "Aviso" dentro de config del hero) -->
+  <div id="aviso-temporal" style="display:none;text-align:center;padding:10px 20px;background:var(--rose-pale);color:var(--rose);font-size:13px;font-weight:500"></div>
+
   <!-- TRUST BAR -->
   <div class="trust-bar">
     <div class="trust-item">🚚 <span><strong>Envío gratis</strong> desde $65.000 CABA/GBA · $85.000 resto</span></div>
@@ -2237,11 +2240,11 @@ function applyHeroConfig(d) {
   const subEl = document.querySelector('.hero-sub');
   if (titleEl && d.title) titleEl.innerHTML = d.title.replace(/\[em\](.*?)\[\/em\]/g, '<em>$1</em>');
   if (subEl && d.sub) subEl.textContent = d.sub;
-  let av = document.getElementById('aviso-temporal');
-  if (d.aviso) {
-    if (!av) { av = document.createElement('div'); av.id = 'aviso-temporal'; av.style.cssText = 'text-align:center;padding:10px 20px;background:var(--rose-pale);color:var(--rose);font-size:13px;font-weight:500'; const hero = document.querySelector('.hero'); if (hero) hero.after(av); }
-    av.textContent = d.aviso; av.style.display = 'block';
-  } else if (av) av.style.display = 'none';
+  const av = document.getElementById('aviso-temporal');
+  if (av) {
+    if (d.aviso) { av.textContent = d.aviso; av.style.display = 'block'; }
+    else av.style.display = 'none';
+  }
 }
 
 function applyApariencia(d) {
@@ -2253,7 +2256,8 @@ function applyApariencia(d) {
   }
   if (d.heroBg) {
     const heroImg = document.getElementById('hero-v2-img');
-    if (heroImg) heroImg.src = d.heroBg;
+    // Evitar re-asignar la misma URL: previene un repintado/"reload" visible de la foto
+    if (heroImg && heroImg.src !== d.heroBg) heroImg.src = d.heroBg;
     const hero = document.querySelector('.hero');
     if (hero) {
       if (hero.classList.contains('banner-mode')) {
