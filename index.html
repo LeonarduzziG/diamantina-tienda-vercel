@@ -784,7 +784,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
   <!-- HERO V2 (banner con foto propia, sin superponer texto) -->
   <div class="hero-v2 hero banner-mode">
     <div class="hero-banner-img-wrap">
-      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/v1789431048/ChatGPT_Image_14_sept_2026_21_09_47_auzjzo.png" alt="Diamantina Lencería" loading="eager" fetchpriority="high" width="1600" height="900">
+      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1600,c_limit,q_auto,f_auto/v1789431048/ChatGPT_Image_14_sept_2026_21_09_47_auzjzo.png" alt="Diamantina Lencería" loading="eager" fetchpriority="high" width="1600" height="900">
     </div>
     <div class="hero-banner-actions">
       <div class="hero-btns-wrap" style="display:inline-flex;flex-direction:column;gap:12px;align-items:center">
@@ -2256,8 +2256,9 @@ function applyApariencia(d) {
   }
   if (d.heroBg) {
     const heroImg = document.getElementById('hero-v2-img');
+    const heroBgOptimizada = (typeof optimizeImg === 'function') ? optimizeImg(d.heroBg, 1600) : d.heroBg;
     // Evitar re-asignar la misma URL: previene un repintado/"reload" visible de la foto
-    if (heroImg && heroImg.src !== d.heroBg) heroImg.src = d.heroBg;
+    if (heroImg && heroImg.src !== heroBgOptimizada) heroImg.src = heroBgOptimizada;
     const hero = document.querySelector('.hero');
     if (hero) {
       if (hero.classList.contains('banner-mode')) {
@@ -2435,9 +2436,18 @@ function optimizeImg(url, width) {
 }
 
 // ── FIREBASE ──
+let _lastProductsRaw = null;
 db.ref('productos').on('value', (snap) => {
+  const data = snap.val();
+  let rawStr = null;
+  try { rawStr = JSON.stringify(data); } catch(e) {}
+  // Firebase entrega primero una copia en caché y después la versión real del servidor;
+  // si el contenido es idéntico al que ya teníamos, no reconstruimos todo de nuevo
+  // (evita el parpadeo de fotos/badges al cargar la página).
+  const sinCambios = rawStr !== null && rawStr === _lastProductsRaw;
+  const esPrimeraCarga = !window._catalogoRestaurado;
+  _lastProductsRaw = rawStr;
   try {
-    const data = snap.val();
     const allProds = data ? Object.entries(data).map(([id, val]) => ({ id, ...val })) : [];
     window._allProducts = data || {};
     products = allProds.filter(p => {
@@ -2455,6 +2465,7 @@ db.ref('productos').on('value', (snap) => {
     products = [];
     console.error('Error procesando productos:', e);
   }
+  if (sinCambios && !esPrimeraCarga) return; // nada cambió: no re-renderizar
   if (typeof renderHomeSizeFilter === 'function') renderHomeSizeFilter();
   // Primera carga: restaurar scroll si volvés de ver un producto (por si el navegador recargó)
   if (!window._catalogoRestaurado) {
