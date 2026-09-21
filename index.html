@@ -2869,6 +2869,7 @@ window.renderCombos = function() {
       + '<div class="prod-img-wrap" style="position:relative;height:220px;overflow:hidden;flex-shrink:0">'
       + (img ? '<img src="'+img+'" alt="'+p.name+'" class="prod-img" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top">' : '<div class="prod-img-placeholder" style="height:100%;background:#eee"></div>')
       + '<div class="badge-arg" style="position:absolute;top:8px;right:8px;background:var(--rose);color:#fff">🎁 COMBO</div>'
+      + (p.descuento > 0 ? '<span class="prod-badge badge-oferta" style="top:8px;left:8px">-'+p.descuento+'%</span>' : '')
       + agotadoOverlayHTML(p)
       + '</div>'
       + '<div class="card-body"><div class="card-name">'+p.name+'</div><div class="prod-price-row">'+precio+'</div></div>'
@@ -2902,6 +2903,7 @@ window.renderNuevos = function() {
       <div class="prod-img-wrap" style="position:relative">
         ${img ? `<img src="${img}" alt="${p.name}" class="prod-img" loading="lazy" width="400" height="400">` : '<div class="prod-img-placeholder"></div>'}
         <div style="position:absolute;top:8px;left:8px;font-size:10px;padding:3px 10px;border-radius:999px;background:rgba(201,79,124,0.9);color:#fff;font-weight:600;letter-spacing:1px;backdrop-filter:blur(4px)">NUEVO ✦</div>
+        ${p.descuento > 0 ? `<span class="prod-badge badge-oferta" style="top:8px;right:8px;left:auto">-${p.descuento}%</span>` : ''}
         ${agotadoOverlayHTML(p)}
       </div>
       <div class="card-body"><div class="card-name">${p.name}</div><div class="prod-price-row">${precio}</div></div>
