@@ -2907,7 +2907,7 @@ window.renderNuevos = function() {
   const section = document.getElementById('nuevos-section');
   const countEl = document.getElementById('nuevos-count');
   if (!el) return;
-  const nuevos = shuffleDiario(products.filter(p => p.esNuevo && p.estado !== 'oculto'));
+  const nuevos = shuffleDiario(products.filter(p => p.esNuevo && p.estado !== 'oculto' && p.estado !== 'agotado'));
   if (nuevos.length === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   if (countEl) countEl.textContent = nuevos.length + ' producto' + (nuevos.length !== 1 ? 's' : '');
