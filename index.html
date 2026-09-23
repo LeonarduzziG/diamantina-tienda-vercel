@@ -2602,6 +2602,8 @@ window.renderCatalog = function() {
     // Orden aleatorio que cambia cada 3 días (igual para todas las visitas dentro del bloque)
     list = shuffleCada3Dias(list);
   }
+  // Los agotados siempre quedan al final, sea cual sea el orden elegido
+  list = list.filter(p => p.estado !== 'agotado').concat(list.filter(p => p.estado === 'agotado'));
 
   const el = document.getElementById('catalog');
   if (!list.length) {
