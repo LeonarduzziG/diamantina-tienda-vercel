@@ -1477,6 +1477,11 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
     <button class="cart-close-btn" onclick="toggleCart()">✕</button>
   </div>
   <div class="cart-items" id="cart-items"></div>
+  <div id="promo-avisos" style="display:none;padding:0 16px 10px"></div>
+  <div id="cart-relacionados" style="display:none;padding:0 16px 14px;border-top:1px solid var(--border);margin-top:2px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:1px;color:var(--ink-mid);text-transform:uppercase;margin:10px 0 8px">✨ Sumá a tu compra</div>
+    <div id="cart-relacionados-grid" style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px"></div>
+  </div>
   <div class="cart-footer">
     <div style="margin-bottom:12px;padding:10px;background:var(--rose-pale);border-radius:var(--radius-sm);border:1px solid var(--border)">
       <!-- TABS -->
@@ -1560,6 +1565,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
       <div id="descuento-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:#2e7d32">
         <span id="descuento-label">Descuento</span>
         <span id="descuento-monto">-$0</span>
+      </div>
+      <div id="promo-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:#2e7d32">
+        <span>🔥 Promo 2x1/3x1</span>
+        <span id="promo-monto">-$0</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);margin-top:4px">
         <span style="font-size:15px;font-weight:500;color:var(--ink)">Total</span>
@@ -1660,6 +1669,66 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
         </label>
       </div>
       <div id="cupones-lista" style="font-size:12px;color:var(--ink-mid)">Cargando cupones...</div>
+    </div>
+  </div>
+
+  <!-- GESTIÓN DE PROMOS 2x1 / 3x1 -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.promo-arrow').textContent=this.nextElementSibling.style.display==='none'?'▼':'▲'">
+      <div style="font-size:13px;font-weight:500;color:var(--ink)">🔥 Promos 2x1 / 3x1</div>
+      <span class="promo-arrow" style="font-size:11px;color:var(--ink-light)">▼</span>
+    </div>
+    <div style="display:none;margin-top:12px">
+      <div style="margin-bottom:10px">
+        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Nombre de la promo</label>
+        <input type="text" id="new-promo-nombre" placeholder="ej: 2x1 en Colaless" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+      </div>
+      <div style="display:flex;gap:14px;margin-bottom:10px;font-size:12px;color:var(--ink-mid)">
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="radio" name="promo-scope" value="categoria" checked onchange="togglePromoScope()">Categoría completa</label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="radio" name="promo-scope" value="productos" onchange="togglePromoScope()">Productos específicos</label>
+      </div>
+      <div id="promo-scope-categoria" style="margin-bottom:10px">
+        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Categoría</label>
+        <select id="new-promo-categoria" style="width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+          <option value="Conjuntos">Conjuntos</option>
+          <option value="Tops">Tops</option>
+          <option value="Bodys">Bodys</option>
+          <option value="Babydoll">Babydoll</option>
+          <option value="Colaless">Colaless</option>
+          <option value="Bikinis">Bikinis</option>
+          <option value="Disfraces">Disfraces</option>
+          <option value="Accesorios">Accesorios</option>
+          <option value="Pijamas">Pijamas</option>
+          <option value="Deportivos">Deportivos</option>
+        </select>
+      </div>
+      <div id="promo-scope-productos" style="display:none;margin-bottom:10px">
+        <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Buscar y elegir productos</label>
+        <input type="text" id="promo-prod-buscar" placeholder="Buscar producto..." oninput="renderPromoProdList()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none;margin-bottom:6px">
+        <div id="promo-prod-list" style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px;font-size:12px"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Llevás</label>
+          <input type="number" id="new-promo-lleva" placeholder="ej: 2" min="2" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Pagás</label>
+          <input type="number" id="new-promo-paga" placeholder="ej: 1" min="1" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Válido desde (opcional)</label>
+          <input type="date" id="new-promo-desde" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--ink-mid);display:block;margin-bottom:4px">Válido hasta (opcional)</label>
+          <input type="date" id="new-promo-hasta" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:var(--surface-2);outline:none">
+        </div>
+      </div>
+      <button onclick="crearPromo()" style="width:100%;padding:8px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px">Crear promo</button>
+      <div id="promos-lista" style="font-size:12px;color:var(--ink-mid)">Cargando promos...</div>
     </div>
   </div>
   <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
@@ -1972,6 +2041,7 @@ window.showPage = function(page) {
     try { renderAdminList(); } catch(e) { console.error('Error en renderAdminList:', e); }
     try { loadCuponesAdmin(); } catch(e) { console.error('Error en loadCuponesAdmin:', e); }
     try { loadVisitasAdmin(); } catch(e) { console.error('Error en loadVisitasAdmin:', e); }
+    try { loadPromosAdmin(); } catch(e) { console.error('Error en loadPromosAdmin:', e); }
   } else if (page === 'pedidos') {
     // Pedidos now inside admin
     const el = document.getElementById('page-admin');
@@ -2062,6 +2132,7 @@ window.showPage = function(page) {
           })),
           total: _sanNum(subtotal),
           cupon: cuponActivo ? _sanStr(cuponActivo.code) : null,
+          promoDescuento: _sanNum((calcPromos(cart) || {}).descuento || 0),
           envio: envioSeleccionado ? _sanStr(envioSeleccionado.zona) : null
         };
         console.log('Guardando pedido nuevo via backend:', pedidoNuevo);
@@ -3342,6 +3413,49 @@ function renderRelacionados(prod) {
   }).join('');
 }
 
+// ── CROSS-SELLING EN EL CARRITO ──
+function renderRelacionadosCarrito() {
+  const grid = document.getElementById('cart-relacionados-grid');
+  const cont = document.getElementById('cart-relacionados');
+  if (!grid || !cont) return;
+  if (!cart.length) { cont.style.display = 'none'; return; }
+
+  const complementarios = {
+    'Colaless': ['Conjuntos','Tops','Bodys'],
+    'Tops': ['Colaless','Conjuntos','Bikinis'],
+    'Conjuntos': ['Colaless','Babydoll'],
+    'Bodys': ['Colaless','Conjuntos'],
+    'Babydoll': ['Conjuntos','Colaless'],
+    'Bikinis': ['Tops','Conjuntos']
+  };
+  const catsEnCarrito = [...new Set(cart.map(i => i.cat).filter(Boolean))];
+  const idsEnCarrito = new Set(cart.map(i => i.prodId || i.id));
+
+  let candidatos = [];
+  catsEnCarrito.forEach(cat => {
+    const catsComp = complementarios[cat] || [];
+    products.filter(p =>
+      !idsEnCarrito.has(p.id) && p.estado !== 'agotado' && p.estado !== 'oculto' &&
+      (p.cat === cat || catsComp.includes(p.cat))
+    ).forEach(p => { if (!candidatos.find(c => c.id === p.id)) candidatos.push(p); });
+  });
+  candidatos = candidatos.sort(() => Math.random()-0.5).slice(0,6);
+
+  if (!candidatos.length) { cont.style.display = 'none'; return; }
+  cont.style.display = 'block';
+  grid.innerHTML = candidatos.map(p => {
+    const img = (p.imgs && p.imgs[0]) || p.img || '';
+    const precio = p.precioFinal || p.price || 0;
+    return `<div onclick="toggleCart(false);setTimeout(()=>openProdModal('${p.id}'),150)" style="flex:0 0 100px;cursor:pointer">
+      <div style="width:100px;height:120px;border-radius:6px;overflow:hidden;background:var(--surface-2);margin-bottom:5px">
+        <img src="${img}" alt="${p.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+      </div>
+      <div style="font-size:10px;color:var(--ink);line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.name}</div>
+      <div style="font-size:11px;color:var(--rose);font-weight:500;margin-top:2px">$${Number(precio).toLocaleString('es-AR')}</div>
+    </div>`;
+  }).join('');
+}
+
 window.compartirProducto = async function() {
   if (!currentProd) return;
   const PROD_URL = 'https://www.diamantina.shop/?producto=' + encodeURIComponent(currentProd.id);
@@ -3496,7 +3610,9 @@ function updateCartUI() {
   document.getElementById('subtotal-productos') && (document.getElementById('subtotal-productos').textContent = '$' + total.toLocaleString('es-AR'));
   const _desc = calcDescuento(total);
   const descuento = isNaN(_desc) ? 0 : _desc;
-  const totalFinal = totalConEnvio - descuento;
+  const _promoRes = calcPromos(cart) || { descuento: 0, avisos: [] };
+  const promoDescuento = isNaN(_promoRes.descuento) ? 0 : _promoRes.descuento;
+  const totalFinal = totalConEnvio - descuento - promoDescuento;
   const cartTotalEl = document.getElementById('cart-total');
   if (cartTotalEl) cartTotalEl.textContent = '$' + totalFinal.toLocaleString('es-AR');
   const checkoutBtn = document.getElementById('checkout-btn');
@@ -3511,6 +3627,26 @@ function updateCartUI() {
       dRow.style.display = 'none';
     }
   }
+  const pRow = document.getElementById('promo-row');
+  if (pRow) {
+    if (promoDescuento > 0) {
+      pRow.style.display = 'flex';
+      document.getElementById('promo-monto').textContent = '-$' + promoDescuento.toLocaleString('es-AR');
+    } else {
+      pRow.style.display = 'none';
+    }
+  }
+  const avisosEl = document.getElementById('promo-avisos');
+  if (avisosEl) {
+    if (_promoRes.avisos && _promoRes.avisos.length) {
+      avisosEl.style.display = 'block';
+      avisosEl.innerHTML = _promoRes.avisos.map(a => `<div style="background:#FFF3CD;color:#8a6d00;border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;font-weight:500;margin-bottom:6px">${a}</div>`).join('');
+    } else {
+      avisosEl.style.display = 'none';
+      avisosEl.innerHTML = '';
+    }
+  }
+  try { renderRelacionadosCarrito(); } catch(e) {}
   // Check free shipping
   const cfg = window._envioConfig || {};
   const gratisActivo = cfg.gratisActivo || false;
@@ -3682,6 +3818,7 @@ window.checkout = async function() {
       })),
       total: cart.reduce((s,i) => s + (Number(i.price)||0) * (Number(i.qty)||1), 0) + envioPrecioReal,
       cupon: cuponActivo ? cuponActivo.code : null,
+      promoDescuento: (calcPromos(cart) || {}).descuento || 0,
       envio: envioSeleccionado.zona,
       envio_tipo: envioSeleccionado.tipo,
       envio_servicio: envioSeleccionado.servicioEnvio || null,
@@ -5843,6 +5980,162 @@ function calcDescuento(subtotal) {
   return Math.min(cuponActivo.valor, subtotal);
 }
 
+// ── PROMOS 2x1 / 3x1 ──
+window._promosCache = {};
+function loadPromosConfig() {
+  db.ref('config/promos').on('value', (snap) => {
+    window._promosCache = snap.val() || {};
+    try { if (typeof updateCartUI === 'function' && cart) updateCartUI(); } catch(e) {}
+    try { if (document.getElementById('promos-lista')) renderPromosAdminList(); } catch(e) {}
+  });
+}
+
+function promoVigente(p) {
+  if (!p || !p.activo) return false;
+  const hoy = new Date().toISOString().slice(0,10);
+  if (p.fechaInicio && p.fechaInicio > hoy) return false;
+  if (p.fechaFin && p.fechaFin < hoy) return false;
+  return true;
+}
+
+function promoAplicaAItem(p, item) {
+  if (p.tipo === 'categoria') return item.cat === p.categoria;
+  if (p.tipo === 'productos') return Array.isArray(p.productos) && p.productos.includes(item.prodId || item.id);
+  return false;
+}
+
+// Calcula el descuento total por promos 2x1/3x1 sobre el carrito, y arma
+// los avisos de "te faltan X para la promo"
+function calcPromos(cartItems) {
+  let totalDescuento = 0;
+  const avisos = [];
+  const promos = window._promosCache || {};
+  Object.entries(promos).forEach(([id, p]) => {
+    if (!promoVigente(p)) return;
+    const lleva = Number(p.lleva) || 0;
+    const paga = Number(p.paga) || 0;
+    if (lleva < 2 || paga < 1 || paga >= lleva) return;
+    // Armar la lista de unidades elegibles (cada unidad = 1 talle/color/qty)
+    let unidades = [];
+    cartItems.forEach(item => {
+      if (promoAplicaAItem(p, item)) {
+        for (let i = 0; i < (item.qty || 1); i++) unidades.push(Number(item.price) || 0);
+      }
+    });
+    if (!unidades.length) return;
+    unidades.sort((a,b) => b - a); // de mayor a menor precio
+    const setsCompletos = Math.floor(unidades.length / lleva);
+    if (setsCompletos > 0) {
+      const gratisPorSet = lleva - paga;
+      // Dentro de cada set, se regalan las unidades más baratas del set
+      for (let s = 0; s < setsCompletos; s++) {
+        const set = unidades.slice(s*lleva, (s+1)*lleva);
+        const masBaratas = set.slice(-gratisPorSet); // las últimas del set ordenado desc = más baratas
+        totalDescuento += masBaratas.reduce((a,b) => a+b, 0);
+      }
+    }
+    const restantes = unidades.length % lleva;
+    if (restantes > 0 && restantes < lleva) {
+      const faltan = lleva - restantes;
+      avisos.push('🔥 ¡Llevás ' + restantes + ' de ' + lleva + ' para el "' + (p.nombre || (lleva + 'x' + paga)) + '"! Agregá ' + faltan + ' más');
+    }
+  });
+  return { descuento: totalDescuento, avisos };
+}
+
+// ── PROMOS ADMIN ──
+window.togglePromoScope = function() {
+  const val = document.querySelector('input[name="promo-scope"]:checked').value;
+  document.getElementById('promo-scope-categoria').style.display = val === 'categoria' ? 'block' : 'none';
+  document.getElementById('promo-scope-productos').style.display = val === 'productos' ? 'block' : 'none';
+  if (val === 'productos') renderPromoProdList();
+};
+
+window._promoProdSeleccionados = window._promoProdSeleccionados || [];
+window.renderPromoProdList = function() {
+  const cont = document.getElementById('promo-prod-list');
+  if (!cont) return;
+  const q = (document.getElementById('promo-prod-buscar').value || '').trim().toLowerCase();
+  const all = window._allProducts ? Object.entries(window._allProducts).map(([id, val]) => ({ id, ...val })) : [];
+  const filtrados = q ? all.filter(p => (p.name||'').toLowerCase().includes(q)) : all;
+  cont.innerHTML = filtrados.slice(0,60).map(p => {
+    const checked = window._promoProdSeleccionados.includes(p.id) ? 'checked' : '';
+    return `<label style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer">
+      <input type="checkbox" value="${p.id}" ${checked} onchange="togglePromoProd('${p.id}', this.checked)">
+      ${p.name}
+    </label>`;
+  }).join('') || '<div style="color:var(--ink-light)">Sin resultados</div>';
+};
+window.togglePromoProd = function(id, checked) {
+  if (checked) { if (!window._promoProdSeleccionados.includes(id)) window._promoProdSeleccionados.push(id); }
+  else { window._promoProdSeleccionados = window._promoProdSeleccionados.filter(x => x !== id); }
+};
+
+window.crearPromo = async function() {
+  const nombre = document.getElementById('new-promo-nombre').value.trim();
+  const tipo = document.querySelector('input[name="promo-scope"]:checked').value;
+  const categoria = document.getElementById('new-promo-categoria').value;
+  const productos = window._promoProdSeleccionados.slice();
+  const lleva = parseInt(document.getElementById('new-promo-lleva').value);
+  const paga = parseInt(document.getElementById('new-promo-paga').value);
+  const fechaInicio = document.getElementById('new-promo-desde').value || null;
+  const fechaFin = document.getElementById('new-promo-hasta').value || null;
+  if (!nombre || !lleva || !paga || paga >= lleva || lleva < 2) { showToast('Revisá los datos de la promo (llevás debe ser mayor que pagás)', 'error'); return; }
+  if (tipo === 'categoria' && !categoria) { showToast('Elegí una categoría', 'error'); return; }
+  if (tipo === 'productos' && !productos.length) { showToast('Elegí al menos un producto', 'error'); return; }
+  const data = { nombre, tipo, lleva, paga, fechaInicio, fechaFin, activo: true };
+  if (tipo === 'categoria') data.categoria = categoria; else data.productos = productos;
+  await db.ref('config/promos').push(data);
+  document.getElementById('new-promo-nombre').value = '';
+  document.getElementById('new-promo-lleva').value = '';
+  document.getElementById('new-promo-paga').value = '';
+  document.getElementById('new-promo-desde').value = '';
+  document.getElementById('new-promo-hasta').value = '';
+  window._promoProdSeleccionados = [];
+  showToast('Promo "' + nombre + '" creada ✦');
+};
+
+function renderPromosAdminList() {
+  const lista = document.getElementById('promos-lista');
+  if (!lista) return;
+  const data = window._promosCache || {};
+  if (!Object.keys(data).length) { lista.textContent = 'No hay promos creadas.'; return; }
+  const hoy = new Date().toISOString().slice(0,10);
+  lista.innerHTML = Object.entries(data).map(([id, p]) => {
+    const vencido = p.fechaFin && p.fechaFin < hoy;
+    const noEmpezo = p.fechaInicio && p.fechaInicio > hoy;
+    let estadoLabel = p.activo ? 'Activa' : 'Inactiva';
+    let estadoColor = p.activo ? { bg:'#EAF3DE', fg:'#2e7d32' } : { bg:'#f5e6e6', fg:'#c62828' };
+    if (p.activo && vencido) { estadoLabel = 'Vencida'; estadoColor = { bg:'#f5e6e6', fg:'#c62828' }; }
+    else if (p.activo && noEmpezo) { estadoLabel = 'Aún no empieza'; estadoColor = { bg:'#fff3cd', fg:'#8a6d00' }; }
+    const alcance = p.tipo === 'categoria' ? p.categoria : (p.productos||[]).length + ' producto(s)';
+    const rango = (p.fechaInicio || p.fechaFin) ? `<div style="font-size:10px;color:var(--ink-light)">${p.fechaInicio ? 'desde ' + p.fechaInicio : ''}${p.fechaInicio && p.fechaFin ? ' · ' : ''}${p.fechaFin ? 'hasta ' + p.fechaFin : ''}</div>` : '';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--surface-2);border-radius:var(--radius-sm);margin-bottom:4px;flex-wrap:wrap;gap:4px">
+      <span>
+        <span style="font-weight:600;color:var(--ink)">${p.nombre}</span>
+        <div style="font-size:10px;color:var(--ink-light)">${alcance}</div>
+        ${rango}
+      </span>
+      <span style="color:var(--ink-mid)">Llevá ${p.lleva}, pagá ${p.paga}</span>
+      <span style="padding:2px 8px;border-radius:999px;font-size:10px;background:${estadoColor.bg};color:${estadoColor.fg}">${estadoLabel}</span>
+      <div style="display:flex;gap:4px">
+        <button onclick="togglePromo('${id}',${!p.activo})" style="padding:3px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-size:11px;cursor:pointer;color:var(--ink-mid)">${p.activo ? 'Desactivar' : 'Activar'}</button>
+        <button onclick="borrarPromo('${id}')" style="padding:3px 8px;border:1px solid #E24B4A;border-radius:var(--radius-sm);background:transparent;font-size:11px;cursor:pointer;color:#E24B4A">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function loadPromosAdmin() { renderPromosAdminList(); }
+
+window.togglePromo = async function(id, activo) {
+  await db.ref('config/promos/' + id).update({ activo });
+};
+window.borrarPromo = async function(id) {
+  if (!confirm('¿Borrar esta promo?')) return;
+  await db.ref('config/promos/' + id).remove();
+  showToast('Promo eliminada');
+};
+
 // ── ENVÍO POR ZONA ──
 const ZONAS_CABA = Array.from({length:500},(_,i)=>String(1000+i));
 const ZONAS_GBA = Array.from({length:300},(_,i)=>String(1600+i));
@@ -6296,6 +6589,7 @@ function loadUser() {
 }
 loadUser();
 loadBanner();
+loadPromosConfig();
 // Auto-open product from URL
 (function() {
   const params = new URLSearchParams(window.location.search);
