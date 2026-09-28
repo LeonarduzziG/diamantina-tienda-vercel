@@ -1577,8 +1577,12 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
           <button id="pago-tab-mp" onclick="switchPagoTab('mp')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">💳 Mercado Pago</button>
           <button id="pago-tab-transferencia" onclick="switchPagoTab('transferencia')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">🏦 Transferencia -5%</button>
         </div>
-        <div id="panel-pago-transferencia" style="display:none;margin-top:8px;background:#EAF3DE;border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:#3B6D11;line-height:1.5">
-          Transferís al alias <strong>diamantinalenceria</strong> y nos mandás el comprobante por WhatsApp. Te queda un <strong>5% off</strong> ya aplicado en el total.
+        <div id="panel-pago-transferencia" style="display:none;margin-top:8px;background:#EAF3DE;border-radius:var(--radius-sm);padding:10px;font-size:12px;color:#3B6D11;line-height:1.5">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:1.5px dashed #3B6D11;border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:6px;flex-wrap:wrap">
+            <span style="font-size:15px;font-weight:700;color:#3B6D11;letter-spacing:0.3px">diamantinalenceria</span>
+            <button onclick="copiarAlias()" style="display:flex;align-items:center;gap:4px;padding:5px 10px;background:#3B6D11;border:none;border-radius:999px;color:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">📋 Copiar</button>
+          </div>
+          Transferí a ese alias y nos mandás el comprobante por WhatsApp al confirmar. Te queda un <strong>5% off</strong> ya aplicado en el total.
         </div>
       </div>
       <div id="descuento-transferencia-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:#2e7d32">
@@ -6950,8 +6954,10 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
   <div class="result-sub" style="font-size:16px;max-width:420px;margin:0 auto 1.2rem;color:var(--ink-mid);line-height:1.7">
     Pedido guardado ✓<br>Transferí <strong id="transf-monto">$0</strong> y mandanos el comprobante para que preparemos tu pedido.
   </div>
-  <div style="display:inline-block;background:var(--rose-pale);border:1px solid var(--rose-light);border-radius:var(--radius-sm);padding:12px 26px;font-size:22px;font-weight:600;color:var(--rose);letter-spacing:0.5px;margin-bottom:1.8rem;cursor:pointer" onclick="copiarAlias()" title="Tocá para copiar">
-    diamantinalenceria 📋
+  <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-light);margin-bottom:8px">Alias para transferir</div>
+  <div style="display:inline-flex;align-items:center;gap:10px;background:var(--rose-pale);border:2px dashed var(--rose);border-radius:var(--radius);padding:14px 16px 14px 24px;margin-bottom:1.8rem;max-width:92vw;flex-wrap:wrap;justify-content:center">
+    <span id="transf-alias-txt" style="font-size:26px;font-weight:700;color:var(--rose);letter-spacing:0.5px;font-family:DM Sans,sans-serif">diamantinalenceria</span>
+    <button onclick="copiarAlias()" style="display:flex;align-items:center;gap:6px;padding:10px 18px;background:var(--rose);border:none;border-radius:999px;color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">📋 Copiar alias</button>
   </div>
   <div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:2.5rem">
     <a id="transf-wa-btn" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:10px;padding:13px 28px;background:#25D366;color:#fff;border-radius:999px;font-size:14px;font-weight:500;text-decoration:none;font-family:DM Sans,sans-serif">
