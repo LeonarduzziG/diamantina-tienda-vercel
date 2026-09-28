@@ -1570,12 +1570,27 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
         <span>🔥 Promo 2x1/3x1</span>
         <span id="promo-monto">-$0</span>
       </div>
+      <!-- MÉTODO DE PAGO -->
+      <div style="margin:10px 0 4px">
+        <div style="font-size:11px;font-weight:600;color:var(--ink-mid);margin-bottom:6px">¿Cómo querés pagar?</div>
+        <div style="display:flex;gap:5px">
+          <button id="pago-tab-mp" onclick="switchPagoTab('mp')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--rose);background:var(--rose);color:#fff;font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">💳 Mercado Pago</button>
+          <button id="pago-tab-transferencia" onclick="switchPagoTab('transferencia')" style="flex:1;padding:6px 0;border-radius:var(--radius-sm);border:2px solid var(--border-strong);background:transparent;color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s">🏦 Transferencia -5%</button>
+        </div>
+        <div id="panel-pago-transferencia" style="display:none;margin-top:8px;background:#EAF3DE;border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;color:#3B6D11;line-height:1.5">
+          Transferís al alias <strong>diamantinalenceria</strong> y nos mandás el comprobante por WhatsApp. Te queda un <strong>5% off</strong> ya aplicado en el total.
+        </div>
+      </div>
+      <div id="descuento-transferencia-row" style="display:none;justify-content:space-between;padding:4px 0;font-size:14px;color:#2e7d32">
+        <span>🏦 Descuento transferencia (5%)</span>
+        <span id="descuento-transferencia-monto">-$0</span>
+      </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);margin-top:4px">
         <span style="font-size:15px;font-weight:500;color:var(--ink)">Total</span>
         <span style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:400;color:var(--ink)" id="cart-total">$0</span>
       </div>
     </div>
-    <button class="checkout-btn" id="checkout-btn" onclick="checkout()">
+    <button class="checkout-btn" id="checkout-btn" onclick="confirmarPedido()">
       Confirmar pedido
     </button>
     <div class="mp-badge" id="mp-badge-txt">Pagá con <span>tarjeta, débito o efectivo</span> — 100% seguro</div>
@@ -2016,7 +2031,7 @@ let selectedTalla = null;
 
 // ── PAGES ──
 window.showPage = function(page) {
-  ['tienda','admin','pedidos','nosotras','politicas','favoritos','success','error'].forEach(p => {
+  ['tienda','admin','pedidos','nosotras','politicas','favoritos','success','error','transferencia'].forEach(p => {
     const el = document.getElementById('page-' + p);
     if (el) { el.style.display = 'none'; el.classList.remove('open'); }
   });
@@ -2188,6 +2203,9 @@ window.showPage = function(page) {
     const _eel = document.getElementById('page-error');
     if (_eel) { _eel.style.display = 'block'; }
     document.getElementById('page-error').classList.add('open');
+  } else if (page === 'transferencia') {
+    const _tel = document.getElementById('page-transferencia');
+    if (_tel) { _tel.style.display = 'block'; _tel.classList.add('open'); }
   }
   window.scrollTo(0, 0);
 };
@@ -3612,9 +3630,21 @@ function updateCartUI() {
   const descuento = isNaN(_desc) ? 0 : _desc;
   const _promoRes = calcPromos(cart) || { descuento: 0, avisos: [] };
   const promoDescuento = isNaN(_promoRes.descuento) ? 0 : _promoRes.descuento;
-  const totalFinal = totalConEnvio - descuento - promoDescuento;
+  const totalPreTransferencia = totalConEnvio - descuento - promoDescuento;
+  const esTransferencia = window._metodoPago === 'transferencia';
+  const descuentoTransferencia = esTransferencia ? Math.round(totalPreTransferencia * 0.05) : 0;
+  const totalFinal = totalPreTransferencia - descuentoTransferencia;
   const cartTotalEl = document.getElementById('cart-total');
   if (cartTotalEl) cartTotalEl.textContent = '$' + totalFinal.toLocaleString('es-AR');
+  const dtRow = document.getElementById('descuento-transferencia-row');
+  if (dtRow) {
+    if (descuentoTransferencia > 0) {
+      dtRow.style.display = 'flex';
+      document.getElementById('descuento-transferencia-monto').textContent = '-$' + descuentoTransferencia.toLocaleString('es-AR');
+    } else {
+      dtRow.style.display = 'none';
+    }
+  }
   const checkoutBtn = document.getElementById('checkout-btn');
   if (checkoutBtn) checkoutBtn.disabled = cart.length === 0;
   const dRow = document.getElementById('descuento-row');
@@ -3842,6 +3872,132 @@ window.checkout = async function() {
   } catch(err) {
     showToast('Error al procesar el pago: ' + err.message, 'error');
     btn.disabled = false; btn.textContent = 'Pagar con MercadoPago';
+  }
+};
+
+window.confirmarPedido = function() {
+  if (window._metodoPago === 'transferencia') { checkoutTransferencia(); return; }
+  checkout();
+};
+
+window.copiarAlias = function() {
+  const text = 'diamantinalenceria';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast('Alias copiado ✦')).catch(() => showToast('Copialo manualmente: ' + text, 'error'));
+  } else {
+    showToast('Copialo manualmente: ' + text, 'error');
+  }
+};
+
+window.checkoutTransferencia = async function() {
+  if (!cart.length) return;
+
+  if (!envioSeleccionado) {
+    showToast('Elegí una opción de envío o retiro primero', 'error');
+    return;
+  }
+
+  if (envioSeleccionado.tipo === 'courrier') {
+    const dato = (document.getElementById('dato-contacto-envio')?.value || '').trim();
+    if (!servicioEnvioSel) { showToast('Elegí el servicio de envío', 'error'); return; }
+    if (!contactoEnvioTipo) { showToast('Elegí cómo contactarte', 'error'); return; }
+    if (!dato || dato.length < 5) { showToast('Ingresá tu ' + (contactoEnvioTipo === 'whatsapp' ? 'número de WhatsApp' : 'email'), 'error'); return; }
+  } else {
+    if (!window._datosBuyer || !window._datosBuyer.nombre) {
+      showToast('Completá y confirmá tus datos (nombre y teléfono) antes de confirmar', 'error');
+      const formEnvio = document.getElementById('form-datos-envio');
+      const formRetiro = document.getElementById('form-datos-retiro');
+      if (formEnvio && formEnvio.offsetParent !== null) formEnvio.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      else if (formRetiro && formRetiro.offsetParent !== null) formRetiro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  }
+
+  const btn = document.getElementById('checkout-btn');
+  btn.disabled = true; btn.textContent = 'Procesando...';
+
+  try {
+    const totalProductos = cart.reduce((s,i) => s + (Number(i.price)||0) * (Number(i.qty)||1), 0);
+    const envioPrecioReal = (envioSeleccionado && !isNaN(envioSeleccionado.precio)) ? Math.round(Number(envioSeleccionado.precio)) : 0;
+    const descuentoCupon = calcDescuento(totalProductos) || 0;
+    const promoDescuento = (calcPromos(cart) || {}).descuento || 0;
+    const totalPreTransferencia = totalProductos + envioPrecioReal - descuentoCupon - promoDescuento;
+    const descuentoTransferencia = Math.round(totalPreTransferencia * 0.05);
+    const totalFinal = totalPreTransferencia - descuentoTransferencia;
+    const orderId = 'TRANSF-' + Date.now();
+
+    const pedidoTransferencia = {
+      ts: Date.now(),
+      estado: 'pendiente_transferencia',
+      metodoPago: 'transferencia',
+      payment_id: orderId,
+      nombre: (window._datosBuyer?.nombre) || myName || 'Cliente',
+      telefono: window._datosBuyer?.tel || null,
+      email: window._datosBuyer?.email || null,
+      cpDestino: window._datosBuyer?.cp || null,
+      direccion: window._datosBuyer?.direccion || null,
+      tipoEnvio: window._datosBuyer?.tipo || null,
+      observaciones: window._datosBuyer?.obs || null,
+      items: cart.map(i => ({
+        title: i.name, name: i.name, prodId: i.prodId || i.id,
+        talla: i.talla || '—',
+        color: i.color ? (typeof i.color === 'object' ? (i.color.nombre || i.color.hex || '') : i.color) : '',
+        qty: i.qty, price: i.price
+      })),
+      total: totalFinal,
+      descuentoTransferencia,
+      cupon: cuponActivo ? cuponActivo.code : null,
+      promoDescuento,
+      envio: envioSeleccionado.zona,
+      envio_tipo: envioSeleccionado.tipo,
+      envio_servicio: envioSeleccionado.servicioEnvio || null,
+      contacto_tipo: envioSeleccionado.contactoTipo || null,
+      contacto_dato: envioSeleccionado.contactoDato || null,
+      envio_precio: envioPrecioReal
+    };
+
+    const res = await fetch(BACKEND + '/guardar-pedido', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pedido: pedidoTransferencia })
+    });
+    const data = await res.json().catch(() => ({}));
+    pedidoTransferencia.firebaseKey = data.key || null;
+
+    notificarPedidoPorMail(pedidoTransferencia);
+
+    const _datosCliente = window._datosBuyer || {
+      nombre: pedidoTransferencia.nombre, tel: pedidoTransferencia.telefono,
+      email: pedidoTransferencia.email, cp: pedidoTransferencia.cpDestino, tipo: pedidoTransferencia.tipoEnvio
+    };
+    if (_datosCliente && _datosCliente.nombre && _datosCliente.nombre !== 'Cliente') {
+      guardarCliente(_datosCliente, pedidoTransferencia.items, pedidoTransferencia.total);
+    }
+
+    // Reserva el stock apenas se confirma el pedido (elegido por vos: se descuenta ya, no cuando se aprueba)
+    fetch(BACKEND + '/bajar-stock', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cart.map(i => ({ prodId: i.prodId||i.id, talla: i.talla||'—', color: i.color||'', qty: i.qty||1 })) })
+    }).catch(e => console.warn('Stock backend error:', e));
+
+    if (pedidoTransferencia.cupon) marcarCuponUsadoSiCorresponde(pedidoTransferencia.cupon);
+
+    const montoEl = document.getElementById('transf-monto');
+    if (montoEl) montoEl.textContent = '$' + totalFinal.toLocaleString('es-AR');
+    const waBtn = document.getElementById('transf-wa-btn');
+    if (waBtn) {
+      const waMsg = encodeURIComponent('Hola! Te mando el comprobante de mi pedido ' + orderId + ' por $' + totalFinal.toLocaleString('es-AR') + ' 💎');
+      waBtn.href = 'https://wa.me/541155627689?text=' + waMsg;
+    }
+
+    cart = []; saveCart(); updateCartUI();
+    window._metodoPago = 'mp';
+    toggleCart(false);
+    showPage('transferencia');
+  } catch(err) {
+    showToast('Error al guardar el pedido: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    updateCheckoutBtn();
   }
 };
 
@@ -4579,9 +4735,9 @@ function _mostrarPedidos(pedidos, todosPedidos) {
   const aCotizarEl = document.getElementById('stat-a-cotizar');
   if (aCotizarEl) aCotizarEl.textContent = aCotizar.length;
   if (!pedidos.length) { el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--ink-light);font-style:italic">No hay pedidos todavía</div>'; return; }
-  const estadoColor = { aprobado:'#3B6D11', pendiente:'#BA7517', pendiente_cotizacion:'#854F0B', fallido:'#A32D2D', enviado:'#1565C0', entregado:'#1B5E20', cancelado:'#888780' };
-  const estadoBg   = { aprobado:'#EAF3DE', pendiente:'#FAEEDA', pendiente_cotizacion:'#FAEEDA', fallido:'#FCEBEB', enviado:'#E3F0FB', entregado:'#EAF3DE', cancelado:'#F5F5F5' };
-  const estadoLabel = { aprobado:'aprobado', pendiente:'pendiente', pendiente_cotizacion:'⏳ a cotizar envío', fallido:'fallido', enviado:'enviado', entregado:'entregado', cancelado:'cancelado' };
+  const estadoColor = { aprobado:'#3B6D11', pendiente:'#BA7517', pendiente_cotizacion:'#854F0B', pendiente_transferencia:'#0277BD', fallido:'#A32D2D', enviado:'#1565C0', entregado:'#1B5E20', cancelado:'#888780' };
+  const estadoBg   = { aprobado:'#EAF3DE', pendiente:'#FAEEDA', pendiente_cotizacion:'#FAEEDA', pendiente_transferencia:'#E1F0FA', fallido:'#FCEBEB', enviado:'#E3F0FB', entregado:'#EAF3DE', cancelado:'#F5F5F5' };
+  const estadoLabel = { aprobado:'aprobado', pendiente:'pendiente', pendiente_cotizacion:'⏳ a cotizar envío', pendiente_transferencia:'🏦 esperando transferencia', fallido:'fallido', enviado:'enviado', entregado:'entregado', cancelado:'cancelado' };
   el.innerHTML = pedidos.map(p => {
     const esCotizar = p.estado === 'pendiente_cotizacion';
     const contactoIcono = p.contacto_tipo === 'whatsapp' ? '💬' : p.contacto_tipo === 'email' ? '✉️' : '';
@@ -4602,6 +4758,7 @@ function _mostrarPedidos(pedidos, todosPedidos) {
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <select onchange="cambiarEstadoPedido('${p.id}',this.value)" style="font-size:11px;font-weight:500;padding:3px 8px;border-radius:999px;border:1px solid var(--border-strong);background:${estadoBg[p.estado]||'#F7F0F5'};color:${estadoColor[p.estado]||'var(--ink-mid)'};cursor:pointer;font-family:DM Sans,sans-serif;outline:none">
             <option value="pendiente_cotizacion" ${p.estado==='pendiente_cotizacion'?'selected':''}>⏳ a cotizar envío</option>
+            <option value="pendiente_transferencia" ${p.estado==='pendiente_transferencia'?'selected':''}>🏦 esperando transferencia</option>
             <option value="aprobado" ${p.estado==='aprobado'?'selected':''}>aprobado</option>
             <option value="pendiente" ${p.estado==='pendiente'?'selected':''}>pendiente</option>
             <option value="enviado" ${p.estado==='enviado'?'selected':''}>enviado</option>
@@ -6150,6 +6307,7 @@ function detectarZona(cp) {
 envioSeleccionado = null;
 let contactoEnvioTipo = null;
 let servicioEnvioSel = null;
+window._metodoPago = 'mp';
 
 // ── COTIZADOR INTEGRADO AL CARRITO ──────────────────────────────────────────
 const PROXY_COT = 'https://api.allorigins.win/get?url=';
@@ -6430,9 +6588,32 @@ function updateCheckoutBtn() {
     if(badge) badge.style.display = 'block';
     return;
   }
-  btn.textContent = 'Pagar con MercadoPago';
-  if(badge) badge.style.display = 'block';
+  if (window._metodoPago === 'transferencia') {
+    btn.textContent = 'Confirmar pedido por transferencia';
+    if(badge) badge.style.display = 'none';
+  } else {
+    btn.textContent = 'Pagar con MercadoPago';
+    if(badge) badge.style.display = 'block';
+  }
 }
+
+window.switchPagoTab = function(tipo) {
+  window._metodoPago = tipo;
+  const tabMp = document.getElementById('pago-tab-mp');
+  const tabTransf = document.getElementById('pago-tab-transferencia');
+  const panelTransf = document.getElementById('panel-pago-transferencia');
+  if (tipo === 'transferencia') {
+    if (tabTransf) tabTransf.style.cssText += ';background:var(--rose);color:#fff;border-color:var(--rose)';
+    if (tabMp) tabMp.style.cssText += ';background:transparent;color:var(--ink-mid);border-color:var(--border-strong)';
+    if (panelTransf) panelTransf.style.display = 'block';
+  } else {
+    if (tabMp) tabMp.style.cssText += ';background:var(--rose);color:#fff;border-color:var(--rose)';
+    if (tabTransf) tabTransf.style.cssText += ';background:transparent;color:var(--ink-mid);border-color:var(--border-strong)';
+    if (panelTransf) panelTransf.style.display = 'none';
+  }
+  updateCartUI();
+  updateCheckoutBtn();
+};
 
 window.calcularEnvio = async function() {};
 
@@ -6762,6 +6943,26 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
   <button class="result-btn" onclick="showPage('tienda')">Volver a la tienda</button>
 </div>
 
+<div class="result-page" id="page-transferencia">
+  <div style="font-size:80px;line-height:1;margin-bottom:8px">🏦</div>
+  <div style="font-size:40px;margin-bottom:1rem">✨</div>
+  <div class="result-title">¡Ya casi! Confirmá tu transferencia</div>
+  <div class="result-sub" style="font-size:16px;max-width:420px;margin:0 auto 1.2rem;color:var(--ink-mid);line-height:1.7">
+    Pedido guardado ✓<br>Transferí <strong id="transf-monto">$0</strong> y mandanos el comprobante para que preparemos tu pedido.
+  </div>
+  <div style="display:inline-block;background:var(--rose-pale);border:1px solid var(--rose-light);border-radius:var(--radius-sm);padding:12px 26px;font-size:22px;font-weight:600;color:var(--rose);letter-spacing:0.5px;margin-bottom:1.8rem;cursor:pointer" onclick="copiarAlias()" title="Tocá para copiar">
+    diamantinalenceria 📋
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:2.5rem">
+    <a id="transf-wa-btn" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:10px;padding:13px 28px;background:#25D366;color:#fff;border-radius:999px;font-size:14px;font-weight:500;text-decoration:none;font-family:DM Sans,sans-serif">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Enviar comprobante por WhatsApp
+    </a>
+    <button class="result-btn" onclick="showPage('tienda')" style="background:transparent;color:var(--rose);border:2px solid var(--rose)">🛍️ Seguir comprando</button>
+  </div>
+  <div style="font-size:12px;color:var(--ink-light);letter-spacing:1px">DIAMANTINA · LENCERÍA DE DISEÑO 💎</div>
+</div>
+
 
 <!-- PRODUCT MODAL -->
 <div class="modal-bg" id="prod-modal-bg" onclick="if(event.target===this)closeProdModal()">
@@ -7059,6 +7260,7 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
         <select id="filtro-estado-pedido" onchange="renderPedidos()" style="padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);outline:none;cursor:pointer">
           <option value="todos">Todos los estados</option>
           <option value="pendiente_cotizacion">A cotizar envío</option>
+          <option value="pendiente_transferencia">🏦 Esperando transferencia</option>
           <option value="aprobado">Aprobados</option>
           <option value="pendiente">Pendientes</option>
           <option value="enviado">Enviados</option>
