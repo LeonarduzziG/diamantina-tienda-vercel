@@ -4662,8 +4662,10 @@ async function notificarPedidoPorMail(pedido) {
     console.log('Enviando email con params:', templateParams);
     const result = await emailjs.send('service_thw68fg', 'template_4tth7pc', templateParams);
     console.log('Email enviado OK:', result.status, result.text);
+    return true;
   } catch(e) {
     console.error('Error enviando email:', e);
+    return false;
   }
 }
 
@@ -4771,6 +4773,7 @@ function _mostrarPedidos(pedidos, todosPedidos) {
             <option value="cancelado" ${p.estado==='cancelado'?'selected':''}>cancelado</option>
           </select>
           <span style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--rose)">$${(p.total||0).toLocaleString('es-AR')}</span>
+          <button onclick="reenviarMailPedido('${p.id}', this)" style="background:none;border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:3px 8px;font-size:11px;color:var(--ink-mid);cursor:pointer;font-family:DM Sans,sans-serif" title="Reenviar email de este pedido">📧 Reenviar mail</button>
           <button onclick="borrarPedido('${p.id}')" style="background:none;border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:3px 8px;font-size:11px;color:#A32D2D;cursor:pointer;font-family:DM Sans,sans-serif" title="Borrar pedido">✕</button>
         </div>
       </div>
@@ -4810,6 +4813,23 @@ window.cambiarEstadoPedido = async function(id, nuevoEstado) {
   } catch(e) {
     console.error('Error actualizando estado:', e.code, e.message);
     showToast('Error al actualizar', 'error');
+  }
+};
+
+window.reenviarMailPedido = async function(id, btnEl) {
+  const pedido = window._pedidosCache.find(x => x.id === id || x.firebaseKey === id || x.payment_id === id);
+  if (!pedido) { showToast('No encontré ese pedido', 'error'); return; }
+  const textoOriginal = btnEl ? btnEl.textContent : '';
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Enviando...'; }
+  try {
+    const ok = await notificarPedidoPorMail(pedido);
+    if (ok) {
+      showToast('Email reenviado ✦ revisá tu bandeja de entrada');
+    } else {
+      showToast('No se pudo enviar el email — revisá tu cuenta de EmailJS (puede estar sin cupo o desconectada)', 'error');
+    }
+  } finally {
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = textoOriginal || '📧 Reenviar mail'; }
   }
 };
 
