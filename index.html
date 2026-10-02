@@ -4634,7 +4634,36 @@ async function guardarCliente(datos, items, totalCompra) {
   }
 }
 
-async function notificarPedidoPorMail(pedido) {
+// Cola de emails pendientes, por si el navegador se cierra o la pestaña de
+// MercadoPago se cierra sola antes de que termine de enviarse el mail.
+// Así, la próxima vez que se abra la tienda (en cualquier página), se reintenta.
+function _emailsPendientesGet() {
+  try { return JSON.parse(localStorage.getItem('diamantina_emails_pendientes') || '[]'); } catch(e) { return []; }
+}
+function _emailsPendientesGuardar(pedido) {
+  try {
+    const q = _emailsPendientesGet().filter(p => p.payment_id !== pedido.payment_id);
+    q.push(pedido);
+    if (q.length > 20) q.shift();
+    localStorage.setItem('diamantina_emails_pendientes', JSON.stringify(q));
+  } catch(e) {}
+}
+function _emailsPendientesQuitar(pedido) {
+  try {
+    const q = _emailsPendientesGet().filter(p => p.payment_id !== pedido.payment_id);
+    localStorage.setItem('diamantina_emails_pendientes', JSON.stringify(q));
+  } catch(e) {}
+}
+window.reintentarEmailsPendientes = async function() {
+  const pendientes = _emailsPendientesGet();
+  if (!pendientes.length) return;
+  console.log('Reintentando', pendientes.length, 'email(s) pendiente(s)...');
+  for (const pedido of pendientes) {
+    await _enviarEmailPedido(pedido);
+  }
+};
+
+async function _enviarEmailPedido(pedido) {
   try {
     const items = (pedido.items || []).map(i => {
       const t = i.talla && i.talla !== '—' ? ' · Talle ' + i.talla : '';
@@ -4662,11 +4691,28 @@ async function notificarPedidoPorMail(pedido) {
     console.log('Enviando email con params:', templateParams);
     const result = await emailjs.send('service_thw68fg', 'template_4tth7pc', templateParams);
     console.log('Email enviado OK:', result.status, result.text);
+    _emailsPendientesQuitar(pedido);
     return true;
   } catch(e) {
     console.error('Error enviando email:', e);
     return false;
   }
+}
+
+async function notificarPedidoPorMail(pedido) {
+  // Lo guardamos como "pendiente" ANTES de intentar enviarlo: si la pestaña
+  // se cierra sola (pasa seguido al volver de MercadoPago en el celular) antes
+  // de que termine el envío, no se pierde — se reintenta solo la próxima vez
+  // que alguien abra la tienda.
+  _emailsPendientesGuardar(pedido);
+  // Hasta 3 intentos, con una pequeña espera entre uno y otro, por si fue
+  // un corte de red momentáneo.
+  for (let intento = 1; intento <= 3; intento++) {
+    const ok = await _enviarEmailPedido(pedido);
+    if (ok) return true;
+    if (intento < 3) await new Promise(r => setTimeout(r, 2000));
+  }
+  return false;
 }
 
 // Cache de pedidos
@@ -6795,6 +6841,7 @@ function loadUser() {
 loadUser();
 loadBanner();
 loadPromosConfig();
+setTimeout(() => { try { reintentarEmailsPendientes(); } catch(e) {} }, 3000);
 // Auto-open product from URL
 (function() {
   const params = new URLSearchParams(window.location.search);
