@@ -1496,7 +1496,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
         <div style="margin-bottom:8px">
           <div style="font-size:11px;font-weight:600;color:var(--ink-mid);margin-bottom:4px">¿A qué CP enviamos?</div>
           <div style="display:flex;gap:6px">
-            <input type="text" id="cp-cotizador" autocomplete="postal-code" placeholder="Ej: 5000" maxlength="8" oninput="this.value=this.value.replace(/\D/g,'')" style="flex:1;width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6pxmargin-bottom:0">
+            <input type="text" id="cp-cotizador" autocomplete="postal-code" placeholder="Ej: 5000" maxlength="8" oninput="this.value=this.value.replace(/\D/g,'')" onblur="confirmarDatosEnvio()" style="flex:1;width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6pxmargin-bottom:0">
             <button onclick="cotizarEnvioCarrito()" style="padding:7px 14px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap">Calcular</button>
           </div>
         </div>
@@ -1507,23 +1507,22 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
         <!-- Formulario datos comprador (aparece al elegir opción) -->
         <div id="form-datos-envio" style="display:none;background:var(--surface-2);border-radius:var(--radius-sm);padding:10px;margin-top:8px">
           <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:8px">Tus datos</div>
-          <input type="text" id="envio-nombre" autocomplete="name" placeholder="Nombre y apellido *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
-          <input type="tel" id="envio-tel" autocomplete="tel" placeholder="Teléfono / WhatsApp *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
-          <input type="email" id="envio-email" autocomplete="email" placeholder="Correo electrónico *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <input type="text" id="envio-nombre" autocomplete="name" placeholder="Nombre y apellido *" onblur="confirmarDatosEnvio()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <input type="tel" id="envio-tel" autocomplete="tel" placeholder="Teléfono / WhatsApp *" onblur="confirmarDatosEnvio()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <input type="email" id="envio-email" autocomplete="email" placeholder="Correo electrónico *" onblur="confirmarDatosEnvio()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
 
           <!-- Domicilio si eligió a domicilio -->
           <div id="campos-domicilio" style="display:none">
-            <input type="text" id="envio-calle" autocomplete="address-line1" placeholder="Calle y altura *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+            <input type="text" id="envio-calle" autocomplete="address-line1" placeholder="Calle y altura *" onblur="confirmarDatosEnvio()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
             <div style="display:flex;gap:6px">
-              <input type="text" id="envio-piso" autocomplete="address-line2" placeholder="Piso" style="flex:1;width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
-              <input type="text" id="envio-depto" placeholder="Depto" autocomplete="address-line3" style="flex:1;width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+              <input type="text" id="envio-piso" autocomplete="address-line2" placeholder="Piso" onblur="confirmarDatosEnvio()" style="flex:1;width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+              <input type="text" id="envio-depto" placeholder="Depto" autocomplete="address-line3" onblur="confirmarDatosEnvio()" style="flex:1;width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
             </div>
-            <input type="text" id="envio-localidad" autocomplete="address-level2" placeholder="Localidad *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
-            <input type="text" id="envio-provincia" autocomplete="address-level1" placeholder="Provincia *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+            <input type="text" id="envio-localidad" autocomplete="address-level2" placeholder="Localidad *" onblur="confirmarDatosEnvio()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+            <input type="text" id="envio-provincia" autocomplete="address-level1" placeholder="Provincia *" onblur="confirmarDatosEnvio()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
           </div>
 
-          <textarea id="envio-obs" placeholder="Observaciones (opcional)" rows="2" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6pxresize:vertical"></textarea>
-          <button onclick="confirmarDatosEnvio()" style="width:100%;padding:8px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:600;cursor:pointer;box-sizing:border-box">Confirmar datos ✓</button>
+          <textarea id="envio-obs" placeholder="Observaciones (opcional)" rows="2" onblur="confirmarDatosEnvio()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6pxresize:vertical"></textarea>
         </div>
 
         <div id="envio-domicilio-ok" style="display:none;font-size:11px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:8px 10px;margin-top:6px"></div>
@@ -1541,10 +1540,9 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
         <!-- DATOS RETIRO -->
         <div id="form-datos-retiro" style="display:none;margin-top:8px">
           <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:6px">Tus datos</div>
-          <input type="text" id="retiro-nombre" autocomplete="name" placeholder="Nombre y apellido *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
-          <input type="tel" id="retiro-tel" autocomplete="tel" placeholder="Teléfono / WhatsApp *" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
-          <textarea id="retiro-obs" placeholder="Observaciones (opcional)" rows="2" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px;resize:vertical"></textarea>
-          <button onclick="confirmarDatosRetiro()" style="width:100%;padding:8px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-sizing:border-box">Confirmar datos ✓</button>
+          <input type="text" id="retiro-nombre" autocomplete="name" placeholder="Nombre y apellido *" onblur="confirmarDatosRetiro()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <input type="tel" id="retiro-tel" autocomplete="tel" placeholder="Teléfono / WhatsApp *" onblur="confirmarDatosRetiro()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px">
+          <textarea id="retiro-obs" placeholder="Observaciones (opcional)" rows="2" onblur="confirmarDatosRetiro()" style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;margin-bottom:6px;resize:vertical"></textarea>
         </div>
         <div id="coord-ok" style="display:none;margin-top:6px;font-size:11px;color:#3B6D11;background:#EAF3DE;border-radius:var(--radius-sm);padding:5px 8px">✓ Retiro en <span id="coord-zona-sel"></span> — te contactamos para coordinar</div>
       </div>
@@ -3826,9 +3824,12 @@ window.checkout = async function() {
     if (!contactoEnvioTipo) { showToast('Elegí cómo contactarte', 'error'); return; }
     if (!dato || dato.length < 5) { showToast('Ingresá tu ' + (contactoEnvioTipo === 'whatsapp' ? 'número de WhatsApp' : 'email'), 'error'); return; }
   } else {
-    // Para envío (sucursal/domicilio) y retiro: exigir datos del comprador confirmados
+    // Para envío (sucursal/domicilio) y retiro: exigir datos del comprador completos
+    // (se intenta tomar los datos de los casilleros por si el blur no llegó a disparar, ej. autocompletado)
+    try { confirmarDatosEnvio(); } catch(e) {}
+    try { confirmarDatosRetiro(); } catch(e) {}
     if (!window._datosBuyer || !window._datosBuyer.nombre) {
-      showToast('Completá y confirmá tus datos (nombre y teléfono) antes de pagar', 'error');
+      showToast('Completá los datos obligatorios antes de pagar', 'error');
       const formEnvio = document.getElementById('form-datos-envio');
       const formRetiro = document.getElementById('form-datos-retiro');
       if (formEnvio && formEnvio.offsetParent !== null) formEnvio.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -3942,8 +3943,10 @@ window.checkoutTransferencia = async function() {
     if (!contactoEnvioTipo) { showToast('Elegí cómo contactarte', 'error'); return; }
     if (!dato || dato.length < 5) { showToast('Ingresá tu ' + (contactoEnvioTipo === 'whatsapp' ? 'número de WhatsApp' : 'email'), 'error'); return; }
   } else {
+    try { confirmarDatosEnvio(); } catch(e) {}
+    try { confirmarDatosRetiro(); } catch(e) {}
     if (!window._datosBuyer || !window._datosBuyer.nombre) {
-      showToast('Completá y confirmá tus datos (nombre y teléfono) antes de confirmar', 'error');
+      showToast('Completá los datos obligatorios antes de confirmar', 'error');
       const formEnvio = document.getElementById('form-datos-envio');
       const formRetiro = document.getElementById('form-datos-retiro');
       if (formEnvio && formEnvio.offsetParent !== null) formEnvio.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -4882,15 +4885,53 @@ function _mostrarPedidos(pedidos, todosPedidos) {
   }).join('');
 };
 
+async function _restaurarStockPedido(pedido) {
+  const items = pedido.items || [];
+  for (const item of items) {
+    const prodId = item.prodId || item.id;
+    if (!prodId) continue;
+    const qty = Number(item.qty) || 1;
+    const colorName = item.color && typeof item.color === 'object' ? (item.color.nombre || item.color.hex || '') : (item.color || '');
+    const talla = (item.talla && item.talla !== '—') ? item.talla : null;
+    const stockKey = (talla && colorName) ? (talla + '__' + colorName) : talla;
+    if (!stockKey) continue;
+    try {
+      const stockRef = db.ref('productos/' + prodId + '/stock/' + stockKey);
+      const snap = await stockRef.get();
+      const actual = Number(snap.val()) || 0;
+      await stockRef.set(actual + qty);
+      // Si el producto estaba marcado agotado, lo reactivamos al recuperar stock
+      const estadoRef = db.ref('productos/' + prodId + '/estado');
+      const estadoSnap = await estadoRef.get();
+      if (estadoSnap.val() === 'agotado') await estadoRef.set('activo');
+    } catch(e) {
+      console.warn('No se pudo restaurar stock de', prodId, stockKey, e);
+    }
+  }
+}
+
 window.cambiarEstadoPedido = async function(id, nuevoEstado) {
   try {
     const user = firebase.auth().currentUser;
     if (!user) { showToast('Sesión expirada', 'error'); showAdminPrompt(); return; }
-    await db.ref('pedidos/' + id).update({ estado: nuevoEstado });
     const p = window._pedidosCache.find(x => x.id === id);
-    if (p) p.estado = nuevoEstado;
+    const estadoAnterior = p ? p.estado : null;
+    const updates = { estado: nuevoEstado };
+
+    // Si se cancela o falla un pedido que YA tenía el stock tomado, lo devolvemos.
+    const ESTADOS_CON_STOCK_TOMADO = ['aprobado', 'enviado', 'entregado', 'pendiente_transferencia'];
+    const esCancelacionOFallo = (nuevoEstado === 'cancelado' || nuevoEstado === 'fallido');
+    let stockRestaurado = false;
+    if (esCancelacionOFallo && p && !p.stockRestaurado && estadoAnterior && ESTADOS_CON_STOCK_TOMADO.includes(estadoAnterior)) {
+      await _restaurarStockPedido(p);
+      updates.stockRestaurado = true;
+      stockRestaurado = true;
+    }
+
+    await db.ref('pedidos/' + id).update(updates);
+    if (p) { p.estado = nuevoEstado; if (stockRestaurado) p.stockRestaurado = true; }
     renderPedidosDesdeCache();
-    showToast('Estado actualizado: ' + nuevoEstado);
+    showToast('Estado actualizado: ' + nuevoEstado + (stockRestaurado ? ' · stock repuesto' : ''));
   } catch(e) {
     console.error('Error actualizando estado:', e.code, e.message);
     showToast('Error al actualizar', 'error');
@@ -6590,13 +6631,15 @@ window.seleccionarTipoEnvio = function(tipo) {
 };
 
 window.confirmarDatosEnvio = function() {
+  // Se dispara solo (al salir de cada casillero). Si falta algún dato obligatorio,
+  // simplemente no confirma todavía — sin mostrar error, para no interrumpir mientras escribe.
   const nombre = document.getElementById('envio-nombre')?.value.trim();
   const tel = document.getElementById('envio-tel')?.value.trim();
   const email = document.getElementById('envio-email')?.value.trim();
   const cp = document.getElementById('cp-cotizador')?.value.trim();
-  if (!nombre || !tel) { showToast('Completá nombre y teléfono', 'error'); return; }
-  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { showToast('Ingresá un correo electrónico válido', 'error'); return; }
-  if (!cp || cp.length < 4) { showToast('Ingresá tu código postal arriba (¿A qué CP enviamos?)', 'error'); return; }
+  if (!nombre || !tel) return false;
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return false;
+  if (!cp || cp.length < 4) return false;
   const tipo = window._tipoEnvio || 'sucursal';
   let direccion = '';
   if (tipo === 'domicilio') {
@@ -6605,34 +6648,32 @@ window.confirmarDatosEnvio = function() {
     const depto = document.getElementById('envio-depto')?.value.trim();
     const localidad = document.getElementById('envio-localidad')?.value.trim();
     const provincia = document.getElementById('envio-provincia')?.value.trim();
-    if (!calle || !localidad || !provincia) { showToast('Completá dirección, localidad y provincia', 'error'); return; }
+    if (!calle || !localidad || !provincia) return false;
     direccion = calle + (piso ? ' Piso ' + piso : '') + (depto ? ' Dpto ' + depto : '') + ', ' + localidad + ', ' + provincia;
   }
   const obs = document.getElementById('envio-obs')?.value.trim();
   window._datosBuyer = { nombre, tel, email, cp, tipo, direccion, obs };
   const okEl = document.getElementById('envio-domicilio-ok');
-  okEl.style.display = 'block';
-  const precio = envioSeleccionado?.precio || 0;
-  okEl.innerHTML = '✓ ' + nombre + ' · ' + (tipo === 'domicilio' ? 'A domicilio — ' + (direccion || '') : 'A sucursal — CP ' + cp) + (precio ? ' · $' + Math.round(precio).toLocaleString('es-AR') : '');
-  document.getElementById('form-datos-envio').style.display = 'none';
-  document.getElementById('res-cotizador').style.display = 'none';
-  updateCartUI();
-  showToast('Datos confirmados ✓');
+  if (okEl) {
+    okEl.style.display = 'block';
+    const precio = envioSeleccionado?.precio || 0;
+    okEl.innerHTML = '✓ ' + nombre + ' · ' + (tipo === 'domicilio' ? 'A domicilio — ' + (direccion || '') : 'A sucursal — CP ' + cp) + (precio ? ' · $' + Math.round(precio).toLocaleString('es-AR') : '');
+  }
+  return true;
 };
 
 window.confirmarDatosRetiro = function() {
   const nombre = document.getElementById('retiro-nombre')?.value.trim();
   const tel = document.getElementById('retiro-tel')?.value.trim();
-  if (!nombre || !tel) { showToast('Completá nombre y teléfono', 'error'); return; }
+  if (!nombre || !tel) return false;
   const obs = document.getElementById('retiro-obs')?.value.trim();
   window._datosBuyer = { nombre, tel, obs, tipo: 'retiro' };
   const zonaEl = document.getElementById('coord-zona-sel');
   if (zonaEl) zonaEl.textContent = window._zonaRetiroSel || '';
-  document.getElementById('form-datos-retiro').style.display = 'none';
-  document.getElementById('coord-ok').style.display = 'block';
+  const coordOk = document.getElementById('coord-ok');
+  if (coordOk) coordOk.style.display = 'block';
   if (envioSeleccionado) envioSeleccionado.datosBuyer = window._datosBuyer;
-  updateCartUI();
-  showToast('Datos confirmados ✓');
+  return true;
 };
 
 window.seleccionarServicioEnvio = function(servicio) {
