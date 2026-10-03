@@ -3782,6 +3782,20 @@ window.toggleCart = function(forceOpen) {
 };
 
 // ── CHECKOUT ──
+// Si hace poco se inició un pago (quedó guardado en localStorage y todavía
+// no se completó/limpió), avisamos antes de generar un pago nuevo — para
+// evitar que alguien pague dos veces lo mismo por apurarse o tocar feo.
+function _pagoPendienteReciente() {
+  try {
+    const raw = localStorage.getItem('diamantina_pedido_pendiente');
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    const minutos = (Date.now() - (p.ts || 0)) / 60000;
+    if (minutos >= 0 && minutos < 30) return p;
+  } catch(e) {}
+  return null;
+}
+
 window.checkout = async function() {
   if (!cart.length) return;
 
@@ -3805,6 +3819,11 @@ window.checkout = async function() {
       else if (formRetiro && formRetiro.offsetParent !== null) formRetiro.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
+  }
+
+  const _pendienteAnterior = _pagoPendienteReciente();
+  if (_pendienteAnterior && !confirm('Ya iniciaste un pago hace unos minutos para este pedido. Si ya pagaste, esperá un momento antes de volver a intentar — pagar de nuevo puede generarte un cobro doble.\n\n¿Seguro que querés iniciar un pago nuevo?')) {
+    return;
   }
 
   const btn = document.getElementById('checkout-btn');
