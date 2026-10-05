@@ -1473,7 +1473,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
 <div class="cart-drawer" id="cart-drawer">
   <div class="cart-header">
-    <div class="cart-title">Tu carrito</div>
+    <button onclick="toggleCart(false);window.scrollTo({top:0,behavior:'smooth'})" style="background:none;border:none;color:var(--rose);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;padding:4px 8px 4px 0;white-space:nowrap">← Seguir comprando</button>
+    <div class="cart-title" style="flex:1;text-align:center">Tu carrito</div>
     <button class="cart-close-btn" onclick="toggleCart()">✕</button>
   </div>
   <div class="cart-items" id="cart-items"></div>
