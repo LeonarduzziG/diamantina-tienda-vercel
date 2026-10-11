@@ -4956,19 +4956,34 @@ window.reenviarMailPedido = async function(id, btnEl) {
   }
 };
 
+function getAdminKey() {
+  let k = localStorage.getItem('diamantina_admin_key') || '';
+  if (!k) {
+    k = (prompt('Ingresá tu clave de administrador (se guarda en este dispositivo):') || '').trim();
+    if (k) localStorage.setItem('diamantina_admin_key', k);
+  }
+  return k;
+}
+
 window.borrarPedido = async function(id) {
   if (!confirm('¿Borrar este pedido? No se puede deshacer.')) return;
   // Find the real Firebase key from cache
   const pedido = window._pedidosCache.find(x => x.id === id || x.firebaseKey === id || x.payment_id === id);
   const fbKey = pedido?.firebaseKey || pedido?.id || id;
   console.log('Borrando pedido id:', id, '→ fbKey:', fbKey);
+  const adminKey = getAdminKey();
+  if (!adminKey) { showToast('Necesitás la clave de admin para borrar', 'error'); return; }
   try {
-    // Try via backend first (no auth needed)
     const res = await fetch(BACKEND + '/borrar-pedido', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ key: fbKey })
+      body: JSON.stringify({ key: fbKey, adminKey })
     });
+    if (res.status === 403) {
+      localStorage.removeItem('diamantina_admin_key'); // clave incorrecta: la olvidamos para que la vuelva a pedir
+      showToast('Clave de admin incorrecta. Probá de nuevo.', 'error');
+      return;
+    }
     const data = await res.json();
     if (data.ok) {
       console.log('Pedido borrado via backend OK:', fbKey);
