@@ -5447,21 +5447,34 @@ window.setStars = function(n) {
   });
 };
 
+// Escapa texto del usuario para que no se ejecute como HTML/código (anti-XSS)
+function escHtml(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 window.renderResenas = function(prodId) {
   const list = document.getElementById('pm-resenas-list');
   if (!list) return;
   const resenas = getResenas(prodId);
   if (!resenas.length) { list.innerHTML = '<div style="font-size:12px;color:var(--ink-light);font-style:italic;padding:4px 0">Sé la primera en dejar una reseña</div>'; return; }
-  list.innerHTML = resenas.map(r => `
+  list.innerHTML = resenas.map(r => {
+    const st = Math.max(0, Math.min(5, parseInt(r.stars) || 0));
+    return `
     <div style="padding:6px 0;border-bottom:1px solid var(--border)">
       <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:11px;color:#BA7517">${'★'.repeat(r.stars)+'☆'.repeat(5-r.stars)}</span>
-        <span style="font-size:11px;font-weight:500;color:var(--ink)">${r.nombre||'Anónima'}</span>
+        <span style="font-size:11px;color:#BA7517">${'★'.repeat(st)+'☆'.repeat(5-st)}</span>
+        <span style="font-size:11px;font-weight:500;color:var(--ink)">${escHtml(r.nombre||'Anónima')}</span>
         <span style="font-size:10px;color:var(--ink-light)">${new Date(r.ts).toLocaleDateString('es-AR')}</span>
       </div>
-      <div style="font-size:12px;color:var(--ink-mid);margin-top:2px">${r.texto}</div>
+      <div style="font-size:12px;color:var(--ink-mid);margin-top:2px">${escHtml(r.texto)}</div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 };
 
 window.submitResena = async function() {
@@ -5520,13 +5533,14 @@ function renderResenasDestacadas(lista) {
   grid.innerHTML = lista.map(r => {
     const prod = (window._allProducts || {})[r.prodId];
     const prodName = prod ? prod.name : '';
+    const st = Math.max(0, Math.min(5, parseInt(r.stars) || 0));
     return `<div class="resena-card">
       <div class="resena-quote">“</div>
-      <div class="resena-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
-      <div class="resena-text">${r.texto}</div>
+      <div class="resena-stars">${'★'.repeat(st)}${'☆'.repeat(5 - st)}</div>
+      <div class="resena-text">${escHtml(r.texto)}</div>
       <div class="resena-footer">
-        <span class="resena-name">${r.nombre || 'Anónima'}</span>
-        ${prodName ? `<span class="resena-prod">${prodName}</span>` : ''}
+        <span class="resena-name">${escHtml(r.nombre || 'Anónima')}</span>
+        ${prodName ? `<span class="resena-prod">${escHtml(prodName)}</span>` : ''}
       </div>
     </div>`;
   }).join('');
