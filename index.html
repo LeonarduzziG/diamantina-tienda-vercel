@@ -6973,12 +6973,15 @@ setTimeout(() => { try { reintentarEmailsPendientes(); } catch(e) {} }, 3000);
   db.ref('config/logo').set(logoUrl);
 })();
 
-// Load config from Firebase on init
-db.ref('config').once('value').then(snap => {
-  const cfg = snap.val() || {};
-  if (cfg.hero) applyHeroConfig(cfg.hero);
-  if (cfg.apariencia) applyApariencia(cfg.apariencia);
-});
+// Load config from Firebase on init (solo las partes públicas, no config completo)
+db.ref('config/hero').once('value').then(snap => {
+  const hero = snap.val();
+  if (hero) applyHeroConfig(hero);
+}).catch(() => {});
+db.ref('config/apariencia').once('value').then(snap => {
+  const ap = snap.val();
+  if (ap) applyApariencia(ap);
+}).catch(() => {});
 registrarVisita();
 loadEnvioConfig();
 loadDimsConfig();
