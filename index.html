@@ -3446,7 +3446,7 @@ window.addFromModal = function() {
   if (!currentProd) return;
   if ((currentProd.tallas||[]).length > 0 && !selectedTalla) { showToast('Elegí una talla primero', 'error'); return; }
   const prodColores = Array.isArray(currentProd.colores) ? currentProd.colores : Object.values(currentProd.colores||{});
-  if (prodColores.length > 0 && !window.selectedColor && window._packOption !== 'pack') { showToast('Elegí un color primero', 'error'); return; }
+  if (prodColores.length > 0 && !window.selectedColor) { showToast('Elegí un color primero', 'error'); return; }
   if (window._packOption === 'pack' && currentProd.packQty >= 2 && currentProd.packPrice > 0) {
     // Add pack: use pack price, qty = packQty
     const packItem = { ...currentProd, price: Math.round(currentProd.packPrice / currentProd.packQty), _packLabel: 'Pack x' + currentProd.packQty };
@@ -3484,14 +3484,17 @@ function addToCart(p, talla, color, forceQty) {
   const packKey = p._packLabel ? '_pack' + (p.packQty||'') : '';
   const key = p.id + '_' + talla + colorKey + packKey;
   const existing = cart.find(i => i.key === key);
-  // Tope de stock (no aplica a packs, que llevan su propia lógica)
-  if (!p._packLabel) {
+  // Tope de stock (incluye packs: un pack suma packQty unidades del mismo bucket)
+  {
     const disp = stockDisponible(p, talla, color);
     const yaEnCarrito = existing ? existing.qty : 0;
     if (yaEnCarrito + qty > disp) {
+      const restante = disp - yaEnCarrito;
       showToast(disp <= 0
         ? 'Sin stock disponible'
-        : 'Solo ' + (disp - yaEnCarrito > 0 ? 'quedan ' + (disp - yaEnCarrito) : 'hay ' + disp) + ' unidad' + (disp === 1 ? '' : 'es') + ' disponible' + (disp === 1 ? '' : 's'), 'error');
+        : (p._packLabel
+            ? 'No hay stock para un pack de ' + qty + ' (quedan ' + disp + ')'
+            : 'Solo ' + (restante > 0 ? 'quedan ' + restante : 'hay ' + disp) + ' unidad' + (disp === 1 ? '' : 'es') + ' disponible' + (disp === 1 ? '' : 's')), 'error');
       return;
     }
   }
