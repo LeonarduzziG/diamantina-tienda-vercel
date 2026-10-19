@@ -381,6 +381,8 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
 .cart-footer{padding:1.25rem 1.5rem;border-top:1px solid var(--border);flex-shrink:0}
 /* Con el carrito abierto, ocultar los botones flotantes para que no tapen el total */
 body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none !important}
+/* En la página de caja de regalo (mobile), subir el WhatsApp para que no tape la barra del total */
+@media(max-width:900px){body.gb-page-open #wa-float-wrap{bottom:calc(84px + env(safe-area-inset-bottom,0px))}body.gb-page-open #back-to-top-btn{display:none}}
 .cart-subtotal{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .cart-subtotal-label{font-size:14px;color:var(--ink-mid)}
 .cart-subtotal-value{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:var(--ink)}
@@ -717,6 +719,9 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 #gb-root *{box-sizing:border-box}
 #gb-root button{font-family:inherit;cursor:pointer}
 #gb-root img{display:block;max-width:100%}
+.gb-backwrap{max-width:1180px;margin:0 auto 18px}
+.gb-back{display:inline-flex;align-items:center;gap:6px;background:var(--gb-blanco);border:1px solid var(--gb-borde);border-radius:999px;padding:8px 16px;font-size:13px;color:var(--gb-texto);font-weight:500}
+.gb-back:hover{border-color:var(--gb-rosa);color:var(--gb-rosa)}
 .gb-head{text-align:center;max-width:640px;margin:0 auto 36px}
 .gb-kicker{letter-spacing:.22em;text-transform:uppercase;font-size:12px;color:var(--gb-rosa);font-weight:600}
 .gb-title{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(34px,5vw,52px);margin:8px 0 10px;line-height:1.05}
@@ -919,7 +924,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
   <!-- HERO V2 (banner con foto propia, sin superponer texto) -->
   <div class="hero-v2 hero banner-mode">
     <div class="hero-banner-img-wrap" onclick="showPage('cajaregalo')" style="cursor:pointer" title="Armá tu caja de regalo">
-      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/v1792430006/Caja_de_Regalo_Diamantina_1_tbllts.png" loading="eager" fetchpriority="high">
+      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1200,q_auto,f_auto/v1791842740/Di%CC%81a_de_la_Madre_entre_flores_y_amor_n696sj.png" alt="Día de la Madre — Diamantina Lencería" loading="eager" fetchpriority="high">
     </div>
     <div class="hero-banner-actions">
       <div class="hero-btns-wrap" style="display:inline-flex;flex-direction:column;gap:12px;align-items:center">
@@ -2179,6 +2184,7 @@ window.showPage = function(page) {
     const navEl = document.getElementById('nav-' + p);
     if (navEl) navEl.classList.toggle('active', p === page);
   });
+  document.body.classList.toggle('gb-page-open', page === 'cajaregalo');
   const hero = document.querySelector('.hero');
   const filters = document.querySelector('.filters');
   const catsVisual = document.getElementById('cats-visual');
@@ -7762,6 +7768,7 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
 <!-- ============ PÁGINA CAJA DE REGALO ============ -->
 <div id="page-cajaregalo" style="display:none">
 <section id="gb-root" aria-labelledby="gb-title">
+  <div class="gb-backwrap"><button class="gb-back" onclick="showPage('tienda')">← Volver a la tienda</button></div>
   <header class="gb-head">
     <div class="gb-kicker">Regalos Diamantina</div>
     <h2 class="gb-title" id="gb-title">Armá tu <em>caja de regalo</em></h2>
