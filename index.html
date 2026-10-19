@@ -706,6 +706,135 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
   .hero-v2-btns .hero-v2-btn-primary,.hero-v2-btns .hero-v2-btn-secondary{flex:1;padding:13px 14px;font-size:13px;white-space:nowrap;justify-content:center}
 }
 
+/* ============ CAJA DE REGALO (scopeado bajo #gb-root, prefijo gb-) ============ */
+#gb-root{
+  --gb-rosa:#C94F7C; --gb-rosa-osc:#A93D66; --gb-rosa-suave:#F7E6ED;
+  --gb-crema:#FBF7F5; --gb-blanco:#fff; --gb-texto:#2B2226; --gb-gris:#8A7B80;
+  --gb-borde:#EADFE2; --gb-sombra:0 10px 30px rgba(120,60,80,.10);
+  font-family:'DM Sans',system-ui,sans-serif; color:var(--gb-texto);
+  background:var(--gb-crema); padding:48px 20px 120px;
+}
+#gb-root *{box-sizing:border-box}
+#gb-root button{font-family:inherit;cursor:pointer}
+#gb-root img{display:block;max-width:100%}
+.gb-head{text-align:center;max-width:640px;margin:0 auto 36px}
+.gb-kicker{letter-spacing:.22em;text-transform:uppercase;font-size:12px;color:var(--gb-rosa);font-weight:600}
+.gb-title{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(34px,5vw,52px);margin:8px 0 10px;line-height:1.05}
+.gb-title em{color:var(--gb-rosa)}
+.gb-sub{color:var(--gb-gris);margin:0;line-height:1.6}
+.gb-layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:32px;align-items:start}
+.gb-step{background:var(--gb-blanco);border:1px solid var(--gb-borde);border-radius:18px;padding:26px;margin-bottom:22px}
+.gb-step-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.gb-step-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin:0;display:flex;align-items:baseline;gap:12px}
+.gb-step-num{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--gb-rosa);border:1px solid var(--gb-rosa);border-radius:999px;padding:2px 9px;transform:translateY(-4px)}
+.gb-step-hint{color:var(--gb-gris);font-size:14px}
+.gb-opt{font-size:12px;color:var(--gb-gris);font-weight:500;font-family:'DM Sans',sans-serif}
+.gb-grid{display:grid;gap:16px}
+.gb-grid--boxes{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.gb-grid--extras{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.gb-grid--clothes{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px}
+.gb-card{position:relative;background:var(--gb-blanco);border:1.5px solid var(--gb-borde);border-radius:14px;overflow:hidden;text-align:left;padding:0;transition:border-color .2s,box-shadow .2s,transform .2s;display:flex;flex-direction:column;color:inherit}
+.gb-card:hover{border-color:#DDB9C7;box-shadow:var(--gb-sombra);transform:translateY(-2px)}
+.gb-card.is-on{border-color:var(--gb-rosa);box-shadow:0 0 0 3px var(--gb-rosa-suave)}
+.gb-card.is-dim{opacity:.5}
+.gb-card-img{aspect-ratio:1/1;object-fit:cover;width:100%;background:var(--gb-rosa-suave)}
+.gb-grid--boxes .gb-card-img{aspect-ratio:4/3}
+.gb-card-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.gb-card-name{font-weight:500;font-size:15px;line-height:1.3}
+.gb-grid--boxes .gb-card-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600}
+.gb-card-desc{color:var(--gb-gris);font-size:13px;line-height:1.45}
+.gb-card-meta{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px;gap:6px 8px}
+.gb-price{font-weight:600}
+.gb-price s{color:var(--gb-gris);font-weight:400;font-size:12px;margin-right:4px}
+.gb-pill{font-size:12px;border-radius:999px;padding:5px 11px;border:1px solid var(--gb-rosa);color:var(--gb-rosa);background:transparent;white-space:nowrap}
+.gb-card.is-on .gb-pill{background:var(--gb-rosa);color:#fff}
+.gb-check{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:var(--gb-rosa);color:#fff;display:none;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.gb-card.is-on .gb-check{display:flex}
+.gb-badge{position:absolute;top:8px;left:8px;background:var(--gb-rosa);color:#fff;font-size:11px;font-weight:600;border-radius:999px;padding:3px 8px}
+.gb-tag{display:inline-block;font-size:12px;color:var(--gb-rosa-osc);background:var(--gb-rosa-suave);border-radius:6px;padding:3px 8px;margin-top:4px;width:fit-content}
+.gb-grid--boxes .gb-card-img,.gb-grid--extras .gb-card-img{object-fit:contain;padding:14px}
+.gb-price-tbd{color:var(--gb-gris);font-style:italic;font-weight:500;font-size:13px}
+.gb-notice{max-width:1180px;margin:0 auto 20px;background:#FFF6E5;border:1px solid #F0D9A8;color:#7A5A1E;border-radius:12px;padding:10px 14px;font-size:13px;display:none}
+.gb-notice.is-on{display:block}
+.gb-grid--clothes .gb-card-body{padding:9px 10px 11px}
+.gb-grid--clothes .gb-card-name{font-size:13px}
+.gb-grid--clothes .gb-price{font-size:13px;display:flex;flex-direction:column;line-height:1.25}
+.gb-grid--clothes .gb-price s{margin:0;font-size:11px}
+.gb-grid--clothes .gb-pill{display:none}
+.gb-counter{font-size:13px;font-weight:600;color:var(--gb-rosa-osc);background:var(--gb-rosa-suave);border-radius:999px;padding:5px 12px}
+.gb-empty{color:var(--gb-gris);font-size:14px;padding:12px 0}
+.gb-note{width:100%;min-height:90px;border:1px solid var(--gb-borde);border-radius:12px;padding:12px 14px;font:inherit;resize:vertical;background:var(--gb-crema)}
+.gb-note:focus{outline:none;border-color:var(--gb-rosa)}
+.gb-note-count{text-align:right;font-size:12px;color:var(--gb-gris);margin-top:4px}
+.gb-summary{position:sticky;top:20px;background:var(--gb-blanco);border:1px solid var(--gb-borde);border-radius:18px;padding:24px;box-shadow:var(--gb-sombra)}
+.gb-sum-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin:0 0 4px}
+.gb-sum-sub{color:var(--gb-gris);font-size:13px;margin:0 0 16px}
+.gb-sum-group{border-top:1px solid var(--gb-borde);padding:12px 0}
+.gb-sum-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gb-gris);margin-bottom:6px}
+.gb-line{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:14px}
+.gb-line img{width:38px;height:38px;border-radius:8px;object-fit:cover;flex:none;background:var(--gb-rosa-suave)}
+.gb-line-txt{flex:1;min-width:0}
+.gb-line-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gb-line-var{font-size:12px;color:var(--gb-gris)}
+.gb-line-price{font-weight:500;white-space:nowrap}
+.gb-x{border:none;background:none;color:var(--gb-gris);font-size:18px;line-height:1;padding:2px 4px;border-radius:6px}
+.gb-x:hover{color:var(--gb-rosa);background:var(--gb-rosa-suave)}
+.gb-placeholder{color:var(--gb-gris);font-size:14px;font-style:italic}
+.gb-total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--gb-borde);padding-top:14px;margin-top:4px}
+.gb-total span:first-child{font-size:14px;color:var(--gb-gris)}
+.gb-total-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600}
+.gb-cta{width:100%;margin-top:14px;border:none;border-radius:999px;padding:15px 18px;background:var(--gb-rosa);color:#fff;font-size:15px;font-weight:600;letter-spacing:.02em;transition:background .2s}
+.gb-cta:hover{background:var(--gb-rosa-osc)}
+.gb-cta:disabled{background:#D9C7CE;cursor:not-allowed}
+.gb-cta-hint{font-size:12px;color:var(--gb-gris);text-align:center;margin-top:8px;min-height:16px}
+.gb-sum-close{display:none}
+.gb-mbar{display:none}
+.gb-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+.gb-modal.is-open{display:flex}
+.gb-modal-bg{position:absolute;inset:0;background:rgba(43,34,38,.55);backdrop-filter:blur(2px)}
+.gb-modal-box{position:relative;background:#fff;border-radius:18px;max-width:760px;width:100%;max-height:92vh;overflow:auto;display:grid;grid-template-columns:1fr 1fr}
+.gb-modal-img{width:100%;height:100%;min-height:320px;object-fit:cover;background:var(--gb-rosa-suave)}
+.gb-modal-body{padding:28px 26px;display:flex;flex-direction:column;gap:14px}
+.gb-modal-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;margin:0;line-height:1.1}
+.gb-modal-close{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:none;background:#fff;font-size:22px;color:var(--gb-texto);box-shadow:0 2px 10px rgba(0,0,0,.12);z-index:2}
+.gb-opt-label{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gb-gris);margin-bottom:8px}
+.gb-chips{display:flex;flex-wrap:wrap;gap:8px}
+.gb-chip{border:1px solid var(--gb-borde);background:#fff;border-radius:999px;padding:7px 14px;font-size:14px;color:var(--gb-texto)}
+.gb-chip:hover{border-color:var(--gb-rosa)}
+.gb-chip.is-on{background:var(--gb-rosa);border-color:var(--gb-rosa);color:#fff}
+.gb-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px;border:1px solid rgba(0,0,0,.15)}
+.gb-chip:disabled{opacity:.35;text-decoration:line-through;cursor:not-allowed}
+.gb-modal-stock{font-size:13px;color:var(--gb-gris);min-height:18px}
+.gb-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--gb-texto);color:#fff;padding:12px 20px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:10000;max-width:90vw;text-align:center}
+.gb-toast.is-on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:900px){
+  #gb-root{padding:32px 14px 110px}
+  .gb-layout{grid-template-columns:1fr}
+  .gb-step{padding:20px 16px}
+  .gb-grid--boxes{grid-template-columns:1fr 1fr;gap:10px}
+  .gb-grid--boxes .gb-card-name{font-size:20px}
+  .gb-grid--extras{grid-template-columns:repeat(2,1fr);gap:10px}
+  .gb-grid--clothes{grid-template-columns:repeat(3,1fr);gap:8px}
+  .gb-grid--clothes .gb-card-name{font-size:12px}
+  .gb-summary{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:9000;border-radius:20px 20px 0 0;max-height:82vh;overflow:auto;transform:translateY(105%);transition:transform .3s;padding-bottom:28px}
+  .gb-summary.is-open{transform:translateY(0)}
+  .gb-sum-close{display:block;position:absolute;top:12px;right:14px;border:none;background:var(--gb-rosa-suave);border-radius:50%;width:34px;height:34px;font-size:20px;color:var(--gb-texto)}
+  .gb-mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:8999;background:#fff;border-top:1px solid var(--gb-borde);padding:12px 16px;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -6px 20px rgba(120,60,80,.08)}
+  .gb-mbar-total{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600}
+  .gb-mbar-items{font-size:12px;color:var(--gb-gris)}
+  .gb-mbar button{border:none;border-radius:999px;background:var(--gb-rosa);color:#fff;padding:12px 20px;font-weight:600;font-size:14px}
+  .gb-toast{bottom:150px}
+  .gb-modal{align-items:flex-end;padding:0}
+  .gb-modal-box{grid-template-columns:1fr;border-radius:20px 20px 0 0;max-height:94vh}
+  .gb-modal-img{min-height:0;aspect-ratio:1/1;max-height:42vh}
+  .gb-modal-body{padding:20px 18px 26px}
+}
+@media (max-width:420px){
+  .gb-grid--boxes .gb-card-body{padding:10px 11px 12px}
+  .gb-grid--boxes .gb-card-name{font-size:19px}
+  .gb-grid--boxes .gb-card-img{padding:8px}
+  .gb-grid--extras .gb-card-body{padding:10px 11px 12px}
+}
 </style>
   <link rel="preload" as="image" href="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1600,c_limit,q_auto,f_auto/v1780699131/diamantina/laqavbxqgax6h1kq0qz0.png" fetchpriority="high">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
@@ -756,6 +885,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
   <!-- Desktop nav -->
   <div class="nav-right" id="nav-right-desktop" style="display:flex;align-items:center;gap:1rem">
     <button onclick="showPage('tienda')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Tienda</button>
+    <button id="nav-cajaregalo" onclick="showPage('cajaregalo')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--rose);font-weight:500;cursor:pointer;padding:4px 8px">🎁 Caja de regalo</button>
     <button onclick="showPage('nosotras')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Guía de talles</button>
     <button onclick="showPage('politicas')" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;padding:4px 8px">Políticas</button>
 
@@ -777,6 +907,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 <!-- Mobile dropdown menu -->
 <div id="nav-mobile-menu" style="display:none;position:fixed;top:60px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:9999;flex-direction:column;box-shadow:0 4px 20px rgba(26,17,24,0.12)">
   <button onclick="showPage('tienda');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Tienda</button>
+  <button onclick="showPage('cajaregalo');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--rose);font-weight:500;cursor:pointer">🎁 Caja de regalo</button>
   <button onclick="showPage('nosotras');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Guía de talles</button>
   <button onclick="showPage('politicas');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Políticas</button>
 
@@ -787,7 +918,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 <div id="page-tienda">
   <!-- HERO V2 (banner con foto propia, sin superponer texto) -->
   <div class="hero-v2 hero banner-mode">
-    <div class="hero-banner-img-wrap">
+    <div class="hero-banner-img-wrap" onclick="showPage('cajaregalo')" style="cursor:pointer" title="Armá tu caja de regalo">
       <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1200,q_auto,f_auto/v1791842740/Di%CC%81a_de_la_Madre_entre_flores_y_amor_n696sj.png" alt="Día de la Madre — Diamantina Lencería" loading="eager" fetchpriority="high">
     </div>
     <div class="hero-banner-actions">
@@ -1613,6 +1744,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
     <button id="atab-pedidos" onclick="switchAdminTab('pedidos')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">📦 Pedidos</button>
     <button id="atab-clientes" onclick="switchAdminTab('clientes')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">👥 Clientes</button>
     <button id="atab-config" onclick="switchAdminTab('config')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">🎨 Tienda</button>
+    <button id="atab-cajas" onclick="switchAdminTab('cajas')" style="padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;color:var(--ink-mid);cursor:pointer;margin-bottom:-2px;transition:all 0.2s">🎁 Cajas de regalo</button>
     </div>
     <button id="admin-logout-btn" onclick="doLogout()" style="display:none;padding:7px 16px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:12px;color:var(--ink-mid);cursor:pointer">Cerrar sesión</button>
     </div>
@@ -2039,11 +2171,11 @@ let selectedTalla = null;
 
 // ── PAGES ──
 window.showPage = function(page) {
-  ['tienda','admin','pedidos','nosotras','politicas','favoritos','success','error','transferencia'].forEach(p => {
+  ['tienda','admin','pedidos','nosotras','politicas','favoritos','cajaregalo','success','error','transferencia'].forEach(p => {
     const el = document.getElementById('page-' + p);
     if (el) { el.style.display = 'none'; el.classList.remove('open'); }
   });
-  ['tienda','admin','pedidos','nosotras','politicas'].forEach(p => {
+  ['tienda','admin','pedidos','nosotras','politicas','cajaregalo'].forEach(p => {
     const navEl = document.getElementById('nav-' + p);
     if (navEl) navEl.classList.toggle('active', p === page);
   });
@@ -2081,6 +2213,10 @@ window.showPage = function(page) {
   } else if (page === 'favoritos') {
     document.getElementById('page-favoritos').style.display = 'block';
     renderFavoritos();
+  } else if (page === 'cajaregalo') {
+    const el = document.getElementById('page-cajaregalo');
+    if (el) el.style.display = 'block';
+    try { if (typeof gbOpen === 'function') gbOpen(); } catch(e) { console.error('Error en caja de regalo:', e); }
   } else if (page === 'success') {
     const _sel = document.getElementById('page-success');
     if (_sel) { _sel.style.display = 'block'; _sel.classList.add('open'); }
@@ -2253,7 +2389,7 @@ function applyApariencia(d) {
 }
 
 window.switchAdminTab = function(tab) {
-  const tabs = ['admin','pedidos','clientes','config'];
+  const tabs = ['admin','pedidos','clientes','config','cajas'];
   tabs.forEach(t => {
     const btn = document.getElementById('atab-' + t);
     const panel = document.getElementById('admin-tab-' + t);
@@ -2263,6 +2399,7 @@ window.switchAdminTab = function(tab) {
   if (tab === 'pedidos') renderPedidos();
   if (tab === 'clientes') renderClientes(true);
   if (tab === 'config') loadConfig();
+  if (tab === 'cajas') gbadmRenderList();
 };
 
 window.abrirWA = function() {
@@ -2434,6 +2571,8 @@ db.ref('productos').on('value', (snap) => {
     window._allProducts = data || {};
     products = allProds.filter(p => {
       if (p.estado === 'oculto') return false;
+      // Las cajas/perfumes/velas se manejan en la sección "Caja de regalo", no en la tienda normal
+      if (['caja-regalo','perfume','vela'].includes(String(p.cat||'').toLowerCase())) return false;
       // Si stock es 0 pero estado no es agotado, marcarlo como agotado
       if (p.stock && Object.keys(p.stock).length > 0) {
         const totalStock = Object.values(p.stock).reduce((s, v) => s + (Number(v) || 0), 0);
@@ -2448,6 +2587,10 @@ db.ref('productos').on('value', (snap) => {
     console.error('Error procesando productos:', e);
   }
   if (sinCambios && !esPrimeraCarga) return; // nada cambió: no re-renderizar
+  // Refrescar la solapa de Cajas de regalo si está abierta
+  try { const _gbt = document.getElementById('admin-tab-cajas'); if (_gbt && _gbt.style.display !== 'none' && typeof gbadmRenderList === 'function') gbadmRenderList(); } catch(e){}
+  // Refrescar la página de Caja de regalo si está visible (stock en vivo)
+  try { const _gbp = document.getElementById('page-cajaregalo'); if (_gbp && _gbp.style.display !== 'none' && typeof gbRefresh === 'function') gbRefresh(); } catch(e){}
   if (typeof renderHomeSizeFilter === 'function') renderHomeSizeFilter();
   // Primera carga: restaurar scroll si volvés de ver un producto (por si el navegador recargó)
   if (!window._catalogoRestaurado) {
@@ -4189,6 +4332,130 @@ window.resetForm = function() {
   document.getElementById('prod-img-input').value = '';
 };
 
+/* ===== ADMIN: Cajas de regalo / Perfumes / Velas ===== */
+let gbadmImg = '';
+const GBADM_CATS = ['caja-regalo','perfume','vela'];
+const GBADM_LABEL = { 'caja-regalo':'Caja', 'perfume':'Perfume', 'vela':'Vela' };
+
+window.gbadmUpload = async function(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const thumb = document.getElementById('gbadm-img-thumb');
+  if (thumb) thumb.innerHTML = '<div style="font-size:12px;color:var(--ink-light);font-style:italic">Subiendo foto…</div>';
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', CLOUDINARY_PRESET);
+    fd.append('folder', 'diamantina');
+    const res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload', { method:'POST', body:fd });
+    const data = await res.json();
+    if (data.secure_url) {
+      gbadmImg = data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_900/');
+      if (thumb) thumb.innerHTML = '<img src="' + gbadmImg + '" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">';
+    } else {
+      showToast('Error al subir la foto', 'error');
+      if (thumb) thumb.innerHTML = '';
+    }
+  } catch(e) {
+    showToast('Error al subir la foto: ' + e.message, 'error');
+    if (thumb) thumb.innerHTML = '';
+  }
+};
+
+window.gbadmSave = async function() {
+  if (!firebase.auth().currentUser) { showToast('Sesión expirada. Iniciá sesión de nuevo.', 'error'); showAdminPrompt(); return; }
+  const tipo = document.getElementById('gbadm-tipo').value;
+  const name = document.getElementById('gbadm-name').value.trim();
+  const price = parseFloat(document.getElementById('gbadm-price').value);
+  let stockN = parseInt(document.getElementById('gbadm-stock').value);
+  const estado = document.getElementById('gbadm-estado').value;
+  const editId = document.getElementById('gbadm-edit-id').value;
+  if (!name || !(price > 0)) { showToast('Completá nombre y precio', 'error'); return; }
+  if (!(stockN >= 0)) stockN = 0;
+  if (estado === 'agotado') stockN = 0;
+  const data = {
+    name, price, descuento: 0, precioFinal: price,
+    cat: tipo, desc: '', estado,
+    tallas: ['Única'], stock: { 'Única': stockN }, colores: [],
+    ts: Date.now()
+  };
+  const imgActual = gbadmImg || (editId && window._allProducts[editId] ? (window._allProducts[editId].img || '') : '');
+  if (imgActual) { data.img = imgActual; data.imgs = [imgActual]; }
+  try {
+    if (editId) { await db.ref('productos/' + editId).update(data); showToast('Ítem actualizado ✦'); }
+    else { await db.ref('productos').push(data); showToast('Ítem guardado ✦'); }
+    gbadmReset();
+  } catch(err) {
+    showToast('Error al guardar: ' + err.message, 'error');
+  }
+};
+
+window.gbadmReset = function() {
+  document.getElementById('gbadm-edit-id').value = '';
+  document.getElementById('gbadm-name').value = '';
+  document.getElementById('gbadm-price').value = '';
+  document.getElementById('gbadm-stock').value = '';
+  document.getElementById('gbadm-tipo').value = 'caja-regalo';
+  document.getElementById('gbadm-estado').value = 'activo';
+  document.getElementById('gbadm-img-input').value = '';
+  document.getElementById('gbadm-img-thumb').innerHTML = '';
+  document.getElementById('gbadm-form-title').textContent = 'Agregar ítem';
+  gbadmImg = '';
+};
+
+window.gbadmRenderList = function() {
+  const el = document.getElementById('gbadm-list');
+  if (!el) return;
+  const all = Object.entries(window._allProducts || {})
+    .map(([id, p]) => ({ id, ...p }))
+    .filter(p => GBADM_CATS.includes(String(p.cat || '').toLowerCase()));
+  if (!all.length) {
+    el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--ink-light);font-style:italic">Todavía no cargaste cajas, perfumes ni velas.</div>';
+    return;
+  }
+  const orden = { 'caja-regalo':0, 'perfume':1, 'vela':2 };
+  all.sort((a,b) => (orden[a.cat]-orden[b.cat]) || String(a.name).localeCompare(b.name));
+  el.innerHTML = all.map(p => {
+    const stockN = p.stock && p.stock['Única'] !== undefined ? Number(p.stock['Única']) : (p.stock ? Object.values(p.stock).reduce((s,v)=>s+(Number(v)||0),0) : 0);
+    const estadoTxt = p.estado === 'oculto' ? 'Oculto' : (p.estado === 'agotado' || stockN === 0 ? 'Agotado' : 'Disponible');
+    const estadoColor = estadoTxt === 'Disponible' ? '#3B6D11' : '#A32D2D';
+    return `<div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
+      <img src="${p.img || ''}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px;background:var(--surface-2);flex-shrink:0">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--rose);font-weight:600">${GBADM_LABEL[p.cat] || p.cat}</div>
+        <div style="font-size:14px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(p.name || '')}</div>
+        <div style="font-size:12px;color:var(--ink-light)">$${Number(p.price||0).toLocaleString('es-AR')} · Stock: ${stockN} · <span style="color:${estadoColor}">${estadoTxt}</span></div>
+      </div>
+      <button onclick="gbadmEdit('${p.id}')" style="padding:5px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:transparent;font-size:12px;color:var(--ink-mid);cursor:pointer">Editar</button>
+      <button onclick="gbadmDelete('${p.id}')" style="padding:5px 10px;border:1px solid #E24B4A;border-radius:var(--radius-sm);background:transparent;font-size:12px;color:#E24B4A;cursor:pointer">✕</button>
+    </div>`;
+  }).join('');
+};
+
+window.gbadmEdit = function(id) {
+  const p = window._allProducts && window._allProducts[id];
+  if (!p) return;
+  document.getElementById('gbadm-edit-id').value = id;
+  document.getElementById('gbadm-tipo').value = String(p.cat || 'caja-regalo').toLowerCase();
+  document.getElementById('gbadm-name').value = p.name || '';
+  document.getElementById('gbadm-price').value = p.price || '';
+  const stockN = p.stock && p.stock['Única'] !== undefined ? Number(p.stock['Única']) : (p.stock ? Object.values(p.stock).reduce((s,v)=>s+(Number(v)||0),0) : 0);
+  document.getElementById('gbadm-stock').value = stockN;
+  document.getElementById('gbadm-estado').value = p.estado || 'activo';
+  gbadmImg = '';
+  document.getElementById('gbadm-img-input').value = '';
+  document.getElementById('gbadm-img-thumb').innerHTML = p.img ? '<img src="' + p.img + '" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"><div style="font-size:11px;color:var(--ink-light);margin-top:3px">Foto actual (subí otra para cambiarla)</div>' : '';
+  document.getElementById('gbadm-form-title').textContent = 'Editar ítem';
+  document.getElementById('gbadm-tipo').scrollIntoView({ behavior:'smooth', block:'center' });
+};
+
+window.gbadmDelete = async function(id) {
+  const p = window._allProducts && window._allProducts[id];
+  if (!p || !confirm('¿Eliminar "' + (p.name || 'este ítem') + '"?')) return;
+  try { await db.ref('productos/' + id).remove(); showToast('Eliminado'); }
+  catch(e) { showToast('Error al eliminar: ' + e.message, 'error'); }
+};
+
 window.editProduct = function(id) {
   // Search in ALL products including hidden ones
   const _fromAll = Object.entries(window._allProducts || {}).map(([k,v]) => ({id:k,...v}));
@@ -4767,6 +5034,7 @@ function _mostrarPedidos(pedidos, todosPedidos) {
           return `<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:var(--surface-2);border-radius:999px;border:1px solid var(--border)">${nombre}${talla}${color} ×${i.qty||1}</span>`;
         }).join('')}
       </div>
+      ${(p.items||[]).some(i=>i.giftRol) ? `<div style="font-size:11px;color:var(--rose);margin-top:4px;font-weight:500">🎁 Caja de regalo${(() => { const d = (p.items||[]).map(i=>i.giftNota).find(Boolean); return d ? ` · Dedicatoria: "${escHtml(d)}"` : ''; })()}</div>` : ''}
       ${p.cupon ? `<div style="font-size:11px;color:#2e7d32;margin-top:4px">🎟️ Cupón: ${p.cupon}</div>` : ''}
       ${esCotizar ? `
         <div style="margin-top:10px;background:#FAEEDA;border-radius:var(--radius-sm);padding:10px 12px;display:flex;flex-direction:column;gap:6px">
@@ -7384,6 +7652,62 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
     </div>
   </div>
 
+  <!-- TAB CAJAS DE REGALO -->
+  <div id="admin-tab-cajas" style="display:none">
+    <div class="admin-title" style="margin-bottom:6px">🎁 Cajas de regalo</div>
+    <div style="font-size:13px;color:var(--ink-light);margin-bottom:1.25rem;line-height:1.6">Cargá acá las <strong>cajas</strong>, los <strong>perfumes</strong> y las <strong>velas</strong> que aparecen en la sección "Armá tu caja de regalo". No se muestran en la tienda normal. La ropa se toma de tus productos de siempre.</div>
+
+    <div class="admin-form" style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
+      <div id="gbadm-form-title" style="font-family:DM Sans,sans-serif;font-size:15px;font-weight:500;color:var(--ink);margin-bottom:1rem">Agregar ítem</div>
+      <input type="hidden" id="gbadm-edit-id" value="">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <label class="form-label">Tipo</label>
+          <select class="form-input" id="gbadm-tipo">
+            <option value="caja-regalo">📦 Caja</option>
+            <option value="perfume">🌸 Perfume</option>
+            <option value="vela">🕯️ Vela</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Estado</label>
+          <select class="form-input" id="gbadm-estado">
+            <option value="activo">Disponible</option>
+            <option value="agotado">Agotado</option>
+            <option value="oculto">Oculto</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label class="form-label">Nombre</label>
+        <input type="text" class="form-input" id="gbadm-name" placeholder="ej: Caja Roja / Perfume Floral / Vela Vainilla">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <label class="form-label">Precio ($)</label>
+          <input type="number" class="form-input" id="gbadm-price" placeholder="ej: 4500">
+        </div>
+        <div>
+          <label class="form-label">Stock (unidades)</label>
+          <input type="number" class="form-input" id="gbadm-stock" placeholder="ej: 10" min="0">
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label class="form-label">Foto</label>
+        <input type="file" id="gbadm-img-input" accept="image/*" onchange="gbadmUpload(this)" style="font-size:13px;font-family:DM Sans,sans-serif">
+        <div id="gbadm-img-thumb" style="margin-top:8px"></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="gbadmSave()" style="padding:10px 20px;background:var(--rose);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;cursor:pointer">Guardar</button>
+        <button onclick="gbadmReset()" style="padding:10px 20px;background:transparent;border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--ink-mid);font-family:DM Sans,sans-serif;font-size:14px;cursor:pointer">Limpiar</button>
+      </div>
+    </div>
+
+    <div id="gbadm-list" style="display:flex;flex-direction:column;gap:10px">
+      <div style="text-align:center;padding:2rem;color:var(--ink-light);font-style:italic">Cargando…</div>
+    </div>
+  </div>
+
 <!-- GUÍA DE TALLES INTELIGENTE -->
 <div id="guia-modal-bg" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(26,17,24,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:var(--radius);max-width:480px;width:90%;max-height:90vh;overflow-y:auto;padding:2rem;position:relative;box-shadow:0 24px 80px rgba(26,17,24,0.2)">
@@ -7434,5 +7758,480 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
     </div>
   </div>
 </div>
+
+<!-- ============ PÁGINA CAJA DE REGALO ============ -->
+<div id="page-cajaregalo" style="display:none">
+<section id="gb-root" aria-labelledby="gb-title">
+  <header class="gb-head">
+    <div class="gb-kicker">Regalos Diamantina</div>
+    <h2 class="gb-title" id="gb-title">Armá tu <em>caja de regalo</em></h2>
+    <p class="gb-sub">Elegí la caja, sumale un perfume o una vela si querés, y completala con tu prenda favorita. Nosotras la preparamos con todo el cariño.</p>
+  </header>
+  <div class="gb-notice" id="gb-notice" role="status"></div>
+  <div class="gb-layout">
+    <div>
+      <div class="gb-step" id="gb-step-box">
+        <div class="gb-step-head">
+          <h3 class="gb-step-title"><span class="gb-step-num">1</span>Elegí tu caja</h3>
+          <span class="gb-step-hint">El corazón de tu regalo</span>
+        </div>
+        <div class="gb-grid gb-grid--boxes" id="gb-boxes"></div>
+      </div>
+      <div class="gb-step" id="gb-step-perfume">
+        <div class="gb-step-head">
+          <h3 class="gb-step-title"><span class="gb-step-num">2</span>Sumá un perfume <span class="gb-opt">opcional</span></h3>
+          <span class="gb-step-hint" id="gb-perfume-hint"></span>
+        </div>
+        <div class="gb-grid gb-grid--extras" id="gb-perfumes"></div>
+      </div>
+      <div class="gb-step" id="gb-step-candle">
+        <div class="gb-step-head">
+          <h3 class="gb-step-title"><span class="gb-step-num">3</span>Sumá una vela <span class="gb-opt">opcional</span></h3>
+          <span class="gb-step-hint" id="gb-candle-hint"></span>
+        </div>
+        <div class="gb-grid gb-grid--extras" id="gb-candles"></div>
+      </div>
+      <div class="gb-step" id="gb-step-clothes">
+        <div class="gb-step-head">
+          <h3 class="gb-step-title"><span class="gb-step-num">4</span>Elegí tu prenda</h3>
+          <span class="gb-counter" id="gb-clothes-counter">Elegí primero una caja</span>
+        </div>
+        <div class="gb-grid gb-grid--clothes" id="gb-clothes"></div>
+      </div>
+      <div class="gb-step" id="gb-step-note">
+        <div class="gb-step-head">
+          <h3 class="gb-step-title"><span class="gb-step-num">5</span>Dedicatoria <span class="gb-opt">opcional</span></h3>
+          <span class="gb-step-hint">Va escrita a mano en una tarjeta dentro de la caja</span>
+        </div>
+        <textarea class="gb-note" id="gb-note" maxlength="200" placeholder="Ej: Feliz cumple, que lo disfrutes mucho ♡"></textarea>
+        <div class="gb-note-count"><span id="gb-note-count">0</span>/200</div>
+      </div>
+    </div>
+    <aside class="gb-summary" id="gb-summary" aria-label="Resumen de tu caja">
+      <button class="gb-sum-close" id="gb-sum-close" aria-label="Cerrar resumen">×</button>
+      <h3 class="gb-sum-title">Tu caja</h3>
+      <p class="gb-sum-sub">Se va armando a medida que elegís</p>
+      <div id="gb-sum-lines"></div>
+      <div class="gb-total"><span>Total</span><span class="gb-total-num" id="gb-total">$ 0</span></div>
+      <button class="gb-cta" id="gb-add-cart" disabled>Añadir al carrito</button>
+      <div class="gb-cta-hint" id="gb-cta-hint">Elegí una caja para empezar</div>
+    </aside>
+  </div>
+  <div class="gb-mbar" id="gb-mbar">
+    <div><div class="gb-mbar-total" id="gb-mbar-total">$ 0</div><div class="gb-mbar-items" id="gb-mbar-items">Tu caja está vacía</div></div>
+    <button id="gb-mbar-open">Ver mi caja</button>
+  </div>
+  <div class="gb-modal" id="gb-modal" role="dialog" aria-modal="true" aria-labelledby="gb-modal-name">
+    <div class="gb-modal-bg" data-gb-close></div>
+    <div class="gb-modal-box">
+      <button class="gb-modal-close" data-gb-close aria-label="Cerrar">×</button>
+      <img class="gb-modal-img" id="gb-modal-img" alt="">
+      <div class="gb-modal-body">
+        <h3 class="gb-modal-name" id="gb-modal-name"></h3>
+        <div class="gb-price" id="gb-modal-price"></div>
+        <div id="gb-modal-talles-wrap"><div class="gb-opt-label">Talle</div><div class="gb-chips" id="gb-modal-talles"></div></div>
+        <div id="gb-modal-colores-wrap"><div class="gb-opt-label">Color</div><div class="gb-chips" id="gb-modal-colores"></div></div>
+        <div class="gb-modal-stock" id="gb-modal-stock"></div>
+        <button class="gb-cta" id="gb-modal-add" disabled>Añadir a la caja</button>
+      </div>
+    </div>
+  </div>
+  <div class="gb-toast" id="gb-toast" role="status" aria-live="polite"></div>
+</section>
+</div>
+
+<script>
+/* ============ CAJA DE REGALO — lógica (integrada al index) ============ */
+const GB_CONFIG = {
+  categoryField: 'cat',
+  categories: { box: 'caja-regalo', perfume: 'perfume', candle: 'vela' },
+  defaultMaxPrendas: 1, minPrendas: 1, maxPerfumes: 1, maxVelas: 1, noteMax: 200
+};
+function gbPh(label, hue){
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='hsl(${hue},45%,92%)'/><stop offset='1' stop-color='hsl(${hue},40%,80%)'/></linearGradient></defs><rect width='400' height='400' fill='url(#g)'/><text x='200' y='212' font-family='Georgia,serif' font-size='30' text-anchor='middle' fill='hsl(${hue},30%,32%)'>${label}</text></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+const GB_PH_IMG = gbPh('Diamantina', 340);
+
+/* ---- adaptadores al index real ---- */
+function gbGetCart(){ return (typeof cart !== 'undefined' && Array.isArray(cart)) ? cart : (window.cart || []); }
+function gbPushToCart(items){
+  if (typeof cart !== 'undefined' && Array.isArray(cart)) { items.forEach(it => cart.push(it)); }
+  else { window.cart = (window.cart || []).concat(items); }
+  if (typeof saveCart === 'function') saveCart();
+  if (typeof updateCartUI === 'function') updateCartUI();
+  if (typeof toggleCart === 'function') toggleCart(true);
+}
+
+/* ---- helpers ---- */
+const gbFmt = new Intl.NumberFormat('es-AR', {style:'currency', currency:'ARS', maximumFractionDigits:0});
+const $gb = id => document.getElementById(id);
+function gbEl(tag, props, ...kids){
+  const n = document.createElement(tag);
+  if (props) for (const [k,v] of Object.entries(props)){
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v === true ? '' : v);
+  }
+  for (const k of kids.flat()) if (k != null && k !== false) n.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return n;
+}
+function gbCat(p){ return String((p && p[GB_CONFIG.categoryField]) || '').trim().toLowerCase(); }
+function gbName(p){ return String(p.name || p.nombre || 'Producto'); }
+function gbSafeKey(s){ return String(s).replace(/[.#$/\[\]]/g, '-'); }
+function gbTallas(p){
+  const t = (Array.isArray(p.tallas) ? p.tallas : Object.values(p.tallas || {})).map(String).filter(Boolean);
+  return t.length ? t : ['Única'];
+}
+function gbColores(p){
+  const c = Array.isArray(p.colores) ? p.colores : Object.values(p.colores || {});
+  return c.filter(x => x && x.nombre).map(x => ({hex: String(x.hex || ''), nombre: String(x.nombre)}));
+}
+function gbStockDisp(p, talla, color){
+  if (!p || !p.stock || typeof p.stock !== 'object') return Infinity;
+  const k1 = color ? (gbSafeKey(talla) + '__' + gbSafeKey(color)) : gbSafeKey(talla);
+  if (p.stock[k1] !== undefined) return Number(p.stock[k1]);
+  if (p.stock[talla] !== undefined) return Number(p.stock[talla]);
+  if (p.stock[gbSafeKey(talla)] !== undefined) return Number(p.stock[gbSafeKey(talla)]);
+  return Infinity;
+}
+function gbStockPorColor(p, talla, color){
+  return !!(color && p.stock && p.stock[gbSafeKey(talla) + '__' + gbSafeKey(color)] !== undefined);
+}
+function gbImg(p){
+  const raw = Array.isArray(p.img) ? p.img[0] : (p.img || p.imagen || '');
+  const src = String(raw || '');
+  if (/^data:image\//i.test(src)) return src;
+  if (!/^https:\/\//i.test(src)) return GB_PH_IMG;
+  return src.replace(/(res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/)/, '$1f_auto,q_auto,w_700/$2');
+}
+function gbImgEl(p, cls, alt){
+  return gbEl('img', {class:cls, src:gbImg(p), alt: alt == null ? gbName(p) : alt, loading:'lazy',
+    onerror: e => { if (e.target.src !== GB_PH_IMG) e.target.src = GB_PH_IMG; }});
+}
+function gbPrice(p){
+  if (p.precioPendiente) return 0;
+  const v = (Number(p.descuento) > 0 && p.precioFinal) ? p.precioFinal : p.price;
+  return Math.max(0, Math.round(Number(v) || 0));
+}
+function gbPriceNode(p){
+  if (p.precioPendiente) return gbEl('span', {class:'gb-price-tbd', text:'Precio a definir'});
+  const final = gbPrice(p), base = Math.round(Number(p.price) || 0);
+  return gbEl('span', {class:'gb-price'}, base > final ? gbEl('s', {text:gbFmt.format(base)}) : null, gbFmt.format(final));
+}
+function gbHexOk(h){ return /^#[0-9a-f]{3,8}$/i.test(h) ? h : ''; }
+let gbToastT;
+function gbToast(msg){
+  const t = $gb('gb-toast'); if (!t) return; t.textContent = msg; t.classList.add('is-on');
+  clearTimeout(gbToastT); gbToastT = setTimeout(() => t.classList.remove('is-on'), 2600);
+}
+function gbNotice(msg){ const n = $gb('gb-notice'); if(!n) return; n.textContent = msg; n.classList.add('is-on'); }
+function gbPrendaWord(n){ return n === 1 ? 'prenda' : 'prendas'; }
+
+/* ---- estado ---- */
+const GB = {
+  catalog: {}, boxes: [], perfumes: [], candles: [], clothes: [],
+  sel: { box:null, perfumes:[], candles:[], prendas:[], note:'' },
+  modal: { id:null, talla:null, color:null },
+  uid: 0, bound: false
+};
+function gbUsadas(id, talla, color){
+  const p = GB.catalog[id];
+  const porColor = gbStockPorColor(p, talla, color);
+  const mismo = (t, c) => String(t) === String(talla) && (!porColor || (c || '') === (color || ''));
+  const cNom = c => c ? (typeof c === 'object' ? (c.nombre || '') : String(c)) : '';
+  let n = 0;
+  if (GB.sel.box === id && mismo('Única', '')) n++;
+  n += GB.sel.perfumes.filter(x => x === id).length * (mismo('Única', '') ? 1 : 0);
+  n += GB.sel.candles.filter(x => x === id).length * (mismo('Única', '') ? 1 : 0);
+  n += GB.sel.prendas.filter(x => x.id === id && mismo(x.talla, cNom(x.color))).length;
+  n += gbGetCart().filter(i => (i.prodId || i.id) === id && mismo(i.talla, cNom(i.color))).reduce((a, i) => a + (Number(i.qty) || 1), 0);
+  return n;
+}
+function gbAvailable(id, talla, color){
+  const p = GB.catalog[id]; if (!p) return 0;
+  const disp = gbStockDisp(p, talla, color || '');
+  if (disp === Infinity) return Infinity;
+  return disp - gbUsadas(id, talla, color || '');
+}
+function gbHayStock(id){
+  const p = GB.catalog[id];
+  if (!p || p.estado === 'agotado') return false;
+  const cols = gbColores(p);
+  return gbTallas(p).some(t => (cols.length ? cols.map(c => c.nombre) : ['']).some(c => gbAvailable(id, t, c) > 0));
+}
+function gbMaxPrendas(){ return GB_CONFIG.defaultMaxPrendas; }
+function gbTotal(){
+  const s = GB.sel, P = id => gbPrice(GB.catalog[id]);
+  return (s.box ? P(s.box) : 0) + s.perfumes.reduce((a,id) => a + P(id), 0)
+    + s.candles.reduce((a,id) => a + P(id), 0) + s.prendas.reduce((a,x) => a + P(x.id), 0);
+}
+function gbHayPendientes(){
+  const s = GB.sel;
+  return [s.box, ...s.perfumes, ...s.candles].some(id => id && GB.catalog[id] && GB.catalog[id].precioPendiente);
+}
+
+/* ---- render ---- */
+function gbRenderBoxes(){
+  const wrap = $gb('gb-boxes'); wrap.replaceChildren();
+  if (!GB.boxes.length) return wrap.append(gbEl('div', {class:'gb-empty', text:'Pronto vas a poder elegir tu caja.'}));
+  GB.boxes.forEach(id => {
+    const p = GB.catalog[id], on = GB.sel.box === id, sinStock = !on && !gbHayStock(id);
+    const max = gbMaxPrendas();
+    wrap.append(gbEl('button', {type:'button', class:'gb-card' + (on ? ' is-on' : '') + (sinStock ? ' is-dim' : ''), 'aria-pressed':String(on), 'data-gb-id':id,
+      onclick: () => gbPickBox(id)},
+      gbEl('span', {class:'gb-check', 'aria-hidden':'true', text:'✓'}),
+      gbImgEl(p, 'gb-card-img'),
+      gbEl('div', {class:'gb-card-body'},
+        gbEl('div', {class:'gb-card-name', text:gbName(p)}),
+        p.descripcion ? gbEl('div', {class:'gb-card-desc', text:String(p.descripcion)}) : null,
+        gbEl('span', {class:'gb-tag', text:`${max} ${gbPrendaWord(max)}`}),
+        gbEl('div', {class:'gb-card-meta'}, gbPriceNode(p), gbEl('span', {class:'gb-pill', text: sinStock ? 'Sin stock' : on ? 'Elegida' : 'Elegir'}))
+      )));
+  });
+}
+function gbRenderExtras(kind){
+  const list = kind === 'perfume' ? GB.perfumes : GB.candles;
+  const sel  = kind === 'perfume' ? GB.sel.perfumes : GB.sel.candles;
+  const max  = kind === 'perfume' ? GB_CONFIG.maxPerfumes : GB_CONFIG.maxVelas;
+  const wrap = $gb(kind === 'perfume' ? 'gb-perfumes' : 'gb-candles'); wrap.replaceChildren();
+  $gb(kind === 'perfume' ? 'gb-perfume-hint' : 'gb-candle-hint').textContent = max === 1 ? 'Podés sumar 1' : `Podés sumar hasta ${max}`;
+  const visibles = list.filter(id => sel.includes(id) || gbHayStock(id));
+  if (!visibles.length) return wrap.append(gbEl('div', {class:'gb-empty', text:'Por ahora no hay opciones disponibles.'}));
+  visibles.forEach(id => {
+    const p = GB.catalog[id], on = sel.includes(id), full = !on && sel.length >= max && max > 1;
+    wrap.append(gbEl('button', {type:'button', class:'gb-card' + (on ? ' is-on' : '') + (full ? ' is-dim' : ''), 'aria-pressed':String(on), 'data-gb-id':id,
+      onclick: () => gbToggleExtra(kind, id)},
+      gbEl('span', {class:'gb-check', 'aria-hidden':'true', text:'✓'}),
+      gbImgEl(p, 'gb-card-img'),
+      gbEl('div', {class:'gb-card-body'},
+        gbEl('div', {class:'gb-card-name', text:gbName(p)}),
+        gbEl('div', {class:'gb-card-meta'}, gbPriceNode(p), gbEl('span', {class:'gb-pill', text: on ? 'Quitar' : 'Sumar'}))
+      )));
+  });
+}
+function gbRenderClothes(){
+  const wrap = $gb('gb-clothes'); wrap.replaceChildren();
+  const max = gbMaxPrendas(), n = GB.sel.prendas.length;
+  $gb('gb-clothes-counter').textContent = GB.sel.box ? `${n} de ${max} ${gbPrendaWord(max)}` : 'Elegí primero una caja';
+  const visibles = GB.clothes.filter(id => gbHayStock(id) || GB.sel.prendas.some(x => x.id === id));
+  if (!visibles.length) return wrap.append(gbEl('div', {class:'gb-empty', text:'No hay prendas disponibles en este momento.'}));
+  visibles.forEach(id => {
+    const p = GB.catalog[id], cant = GB.sel.prendas.filter(x => x.id === id).length;
+    wrap.append(gbEl('button', {type:'button', class:'gb-card' + (cant ? ' is-on' : ''), 'data-gb-id':id, onclick: () => gbOpenModal(id)},
+      cant ? gbEl('span', {class:'gb-badge', text:`×${cant} en tu caja`}) : null,
+      gbImgEl(p, 'gb-card-img'),
+      gbEl('div', {class:'gb-card-body'},
+        gbEl('div', {class:'gb-card-name', text:gbName(p)}),
+        gbEl('div', {class:'gb-card-meta'}, gbPriceNode(p))
+      )));
+  });
+}
+function gbLine(id, variante, onRemove){
+  const p = GB.catalog[id];
+  return gbEl('div', {class:'gb-line'},
+    gbImgEl(p, null, ''),
+    gbEl('div', {class:'gb-line-txt'},
+      gbEl('div', {class:'gb-line-name', text:gbName(p)}),
+      variante ? gbEl('div', {class:'gb-line-var', text:variante}) : null),
+    p.precioPendiente ? gbEl('span', {class:'gb-price-tbd', text:'a definir'}) : gbEl('span', {class:'gb-line-price', text:gbFmt.format(gbPrice(p))}),
+    onRemove ? gbEl('button', {type:'button', class:'gb-x', 'aria-label':'Quitar ' + gbName(p), onclick:onRemove, text:'×'}) : null);
+}
+function gbRenderSummary(){
+  const s = GB.sel, box = $gb('gb-sum-lines'); box.replaceChildren();
+  const group = (label, ...kids) => gbEl('div', {class:'gb-sum-group'}, gbEl('div', {class:'gb-sum-label', text:label}), ...kids);
+  box.append(group('Caja', s.box ? gbLine(s.box, `${gbMaxPrendas()} ${gbPrendaWord(gbMaxPrendas())}`, null) : gbEl('div', {class:'gb-placeholder', text:'Todavía no elegiste caja'})));
+  if (s.perfumes.length) box.append(group('Perfume', s.perfumes.map(id => gbLine(id, null, () => gbToggleExtra('perfume', id)))));
+  if (s.candles.length)  box.append(group('Vela',   s.candles.map(id  => gbLine(id, null, () => gbToggleExtra('candle', id)))));
+  box.append(group(`Prenda${s.box ? ` (${s.prendas.length}/${gbMaxPrendas()})` : ''}`,
+    s.prendas.length ? s.prendas.map(x => gbLine(x.id, [x.talla !== 'Única' && 'Talle ' + x.talla, x.color && x.color.nombre].filter(Boolean).join(' · '), () => gbRemovePrenda(x.uid)))
+                     : gbEl('div', {class:'gb-placeholder', text:'Sumá tu prenda'})));
+  if (s.note.trim()) box.append(group('Dedicatoria', gbEl('div', {class:'gb-line-var', text:'“' + s.note.trim() + '”'})));
+  const total = gbFmt.format(gbTotal());
+  $gb('gb-total').textContent = total; $gb('gb-mbar-total').textContent = total;
+  const items = (s.box ? 1 : 0) + s.perfumes.length + s.candles.length + s.prendas.length;
+  $gb('gb-mbar-items').textContent = items ? `${items} ${items === 1 ? 'ítem' : 'ítems'} en tu caja` : 'Tu caja está vacía';
+  const falta = !s.box ? 'Elegí una caja para empezar'
+    : s.prendas.length < GB_CONFIG.minPrendas ? `Sumá tu prenda` : '';
+  $gb('gb-add-cart').disabled = !!falta;
+  $gb('gb-cta-hint').textContent = falta || (gbHayPendientes() ? 'Hay precios a definir (no suman al total)' : 'Los precios se confirman al pagar');
+}
+function gbRenderAll(){ gbRenderBoxes(); gbRenderExtras('perfume'); gbRenderExtras('candle'); gbRenderClothes(); gbRenderSummary(); }
+
+/* ---- acciones ---- */
+function gbPickBox(id){
+  if (GB.sel.box === id) return;
+  if (!gbHayStock(id)) return gbToast('Esa caja está sin stock por ahora');
+  const nuevaMax = gbMaxPrendas();
+  if (GB.sel.prendas.length > nuevaMax)
+    return gbToast(`Esa caja lleva hasta ${nuevaMax} ${gbPrendaWord(nuevaMax)}.`);
+  GB.sel.box = id;
+  gbRenderAll();
+}
+function gbToggleExtra(kind, id){
+  const arr = kind === 'perfume' ? GB.sel.perfumes : GB.sel.candles;
+  const max = kind === 'perfume' ? GB_CONFIG.maxPerfumes : GB_CONFIG.maxVelas;
+  const i = arr.indexOf(id);
+  if (i >= 0) arr.splice(i, 1);
+  else {
+    if (!gbHayStock(id)) return gbToast('Sin stock por ahora');
+    if (arr.length >= max){
+      if (max === 1) arr.splice(0, 1);
+      else return gbToast(`Podés sumar hasta ${max} ${kind === 'perfume' ? 'perfumes' : 'velas'}`);
+    }
+    arr.push(id);
+  }
+  gbRenderAll();
+}
+function gbRemovePrenda(uid){ GB.sel.prendas = GB.sel.prendas.filter(x => x.uid !== uid); gbRenderAll(); }
+
+let gbLastFocus = null;
+function gbOpenModal(id){
+  if (!GB.sel.box){
+    gbToast('Primero elegí tu caja ♡');
+    $gb('gb-step-box').scrollIntoView({behavior:'smooth', block:'start'});
+    return;
+  }
+  const p = GB.catalog[id];
+  GB.modal = {id, talla:null, color:null};
+  const img = $gb('gb-modal-img');
+  img.onerror = e => { if (e.target.src !== GB_PH_IMG) e.target.src = GB_PH_IMG; };
+  img.src = gbImg(p); img.alt = gbName(p);
+  $gb('gb-modal-name').textContent = gbName(p);
+  $gb('gb-modal-price').replaceChildren(gbPriceNode(p));
+  const tallas = gbTallas(p), cols = gbColores(p);
+  if (tallas.length === 1) GB.modal.talla = tallas[0];
+  if (cols.length === 1) GB.modal.color = cols[0];
+  gbRenderModal();
+  gbLastFocus = document.activeElement;
+  $gb('gb-modal').classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+  $gb('gb-modal').querySelector('.gb-modal-close').focus();
+}
+function gbCloseModal(){
+  $gb('gb-modal').classList.remove('is-open');
+  document.body.style.overflow = '';
+  if (gbLastFocus) gbLastFocus.focus();
+}
+function gbRenderModal(){
+  const {id} = GB.modal, p = GB.catalog[id];
+  const tallas = gbTallas(p), cols = gbColores(p);
+  const colNom = () => GB.modal.color ? GB.modal.color.nombre : '';
+  const avail = (t, c) => gbAvailable(id, t, c);
+  const tallaOk = t => cols.length ? cols.some(c => avail(t, c.nombre) > 0) : avail(t, '') > 0;
+  $gb('gb-modal-talles-wrap').style.display = (tallas.length === 1 && tallas[0] === 'Única') ? 'none' : '';
+  $gb('gb-modal-talles').replaceChildren(...tallas.map(t =>
+    gbEl('button', {type:'button', class:'gb-chip' + (GB.modal.talla === t ? ' is-on' : ''), disabled:!tallaOk(t), text:t,
+      onclick: () => {
+        GB.modal.talla = t;
+        if (GB.modal.color && avail(t, GB.modal.color.nombre) <= 0) GB.modal.color = null;
+        const libres = cols.filter(c => avail(t, c.nombre) > 0);
+        if (!GB.modal.color && libres.length === 1) GB.modal.color = libres[0];
+        gbRenderModal();
+      }})));
+  $gb('gb-modal-colores-wrap').style.display = cols.length ? '' : 'none';
+  $gb('gb-modal-colores').replaceChildren(...cols.map(c => {
+    const ok = GB.modal.talla == null ? tallas.some(t => avail(t, c.nombre) > 0) : avail(GB.modal.talla, c.nombre) > 0;
+    const hex = gbHexOk(c.hex);
+    const dot = gbEl('span', {class:'gb-dot', 'aria-hidden':'true'}); if (hex) dot.style.background = hex;
+    return gbEl('button', {type:'button', class:'gb-chip' + (GB.modal.color && GB.modal.color.nombre === c.nombre ? ' is-on' : ''), disabled:!ok,
+      onclick: () => { GB.modal.color = c; gbRenderModal(); }}, hex ? dot : null, c.nombre);
+  }));
+  const listo = GB.modal.talla != null && (!cols.length || GB.modal.color != null);
+  const quedan = listo ? avail(GB.modal.talla, colNom()) : 0;
+  const lleno = GB.sel.prendas.length >= gbMaxPrendas();
+  const btn = $gb('gb-modal-add');
+  btn.disabled = !listo || quedan <= 0 || lleno;
+  btn.textContent = lleno ? `Tu caja ya tiene su prenda` : 'Añadir a la caja';
+  $gb('gb-modal-stock').textContent =
+    !listo ? (GB.modal.talla == null ? 'Elegí talle' : 'Elegí color')
+    : quedan <= 0 ? 'Sin stock en esta combinación'
+    : quedan <= 2 ? `¡Quedan ${quedan}!` : '';
+}
+function gbAddPrenda(){
+  const {id, talla, color} = GB.modal;
+  if (GB.sel.prendas.length >= gbMaxPrendas()) return gbToast('Tu caja ya tiene su prenda');
+  if (gbAvailable(id, talla, color ? color.nombre : '') <= 0) return gbToast('Sin stock en esa combinación');
+  GB.sel.prendas.push({uid: ++GB.uid, id, talla, color: color ? {hex: color.hex, nombre: color.nombre} : null});
+  gbCloseModal();
+  gbRenderAll();
+  gbToast('¡Prenda agregada! Ya podés añadir tu caja al carrito');
+}
+
+function gbAddToCart(){
+  const s = GB.sel;
+  if (!s.box || s.prendas.length < GB_CONFIG.minPrendas) return;
+  const giftBoxId = 'gb' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const nota = s.note.trim().slice(0, GB_CONFIG.noteMax);
+  const item = (id, rol, talla, color) => {
+    const p = GB.catalog[id];
+    const colorKey = color ? '_' + (color.hex || color.nombre) : '';
+    return {
+      key: id + '_' + talla + colorKey + '_' + giftBoxId,
+      id, prodId: id, name: gbName(p), price: gbPrice(p),
+      precioOriginal: Math.round(Number(p.price) || 0), descuento: Number(p.descuento) || 0,
+      img: Array.isArray(p.img) ? p.img[0] : (p.img || ''), cat: p.cat || '',
+      talla, color: color || null, qty: 1,
+      giftBoxId, giftRol: rol, ...(rol === 'caja' ? { giftNota: nota } : {})
+    };
+  };
+  const items = [
+    item(s.box, 'caja', 'Única'),
+    ...s.perfumes.map(id => item(id, 'perfume', 'Única')),
+    ...s.candles.map(id => item(id, 'vela', 'Única')),
+    ...s.prendas.map(x => item(x.id, 'prenda', x.talla, x.color))
+  ];
+  gbPushToCart(items);
+  GB.sel = { box:null, perfumes:[], candles:[], prendas:[], note:'' };
+  $gb('gb-note').value = ''; $gb('gb-note-count').textContent = '0';
+  $gb('gb-summary').classList.remove('is-open');
+  gbRenderAll();
+  gbToast('¡Tu caja de regalo se sumó al carrito! 🎁');
+}
+
+/* ---- init / apertura ---- */
+function gbBuildCatalog(){
+  GB.catalog = {}; GB.boxes = []; GB.perfumes = []; GB.candles = []; GB.clothes = [];
+  const productos = window._allProducts || {};
+  const C = GB_CONFIG.categories;
+  for (const [id, p] of Object.entries(productos)){
+    if (!p || typeof p !== 'object' || p.estado === 'oculto') continue;
+    if (gbPrice(p) <= 0 && !p.precioPendiente) continue;
+    GB.catalog[id] = p;
+    const cat = gbCat(p);
+    if (cat === C.box) GB.boxes.push(id);
+    else if (cat === C.perfume) GB.perfumes.push(id);
+    else if (cat === C.candle) GB.candles.push(id);
+    else GB.clothes.push(id);
+  }
+  GB.boxes.sort((a, b) => gbPrice(GB.catalog[a]) - gbPrice(GB.catalog[b]) || a.localeCompare(b));
+  if (GB.sel.box && !GB.catalog[GB.sel.box]) GB.sel.box = null;
+  GB.sel.perfumes = GB.sel.perfumes.filter(id => GB.catalog[id]);
+  GB.sel.candles = GB.sel.candles.filter(id => GB.catalog[id]);
+  GB.sel.prendas = GB.sel.prendas.filter(x => GB.catalog[x.id]);
+}
+function gbBindOnce(){
+  if (GB.bound) return; GB.bound = true;
+  $gb('gb-add-cart').addEventListener('click', gbAddToCart);
+  $gb('gb-modal-add').addEventListener('click', gbAddPrenda);
+  $gb('gb-modal').addEventListener('click', e => { if (e.target.closest('[data-gb-close]')) gbCloseModal(); });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if ($gb('gb-modal').classList.contains('is-open')) gbCloseModal();
+    else $gb('gb-summary').classList.remove('is-open');
+  });
+  $gb('gb-note').addEventListener('input', e => {
+    GB.sel.note = e.target.value.slice(0, GB_CONFIG.noteMax);
+    $gb('gb-note-count').textContent = GB.sel.note.length;
+    gbRenderSummary();
+  });
+  $gb('gb-mbar-open').addEventListener('click', () => $gb('gb-summary').classList.add('is-open'));
+  $gb('gb-sum-close').addEventListener('click', () => $gb('gb-summary').classList.remove('is-open'));
+}
+window.gbOpen = function(){ gbBindOnce(); gbBuildCatalog(); gbRenderAll(); };
+window.gbRefresh = function(){ if (!GB.bound) return; gbBuildCatalog(); gbRenderAll(); };
+</script>
 
 </body>
