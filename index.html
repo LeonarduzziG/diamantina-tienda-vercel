@@ -382,7 +382,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
 /* Con el carrito abierto, ocultar los botones flotantes para que no tapen el total */
 body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none !important}
 /* En la página de caja de regalo (mobile), subir el WhatsApp para que no tape la barra del total */
-@media(max-width:900px){body.gb-page-open #wa-float-wrap{bottom:calc(84px + env(safe-area-inset-bottom,0px))}body.gb-page-open #back-to-top-btn{display:none}}
+@media(max-width:900px){body.gb-page-open #wa-float-wrap{bottom:calc(84px + env(safe-area-inset-bottom,0px)) !important}body.gb-page-open #back-to-top-btn{display:none !important}}
 .cart-subtotal{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .cart-subtotal-label{font-size:14px;color:var(--ink-mid)}
 .cart-subtotal-value{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:var(--ink)}
@@ -924,7 +924,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
   <!-- HERO V2 (banner con foto propia, sin superponer texto) -->
   <div class="hero-v2 hero banner-mode">
     <div class="hero-banner-img-wrap" onclick="showPage('cajaregalo')" style="cursor:pointer" title="Armá tu caja de regalo">
-      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/v1792430006/Caja_de_Regalo_Diamantina_1_tbllts.png" loading="eager" fetchpriority="high">
+      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1200,q_auto,f_auto/v1792430006/Caja_de_Regalo_Diamantina_1_tbllts.png" alt="Armá tu caja de regalo — Diamantina Lencería" loading="eager" fetchpriority="high">
     </div>
     <div class="hero-banner-actions">
       <div class="hero-btns-wrap" style="display:inline-flex;flex-direction:column;gap:12px;align-items:center">
