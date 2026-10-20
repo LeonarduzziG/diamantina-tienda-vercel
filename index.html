@@ -3762,7 +3762,9 @@ function updateCartUI() {
   // Free shipping progress
   const cfg2 = window._envioConfig || {};
   const gratisActivo2 = cfg2.gratisActivo || false;
-  const minGratis2 = esCABAGBA ? 65000 : 85000;
+  // Sin CP cargado: asumimos CABA/GBA ($65.000). Al cargar el CP se ajusta solo.
+  const _tieneCP = cpActual >= 1000;
+  const minGratis2 = (!_tieneCP || esCABAGBA) ? 65000 : 85000;
   const bannerEl = document.getElementById('envio-gratis-banner');
   const progresoEl = document.getElementById('envio-gratis-progreso');
   const barEl = document.getElementById('envio-gratis-bar');
