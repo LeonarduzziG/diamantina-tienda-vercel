@@ -3767,7 +3767,9 @@ function updateCartUI() {
   const progresoEl = document.getElementById('envio-gratis-progreso');
   const barEl = document.getElementById('envio-gratis-bar');
   const fillEl = document.getElementById('envio-gratis-bar-fill');
-  if (gratisActivo2) {
+  // Si elige retiro (coordinar), el envío ya es gratis: no mostramos la barra de "falta para envío gratis"
+  const esRetiroGratis = (typeof envioSeleccionado !== 'undefined' && envioSeleccionado && envioSeleccionado.tipo === 'coordinar');
+  if (gratisActivo2 && !esRetiroGratis) {
     const pct = minGratis2 > 0 ? Math.max(0, Math.min(100, Math.round(total / minGratis2 * 100))) : 0;
     if (barEl) barEl.style.display = 'block';
     if (total >= minGratis2) {
