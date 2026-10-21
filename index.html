@@ -6750,8 +6750,19 @@ window.cotizarEnvioCarrito = async function() {
   resCont.innerHTML = '<div style="font-size:12px;color:var(--ink-light);padding:6px 0">⏳ Consultando tarifas...</div>';
 
   const DIMS_DEF = window._dimsConfig || DIMS_DEFAULT_INICIAL;
+  // Medidas fijas de la caja de regalo (cambiá acá si cambia la caja)
+  const GIFTBOX_PKG = { peso: 0.780, alto: 11, ancho: 30, largo: 30 };
   let totalPesoKg=0, maxAlto=0, maxAncho=0, maxLargo=0;
+  const hayCajaRegalo = cart.some(function(i){ return i.giftBoxId || i.giftRol; });
+  if (hayCajaRegalo) {
+    // La caja de regalo viaja como un paquete fijo, sin importar lo que lleve adentro
+    totalPesoKg += GIFTBOX_PKG.peso;
+    maxAlto = Math.max(maxAlto, GIFTBOX_PKG.alto);
+    maxAncho = Math.max(maxAncho, GIFTBOX_PKG.ancho);
+    maxLargo = Math.max(maxLargo, GIFTBOX_PKG.largo);
+  }
   cart.forEach(function(item) {
+    if (item.giftBoxId || item.giftRol) return; // ya contabilizado como caja fija
     const prod = products.find(function(p){ return p.id === (item.prodId||item.id); });
     const def = DIMS_DEF[prod && prod.cat] || DIMS_DEF['default'];
     totalPesoKg += Number(prod && prod.peso || def.peso) * (item.qty||1);
