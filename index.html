@@ -6680,7 +6680,7 @@ async function tarifasCorreo(cpO, cpD, pesoG, alto, ancho, largo, valor) {
     return res;
   } catch(e) {
     // Tarifas calibradas con datos reales
-    const seg = valor > 0 ? Math.round(valor * 0.02) : 0;
+    const seg = valor > 0 ? Math.round(valor * 0.01) : 0;
     const kg = pesoG / 1000;
     const fp = kg<=0.5?1 : kg<=1?1.15 : kg<=2?1.32 : kg<=3?1.52 : kg<=5?1.75 : 2.1;
     const cp4 = parseInt((String(cpD)+'0000').slice(0,4));
@@ -6721,7 +6721,7 @@ async function tarifasAndreani(cpO, cpD, pesoG, alto, ancho, largo, valor) {
     if (!res.length) throw 'x';
     return res;
   } catch(e) {
-    const seg = valor > 0 ? Math.round(valor * 0.02) : 0;
+    const seg = valor > 0 ? Math.round(valor * 0.01) : 0;
     const kg = pesoG / 1000;
     const fp = kg<=0.5?1 : kg<=1?1.15 : kg<=2?1.32 : kg<=3?1.52 : kg<=5?1.75 : 2.1;
     const cp2 = parseInt((String(cpD)+'0000').slice(0,4));
