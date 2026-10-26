@@ -6676,11 +6676,13 @@ async function tarifasCorreo(cpO, cpD, pesoRealG, alto, ancho, largo, valor) {
     const ops = Array.isArray(data.opciones) ? data.opciones : [];
     const res = ops.map(o => {
       const nom = String(o.nombre || 'Correo Argentino');
+      const tipo = o.tipo || (nom.toLowerCase().indexOf('domicilio') !== -1 ? 'domicilio' : 'sucursal');
+      const nomBase = nom.toLowerCase().indexOf('correo') !== -1 ? nom : 'Correo – ' + nom;
       return {
-        name: nom.toLowerCase().indexOf('correo') !== -1 ? nom : 'Correo – ' + nom,
+        name: nomBase + (tipo === 'sucursal' ? ' · a sucursal' : ' · a domicilio'),
         price: Math.round(Number(o.precio) || 0),
         days: o.plazo ? (String(o.plazo).match(/d[ií]a/i) ? String(o.plazo) : o.plazo + ' días hábiles') : '',
-        tipo: o.tipo || (nom.toLowerCase().indexOf('domicilio') !== -1 ? 'domicilio' : 'sucursal')
+        tipo
       };
     }).filter(o => o.price > 0);
     if (!res.length) throw new Error('sin tarifas');
