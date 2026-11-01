@@ -666,7 +666,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 .hero-v2-btn-secondary.on-light{background:#fff;color:var(--ink);border-color:var(--border);backdrop-filter:none}
 .hero-v2-btn-secondary.on-light:hover{border-color:var(--rose);color:var(--rose);background:#fff}
 .hero-v2.banner-mode{display:block;min-height:auto;background:#fff;overflow:visible;padding:0}
-.hero-banner-img-wrap{width:100%;line-height:0}
+.hero-banner-img-wrap{width:100%;line-height:0;position:relative}
 .hero-banner-img-wrap img{width:100%;height:auto;display:block}
 /* Carrusel del banner principal */
 .hero-carousel{position:relative;width:100%;overflow:hidden}
@@ -676,6 +676,13 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 .hero-carousel-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:4;line-height:0}
 .hero-carousel-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.55);border:1px solid rgba(0,0,0,0.12);cursor:pointer;padding:0;transition:background .2s,width .2s}
 .hero-carousel-dot.active{background:#fff;width:20px;border-radius:4px}
+/* Indicador "deslizá para ver más" sobre el banner */
+.hero-scroll-hint{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);z-index:6;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;text-align:center;background:rgba(26,17,24,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:8px 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.4);box-shadow:0 4px 14px rgba(0,0,0,0.25);line-height:1.1}
+.hero-scroll-hint .hint-text{color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.3px;text-shadow:0 1px 6px rgba(0,0,0,0.6);white-space:nowrap}
+.hero-scroll-hint .hint-arrow{color:#fff;font-size:20px;line-height:1;text-shadow:0 1px 6px rgba(0,0,0,0.6);animation:hintBounce 1.4s ease-in-out infinite}
+@keyframes hintBounce{0%,100%{transform:translateY(0);opacity:.85}50%{transform:translateY(7px);opacity:1}}
+@media(max-width:600px){.hero-scroll-hint{bottom:24px;padding:7px 15px}.hero-scroll-hint .hint-text{font-size:12px}.hero-scroll-hint .hint-arrow{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.hero-scroll-hint .hint-arrow{animation:none}}
 /* En compu: banner más chico y centrado (en celular queda a lo ancho completo) */
 @media(min-width:769px){.hero-banner-img-wrap{max-width:920px;margin-inline:auto}}
 .hero-banner-actions{padding:2rem 1.5rem 2.5rem;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;position:static}
