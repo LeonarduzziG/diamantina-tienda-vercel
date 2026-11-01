@@ -200,6 +200,17 @@ nav{position:sticky;top:0;z-index:200;background:rgba(254,251,253,0.97);backdrop
 .carousel-dot.active{background:var(--rose);width:16px;border-radius:3px}
 .nuevos-section .carousel-dot{background:rgba(255,255,255,0.3)}
 .nuevos-section .carousel-dot.active{background:#fff}
+/* ── CYBER MONDAY ── */
+.cyber-section{background:linear-gradient(135deg,#050510 0%,#0a0a2e 45%,#140827 100%)}
+.cyber-section::before{background:radial-gradient(ellipse at 20% 50%,rgba(0,229,255,0.18) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(138,43,226,0.20) 0%,transparent 55%)}
+.cyber-section::after{background:linear-gradient(90deg,transparent,rgba(0,229,255,0.7),transparent)}
+.cyber-section .ofertas-title{text-shadow:0 0 34px rgba(0,229,255,0.5)}
+.cyber-section .prod-price,.cyber-section .prod-price-discount{color:#2ee6ff !important}
+.cyber-section .prod-card:hover{box-shadow:0 20px 40px rgba(0,0,0,0.5),0 0 30px rgba(0,229,255,0.35),0 0 60px rgba(138,43,226,0.15);border-color:rgba(0,229,255,0.6)}
+.cyber-section .ofertas-carousel-wrap::before{background:linear-gradient(to right,#07071c,transparent)}
+.cyber-section .ofertas-carousel-wrap::after{background:linear-gradient(to left,#07071c,transparent)}
+.cyber-badge{display:inline-block;background:linear-gradient(90deg,#00e5ff,#8a2be2);color:#fff;font-weight:700;letter-spacing:1.5px;font-size:11px;padding:4px 13px;border-radius:999px;text-transform:uppercase;box-shadow:0 0 18px rgba(0,229,255,0.4)}
+.cyber-freeship{display:inline-flex;align-items:center;gap:6px;background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.45);color:#2ee6ff;font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px}
 .resenas-section{scroll-margin-top:120px;padding:0 2rem 1.5rem;background:#FFF9F5;border-bottom:1px solid rgba(201,79,124,0.12)}
 .resenas-carousel-wrap{position:relative}
 .resenas-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding:4px 4px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -657,6 +668,14 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 .hero-v2.banner-mode{display:block;min-height:auto;background:#fff;overflow:visible;padding:0}
 .hero-banner-img-wrap{width:100%;line-height:0}
 .hero-banner-img-wrap img{width:100%;height:auto;display:block}
+/* Carrusel del banner principal */
+.hero-carousel{position:relative;width:100%;overflow:hidden}
+.hero-carousel .hero-slide-spacer{width:100%;height:auto;display:block;visibility:hidden}
+.hero-carousel .hero-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s ease}
+.hero-carousel .hero-slide.active{opacity:1}
+.hero-carousel-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:4;line-height:0}
+.hero-carousel-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.55);border:1px solid rgba(0,0,0,0.12);cursor:pointer;padding:0;transition:background .2s,width .2s}
+.hero-carousel-dot.active{background:#fff;width:20px;border-radius:4px}
 /* En compu: banner más chico y centrado (en celular queda a lo ancho completo) */
 @media(min-width:769px){.hero-banner-img-wrap{max-width:920px;margin-inline:auto}}
 .hero-banner-actions{padding:2rem 1.5rem 2.5rem;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;position:static}
@@ -923,8 +942,9 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 <div id="page-tienda">
   <!-- HERO V2 (banner con foto propia, sin superponer texto) -->
   <div class="hero-v2 hero banner-mode">
-    <div class="hero-banner-img-wrap" onclick="showPage('cajaregalo')" style="cursor:pointer" title="Armá tu caja de regalo">
-      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1200,q_auto,f_auto/v1792430006/Caja_de_Regalo_Diamantina_1_tbllts.png" alt="Armá tu caja de regalo — Diamantina Lencería" loading="eager" fetchpriority="high">
+    <div class="hero-banner-img-wrap" id="hero-banner-wrap" style="cursor:pointer" title="Diamantina">
+      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1200,q_auto,f_auto/v1792430006/Caja_de_Regalo_Diamantina_1_tbllts.png" alt="Armá tu caja de regalo — Diamantina Lencería" loading="eager" fetchpriority="high" onclick="showPage('cajaregalo')">
+      <div id="hero-carousel" class="hero-carousel" style="display:none"></div>
     </div>
     <div class="hero-banner-actions">
       <div class="hero-btns-wrap" style="display:inline-flex;flex-direction:column;gap:12px;align-items:center">
@@ -1018,6 +1038,26 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
         <div class="cat-img-wrap"><img src="https://res.cloudinary.com/dy1yckjcj/image/upload/q_auto/f_auto/v1781625757/deportivos_d1vnzj.png" alt="Deportivos" loading="lazy"></div>
         <div class="cat-label">Deportivos</div>
       </div>
+    </div>
+  </div>
+
+  <!-- CYBER MONDAY (aparece solo durante la ventana activa) -->
+  <div class="nuevos-section cyber-section" id="cyber-section" style="display:none">
+    <div style="position:relative;z-index:1;padding-top:1.8rem">
+      <div class="ofertas-header" style="flex-direction:column;align-items:flex-start;gap:6px">
+        <div class="cyber-badge">⚡ Cyber Monday</div>
+        <div class="nuevos-title-wrap" style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+          <div class="ofertas-title">Ofertas Cyber Monday</div>
+          <div class="ofertas-count" id="cyber-count"></div>
+        </div>
+        <div class="cyber-freeship">🚚 Envío GRATIS en toda la tienda</div>
+      </div>
+      <div class="ofertas-carousel-wrap" style="margin-top:1rem">
+        <button class="ofertas-carousel-btn left" onclick="cyberScroll(-1)" aria-label="Anterior">‹</button>
+        <div class="ofertas-grid" id="cyber-grid"></div>
+        <button class="ofertas-carousel-btn right" onclick="cyberScroll(1)" aria-label="Siguiente">›</button>
+      </div>
+      <div class="carousel-dots" data-for="cyber-grid"></div>
     </div>
   </div>
 
@@ -1961,6 +2001,10 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
         <input type="checkbox" id="prod-es-combo" style="width:16px;height:16px;accent-color:var(--rose);cursor:pointer">
         <label for="prod-es-combo" style="font-size:13px;color:var(--ink);cursor:pointer;font-weight:500">🎁 Mostrar en "Combos especiales"</label>
       </div>
+      <div class="form-field" style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="prod-es-cyber" style="width:16px;height:16px;accent-color:var(--rose);cursor:pointer">
+        <label for="prod-es-cyber" style="font-size:13px;color:var(--ink);cursor:pointer;font-weight:500">⚡ Mostrar en "Cyber Monday" (solo durante el evento)</label>
+      </div>
       <div class="form-field">
         <label class="form-label">Precio (ARS)</label>
         <input type="number" class="form-input" id="prod-price" placeholder="ej: 12500" oninput="calcDescuentoPreview();updateCuotasPreview()">
@@ -2397,6 +2441,177 @@ function applyApariencia(d) {
   if (d.wa) window._waNumber = d.wa;
 }
 
+// ── BANNER PRINCIPAL: carrusel con varias fotos ──
+let _heroRotTimer = null, _heroIdx = 0, _heroCount = 0, _heroSpeed = 5000;
+function heroStartRotation() {
+  if (_heroRotTimer) { clearInterval(_heroRotTimer); _heroRotTimer = null; }
+  if (_heroCount > 1) {
+    _heroRotTimer = setInterval(function(){ heroGoTo((_heroIdx + 1) % _heroCount); }, _heroSpeed);
+  }
+}
+window.heroGoTo = function(i, manual) {
+  const carousel = document.getElementById('hero-carousel');
+  if (!carousel) return;
+  const slides = carousel.querySelectorAll('.hero-slide');
+  const dots = carousel.querySelectorAll('.hero-carousel-dot');
+  if (!slides.length) return;
+  _heroIdx = ((i % slides.length) + slides.length) % slides.length;
+  slides.forEach(function(s, idx){ s.classList.toggle('active', idx === _heroIdx); });
+  dots.forEach(function(dt, idx){ dt.classList.toggle('active', idx === _heroIdx); });
+  if (manual) heroStartRotation(); // reinicia el tiempo si el usuario tocó un punto
+};
+window.heroBannerGo = function(dest) {
+  if (dest && typeof showPage === 'function') showPage(dest);
+};
+// list: [{ url, link }]. speedSec: segundos entre fotos. Si no hay fotos, usa la imagen única clásica.
+function renderHeroBanner(list, speedSec) {
+  const carousel = document.getElementById('hero-carousel');
+  const single = document.getElementById('hero-v2-img');
+  if (!carousel) return;
+  const imgs = Array.isArray(list)
+    ? list.map(function(x){ return (typeof x === 'string') ? { url: x, link: '' } : x; }).filter(function(x){ return x && x.url; })
+    : [];
+  if (_heroRotTimer) { clearInterval(_heroRotTimer); _heroRotTimer = null; }
+  if (imgs.length === 0) {
+    // Sin banners cargados: comportamiento clásico (imagen única)
+    carousel.style.display = 'none';
+    carousel.innerHTML = '';
+    if (single) single.style.display = 'block';
+    return;
+  }
+  if (single) single.style.display = 'none';
+  carousel.style.display = 'block';
+  _heroSpeed = Math.max(2, Number(speedSec) || 5) * 1000;
+  _heroCount = imgs.length;
+  _heroIdx = 0;
+  const opt = function(u){ return (typeof optimizeImg === 'function') ? optimizeImg(u, 1600) : u; };
+  let html = '<img class="hero-slide-spacer" src="' + opt(imgs[0].url) + '" alt="" aria-hidden="true">';
+  imgs.forEach(function(it, i){
+    const link = (it.link || '').replace(/'/g, '');
+    const cursor = link ? 'pointer' : 'default';
+    const onclick = link ? ' onclick="heroBannerGo(\'' + link + '\')"' : '';
+    html += '<img class="hero-slide' + (i === 0 ? ' active' : '') + '" src="' + opt(it.url) + '" alt="Banner Diamantina" style="cursor:' + cursor + '"'
+      + (i === 0 ? ' fetchpriority="high"' : ' loading="lazy"') + onclick + '>';
+  });
+  if (imgs.length > 1) {
+    html += '<div class="hero-carousel-dots">';
+    imgs.forEach(function(it, i){ html += '<button class="hero-carousel-dot' + (i === 0 ? ' active' : '') + '" onclick="heroGoTo(' + i + ',true)" aria-label="Foto ' + (i + 1) + '"></button>'; });
+    html += '</div>';
+  }
+  carousel.innerHTML = html;
+  heroStartRotation();
+}
+window.renderHeroBanner = renderHeroBanner;
+
+// Escucha la config del banner en Firebase y re-renderiza el carrusel en vivo
+function loadBannersConfig() {
+  if (!db) return;
+  db.ref('config/bannerCfg').on('value', function(snap){
+    const d = snap.val() || {};
+    window._bannerCfg = d;
+    const imgs = Array.isArray(d.imgs) ? d.imgs : [];
+    try { renderHeroBanner(imgs, d.speed || 5); } catch(e){}
+    try { if (typeof cargarBannerAdmin === 'function') cargarBannerAdmin(d); } catch(e){}
+  });
+}
+
+// ── ADMIN: gestor del banner principal (varias fotos) ──
+let bannerImgs = [];   // [{ url, link }]
+let bannerSpeed = 5;   // segundos entre fotos
+const _BANNER_LINKS = [
+  { v: '',           t: 'Sin enlace' },
+  { v: 'cajaregalo', t: 'Caja de regalo' },
+  { v: 'home',       t: 'Inicio' }
+];
+
+window.subirBannerImgs = async function(input) {
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+  const estado = document.getElementById('banner-upload-estado');
+  if (estado) estado.textContent = 'Subiendo ' + files.length + ' foto' + (files.length > 1 ? 's' : '') + '...';
+  let ok = 0;
+  for (const file of files) {
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', CLOUDINARY_PRESET);
+      fd.append('folder', 'diamantina');
+      const res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.secure_url) {
+        bannerImgs.push({ url: data.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_1600/'), link: '' });
+        ok++;
+        if (estado) estado.textContent = '✓ ' + ok + ' de ' + files.length + '...';
+      } else {
+        showToast('Error al subir: ' + (data.error && data.error.message || 'desconocido'), 'error');
+      }
+    } catch(e) { showToast('Error de conexión con Cloudinary', 'error'); }
+  }
+  if (estado) estado.textContent = '';
+  renderBannerThumbs();
+  if (ok) showToast(ok + ' foto' + (ok > 1 ? 's' : '') + ' agregada' + (ok > 1 ? 's' : '') + ' ✦. Acordate de "Guardar banner".');
+  input.value = '';
+};
+
+function renderBannerThumbs() {
+  const el = document.getElementById('banner-thumbs');
+  if (!el) return;
+  if (!bannerImgs.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--ink-light);font-style:italic">Todavía no hay fotos. Subí una o más y van a rotar solas en el banner. Si no cargás ninguna, se usa la imagen única de arriba.</div>';
+    return;
+  }
+  el.innerHTML = bannerImgs.map(function(it, i){
+    const opts = _BANNER_LINKS.map(function(o){ return '<option value="' + o.v + '"' + (o.v === (it.link || '') ? ' selected' : '') + '>' + o.t + '</option>'; }).join('');
+    return '<div draggable="true" ondragstart="bDragStart(' + i + ')" ondragover="bDragOver(event)" ondrop="bDrop(event,' + i + ')" style="display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;margin-bottom:8px">'
+      + '<span style="cursor:grab;color:var(--ink-light);font-size:16px">⠿</span>'
+      + '<img src="' + it.url + '" alt="" style="width:80px;height:46px;object-fit:cover;border-radius:4px;flex-shrink:0">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-size:10px;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Al tocar la foto, ir a:</div>'
+      + '<select onchange="bSetLink(' + i + ',this.value)" style="width:100%;padding:5px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;background:#fff;color:var(--ink)">' + opts + '</select>'
+      + '</div>'
+      + '<button onclick="bRemove(' + i + ')" title="Quitar" style="background:#fff;border:1px solid var(--border-strong);border-radius:50%;width:26px;height:26px;cursor:pointer;color:#c0392b;font-size:13px;flex-shrink:0">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+let _bDragIdx = null;
+window.bDragStart = function(i){ _bDragIdx = i; };
+window.bDragOver = function(e){ e.preventDefault(); };
+window.bDrop = function(e, i){
+  e.preventDefault();
+  if (_bDragIdx === null || _bDragIdx === i) return;
+  const moved = bannerImgs.splice(_bDragIdx, 1)[0];
+  bannerImgs.splice(i, 0, moved);
+  _bDragIdx = null;
+  renderBannerThumbs();
+};
+window.bRemove = function(i){ bannerImgs.splice(i, 1); renderBannerThumbs(); };
+window.bSetLink = function(i, v){ if (bannerImgs[i]) bannerImgs[i].link = v || ''; };
+
+window.guardarBanners = async function() {
+  if (!db) { showToast('Sin conexión', 'error'); return; }
+  const sp = parseInt(document.getElementById('banner-speed') && document.getElementById('banner-speed').value) || 5;
+  bannerSpeed = Math.max(2, sp);
+  try {
+    await db.ref('config/bannerCfg').set({ imgs: bannerImgs, speed: bannerSpeed });
+    showToast('Banner guardado ✦');
+  } catch(e) {
+    console.error('Error guardando banner:', e);
+    showToast('No se pudo guardar el banner', 'error');
+  }
+};
+
+// Rellena el gestor del admin con lo que hay guardado
+function cargarBannerAdmin(d) {
+  d = d || {};
+  bannerImgs = (Array.isArray(d.imgs) ? d.imgs : []).map(function(x){ return (typeof x === 'string') ? { url: x, link: '' } : { url: x.url, link: x.link || '' }; });
+  bannerSpeed = Number(d.speed) || 5;
+  const sp = document.getElementById('banner-speed');
+  if (sp) sp.value = bannerSpeed;
+  renderBannerThumbs();
+}
+window.cargarBannerAdmin = cargarBannerAdmin;
+
 window.switchAdminTab = function(tab) {
   const tabs = ['admin','pedidos','clientes','config','cajas'];
   tabs.forEach(t => {
@@ -2634,6 +2849,7 @@ db.ref('productos').on('value', (snap) => {
     const modalAbierto = document.getElementById('prod-modal-bg')?.classList.contains('open');
     if (!modalAbierto) renderCatalog();
   }
+  renderCyber();
   renderOfertas();
   renderNuevos();
   renderCombos();
@@ -2643,6 +2859,7 @@ db.ref('productos').on('value', (snap) => {
   if (window._resenasDestacadasCache) renderResenasDestacadas(window._resenasDestacadasCache);
   // Iniciar auto-scroll de carruseles (cada uno a su ritmo)
   setTimeout(function() {
+    iniciarAutoScroll('cyber-grid', 2);
     iniciarAutoScroll('ofertas-grid', 2);
     iniciarAutoScroll('combos-grid', 3);
     iniciarAutoScroll('nuevos-grid', 2.5);
@@ -3038,6 +3255,57 @@ window.nuevosScroll = function(dir) {
   const el = document.getElementById('nuevos-grid');
   if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
   pausarAutoScroll('nuevos-grid');
+};
+
+// ── CYBER MONDAY ──
+// Ventana automática: por defecto termina el 5-nov a las 00:00 (hora Argentina).
+// Se puede ajustar/apagar desde el admin (config/cyber: { activo, fin }).
+const CYBER_FIN_DEFAULT = new Date('2026-11-05T00:00:00-03:00').getTime();
+function cyberFin() {
+  const c = window._cyberConfig || {};
+  const t = c.fin ? new Date(c.fin).getTime() : CYBER_FIN_DEFAULT;
+  return isNaN(t) ? CYBER_FIN_DEFAULT : t;
+}
+function cyberActivo() {
+  const c = window._cyberConfig || {};
+  if (c.activo === false) return false;      // apagado manual desde el admin
+  return Date.now() < cyberFin();            // dentro de la ventana
+}
+window.cyberActivo = cyberActivo;
+
+window.cyberScroll = function(dir) {
+  const el = document.getElementById('cyber-grid');
+  if (el) el.scrollBy({ left: dir * 220, behavior: 'smooth' });
+  pausarAutoScroll('cyber-grid');
+};
+
+window.renderCyber = function() {
+  const el = document.getElementById('cyber-grid');
+  const section = document.getElementById('cyber-section');
+  const countEl = document.getElementById('cyber-count');
+  if (!el || !section) return;
+  if (!cyberActivo()) { section.style.display = 'none'; return; }
+  const prods = products.filter(p => p.esCyber && p.estado !== 'oculto' && p.estado !== 'agotado');
+  if (prods.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  if (countEl) countEl.textContent = prods.length + ' producto' + (prods.length !== 1 ? 's' : '');
+  el.innerHTML = prods.map((p, idx) => {
+    const precio = precioHTML(p);
+    const img = optimizeImg((p.imgs && p.imgs[0]) || p.img || '', 400);
+    return '<div class="prod-card" data-prod-id="' + p.id + '" style="cursor:pointer;min-width:200px;max-width:200px;scroll-snap-align:start;flex-shrink:0;animation:float-up 0.5s ' + (idx * 0.1) + 's ease both;border:2px solid rgba(0,229,255,0.35);display:flex;flex-direction:column">'
+      + '<div class="prod-img-wrap" style="position:relative;height:220px;overflow:hidden;flex-shrink:0">'
+      + (img ? '<img src="' + img + '" alt="' + p.name + '" class="prod-img" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top">' : '<div class="prod-img-placeholder" style="height:100%;background:#eee"></div>')
+      + '<div class="badge-arg" style="position:absolute;top:8px;right:8px;background:linear-gradient(90deg,#00e5ff,#8a2be2);color:#fff">⚡ CYBER</div>'
+      + (p.descuento > 0 ? '<span class="prod-badge badge-oferta" style="top:8px;left:8px">-' + p.descuento + '%</span>' : '')
+      + agotadoOverlayHTML(p)
+      + '</div>'
+      + '<div class="card-body"><div class="card-name">' + p.name + '</div><div class="prod-price-row">' + precio + '</div></div>'
+      + '</div>';
+  }).join('');
+  el.querySelectorAll('.prod-card').forEach(card => {
+    card.addEventListener('click', () => openProdModal(card.dataset.prodId));
+  });
+  setupCarouselDots('cyber-grid');
 };
 
 window.renderNuevos = function() {
@@ -3693,6 +3961,12 @@ function updateCartUI() {
   const nav2 = document.getElementById('cart-count-nav2');
   if (nav1) nav1.textContent = count;
   if (nav2) nav2.textContent = count;
+  // Cyber Monday: envío gratis en toda la tienda. Forzamos precio 0 en la opción
+  // elegida (menos retiro, que ya es gratis) antes de calcular el total.
+  const _cyberOn = (typeof cyberActivo === 'function') && cyberActivo();
+  if (_cyberOn && typeof envioSeleccionado !== 'undefined' && envioSeleccionado && envioSeleccionado.tipo !== 'coordinar') {
+    envioSeleccionado = { ...envioSeleccionado, precio: 0 };
+  }
   const _envioPrecio = (typeof envioSeleccionado !== 'undefined' && envioSeleccionado && !isNaN(envioSeleccionado.precio)) ? Number(envioSeleccionado.precio) : 0;
   const totalConEnvio = total + _envioPrecio;
   document.getElementById('subtotal-productos') && (document.getElementById('subtotal-productos').textContent = '$' + total.toLocaleString('es-AR'));
@@ -3771,11 +4045,16 @@ function updateCartUI() {
   const fillEl = document.getElementById('envio-gratis-bar-fill');
   // Si elige retiro (coordinar), el envío ya es gratis: no mostramos la barra de "falta para envío gratis"
   const esRetiroGratis = (typeof envioSeleccionado !== 'undefined' && envioSeleccionado && envioSeleccionado.tipo === 'coordinar');
-  if (gratisActivo2 && !esRetiroGratis) {
+  if (_cyberOn && !esRetiroGratis) {
+    // Durante Cyber Monday el envío es gratis siempre: cartel fijo, sin barra de progreso.
+    if (bannerEl) { bannerEl.style.display = 'block'; bannerEl.innerHTML = '⚡ Cyber Monday: envío GRATIS en toda la tienda'; }
+    if (progresoEl) progresoEl.style.display = 'none';
+    if (barEl) barEl.style.display = 'none';
+  } else if (gratisActivo2 && !esRetiroGratis) {
     const pct = minGratis2 > 0 ? Math.max(0, Math.min(100, Math.round(total / minGratis2 * 100))) : 0;
     if (barEl) barEl.style.display = 'block';
     if (total >= minGratis2) {
-      if (bannerEl) bannerEl.style.display = 'block';
+      if (bannerEl) { bannerEl.style.display = 'block'; bannerEl.innerHTML = '🎉 ¡Envío gratis!'; }
       if (progresoEl) progresoEl.style.display = 'none';
       if (fillEl) { fillEl.style.width = '100%'; fillEl.style.background = '#3B6D11'; }
     } else {
@@ -3800,7 +4079,7 @@ function updateCartUI() {
       er.style.display='flex';
       const _esCoordinar = envioSeleccionado && envioSeleccionado.tipo === 'coordinar';
       document.getElementById('envio-label').textContent = _esCoordinar ? '📍 ' + envioSeleccionado.zona : 'Envío (' + envioSeleccionado.zona + ')';
-      document.getElementById('subtotal-envio').textContent = _esCoordinar ? 'Gratis' : '$' + _envioPrecio.toLocaleString('es-AR');
+      document.getElementById('subtotal-envio').textContent = (_esCoordinar || (_cyberOn && _envioPrecio === 0)) ? 'Gratis' : '$' + _envioPrecio.toLocaleString('es-AR');
     }
   } else {
     const er = document.getElementById('envio-row');
@@ -4295,11 +4574,12 @@ window.saveProduct = async function() {
   const packPrice = parseInt(document.getElementById('prod-pack-price')?.value) || 0;
   const esNuevo = document.getElementById('prod-es-nuevo')?.checked || false;
   const esCombo = document.getElementById('prod-es-combo')?.checked || false;
+  const esCyber = document.getElementById('prod-es-cyber')?.checked || false;
   // Si estado=agotado, poner todo el stock en 0
   if (estado === 'agotado') {
     Object.keys(stock).forEach(k => { stock[k] = 0; });
   }
-  const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas, esNuevo: esNuevo || null, esCombo: esCombo || null,
+  const data = { name, price, descuento, precioFinal, cat, desc, estado, tallas, stock, colores, cuotas, esNuevo: esNuevo || null, esCombo: esCombo || null, esCyber: esCyber || null,
     packQty: packQty >= 2 ? packQty : null,
     packPrice: packPrice > 0 && packQty >= 2 ? packPrice : null,
     keywords: keywords || null,
@@ -4343,6 +4623,8 @@ window.resetForm = function() {
   document.getElementById('prod-cuotas').value = '0';
   ['prod-peso','prod-alto','prod-ancho','prod-largo'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   if (document.getElementById('prod-es-nuevo')) document.getElementById('prod-es-nuevo').checked = false;
+  if (document.getElementById('prod-es-combo')) document.getElementById('prod-es-combo').checked = false;
+  if (document.getElementById('prod-es-cyber')) document.getElementById('prod-es-cyber').checked = false;
   if (document.getElementById('prod-es-arg')) document.getElementById('prod-es-arg').checked = false;
   if (document.getElementById('prod-pack-qty')) document.getElementById('prod-pack-qty').value = '';
   if (document.getElementById('prod-pack-price')) document.getElementById('prod-pack-price').value = '';
@@ -4504,6 +4786,7 @@ window.editProduct = function(id) {
     document.getElementById('prod-cuotas').value = p.cuotas || '0';
     if (document.getElementById('prod-es-nuevo')) document.getElementById('prod-es-nuevo').checked = !!p.esNuevo;
     if (document.getElementById('prod-es-combo')) document.getElementById('prod-es-combo').checked = !!p.esCombo;
+    if (document.getElementById('prod-es-cyber')) document.getElementById('prod-es-cyber').checked = !!p.esCyber;
     if (document.getElementById('prod-pack-qty')) document.getElementById('prod-pack-qty').value = p.packQty || '';
     if (document.getElementById('prod-pack-price')) document.getElementById('prod-pack-price').value = p.packPrice || '';
     updatePackPreview();
@@ -5856,6 +6139,75 @@ function loadEnvioConfig() {
   });
 }
 
+// ── CYBER MONDAY: config opcional desde el admin (override de la ventana) ──
+window._cyberConfig = window._cyberConfig || {};
+let _cyberEstadoPrevio = null;
+function loadCyberConfig() {
+  if (!db) return;
+  db.ref('config/cyber').on('value', (snap) => {
+    window._cyberConfig = snap.val() || {};
+    // Reflejar en el admin si la solapa está cargada
+    const act = document.getElementById('cyber-activo');
+    if (act) act.checked = (window._cyberConfig.activo !== false);
+    const fin = document.getElementById('cyber-fin');
+    if (fin && window._cyberConfig.fin) {
+      const s = String(window._cyberConfig.fin);
+      if (s.length >= 16) fin.value = s.slice(0, 16); // "YYYY-MM-DDTHH:MM" en hora local AR
+    }
+    try { renderCyber(); } catch(e){}
+    try { updateCartUI(); } catch(e){}
+    actualizarEstadoCyberAdmin();
+  });
+  // Chequeo periódico: si la ventana se cierra con la página abierta, apagar solo
+  setInterval(() => {
+    const ahora = cyberActivo();
+    if (_cyberEstadoPrevio === null) { _cyberEstadoPrevio = ahora; return; }
+    if (ahora !== _cyberEstadoPrevio) {
+      _cyberEstadoPrevio = ahora;
+      try { renderCyber(); } catch(e){}
+      try { updateCartUI(); } catch(e){}
+      actualizarEstadoCyberAdmin();
+    }
+  }, 60 * 1000);
+}
+
+// Muestra en el admin si el Cyber está corriendo o no, y rellena la fecha por defecto
+function actualizarEstadoCyberAdmin() {
+  const estado = document.getElementById('cyber-estado');
+  const fin = document.getElementById('cyber-fin');
+  if (fin && !fin.value) {
+    // Default visible: 5-nov 00:00 (hora AR)
+    try { fin.value = '2026-11-05T00:00'; } catch(e){}
+  }
+  if (!estado) return;
+  if (typeof cyberActivo === 'function' && cyberActivo()) {
+    const f = new Date(cyberFin());
+    estado.style.color = '#2ee6ff';
+    estado.textContent = '🟢 Activo — termina ' + f.toLocaleString('es-AR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+  } else {
+    estado.style.color = 'rgba(255,255,255,0.6)';
+    estado.textContent = '⚪ Inactivo';
+  }
+}
+
+// Guarda la config de Cyber Monday (activo + fecha de fin) en Firebase
+window.guardarCyber = async function() {
+  if (!db) { showToast('Sin conexión', 'error'); return; }
+  const activo = !!(document.getElementById('cyber-activo') && document.getElementById('cyber-activo').checked);
+  const finVal = (document.getElementById('cyber-fin') && document.getElementById('cyber-fin').value) || '';
+  // El input datetime-local da hora local; la guardamos con offset -03:00 (hora Argentina)
+  // para que la ventana se interprete igual en cualquier dispositivo.
+  const fin = finVal ? (finVal.slice(0, 16) + ':00-03:00') : null;
+  try {
+    await db.ref('config/cyber').set({ activo, fin });
+    showToast('Cyber Monday guardado ⚡');
+    actualizarEstadoCyberAdmin();
+  } catch (e) {
+    console.error('Error guardando Cyber:', e);
+    showToast('No se pudo guardar', 'error');
+  }
+};
+
 // ── DIMENSIONES POR CATEGORÍA (usadas por el cotizador real) ──
 const DIMS_DEFAULT_INICIAL = {
   'Conjuntos':  {peso:0.30, alto:8,  ancho:15, largo:15},
@@ -6669,7 +7021,7 @@ async function tarifasCorreo(cpO, cpD, pesoRealG, alto, ancho, largo, valor) {
     const r = await fetch(BACKEND + '/correo-cotizar', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cpDestino: String(cpD), peso: Math.round(Number(pesoRealG)||500), largo: Math.round(largo), ancho: Math.round(ancho), alto: Math.round(alto) }),
-      signal: AbortSignal.timeout(9000)
+      signal: AbortSignal.timeout(15000)
     });
     if (!r.ok) throw new Error('backend ' + r.status);
     const data = await r.json();
@@ -6720,7 +7072,7 @@ async function tarifasAndreani(cpO, cpD, pesoRealG, alto, ancho, largo, valor) {
     const r = await fetch(BACKEND + '/andreani-cotizar', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cpDestino: String(cpD), peso: (Number(pesoRealG)||300)/1000, largo: Math.round(largo), ancho: Math.round(ancho), alto: Math.round(alto) }),
-      signal: AbortSignal.timeout(9000)
+      signal: AbortSignal.timeout(15000)
     });
     if (!r.ok) throw new Error('backend ' + r.status);
     const data = await r.json();
@@ -6794,7 +7146,9 @@ window.cotizarEnvioCarrito = async function() {
 
   const allOpts = correoOpts.slice().sort(function(a,b){ return a.price - b.price; });
 
+  const _cyberOn = (typeof cyberActivo === 'function') && cyberActivo();
   let resHtml = '<div style="font-size:11px;color:var(--ink-light);margin-bottom:6px">CP ' + cp + ' · ' + Math.round(totalPesoKg*1000) + 'g — Elegí una opción:</div>';
+  if (_cyberOn) resHtml = '<div style="font-size:11px;font-weight:700;color:#0a8f9e;background:rgba(0,229,255,0.12);border-radius:var(--radius-sm);padding:6px 8px;margin-bottom:6px">⚡ Cyber Monday: el envío es GRATIS, elegí domicilio o sucursal igual así sabemos cómo despacharte</div>' + resHtml;
   allOpts.forEach(function(opt, idx) {
     const isBest = idx === 0;
     const borderColor = isBest ? 'var(--rose)' : 'var(--border)';
@@ -6802,13 +7156,16 @@ window.cotizarEnvioCarrito = async function() {
     const priceColor = isBest ? 'var(--rose)' : 'var(--ink)';
     const icon = opt.name.indexOf('Correo') !== -1 ? '📬' : '🚚';
     const safeName = opt.name.replace(/\\/g,'').replace(/'/g,'');
+    const precioHtml = _cyberOn
+      ? '<div style="text-align:right"><div style="font-size:11px;color:var(--ink-light);text-decoration:line-through">$'+Math.round(opt.price).toLocaleString('es-AR')+'</div><div style="font-size:15px;font-weight:700;color:#0a8f9e">GRATIS</div></div>'
+      : '<div style="font-size:16px;font-weight:700;color:'+priceColor+'">$'+Math.round(opt.price).toLocaleString('es-AR')+'</div>';
     resHtml += '<div onclick="elegirOpcionEnvio(\''+safeName+'\','+opt.price+',\''+opt.tipo+'\',\''+cp+'\''+')" style="cursor:pointer;padding:8px 10px;border-radius:var(--radius-sm);border:2px solid '+borderColor+';background:'+bg+';margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s">'
       + '<div>'
       + (isBest ? '<div style="font-size:10px;font-weight:700;color:var(--rose);margin-bottom:2px">⭐ MÁS ECONÓMICO</div>' : '')
       + '<div style="font-size:12px;font-weight:600;color:var(--ink)">'+icon+' '+opt.name+'</div>'
       + '<div style="font-size:11px;color:var(--ink-light)">'+opt.days+'</div>'
       + '</div>'
-      + '<div style="font-size:16px;font-weight:700;color:'+priceColor+'">$'+Math.round(opt.price).toLocaleString('es-AR')+'</div>'
+      + precioHtml
       + '</div>';
   });
   resCont.innerHTML = resHtml;
@@ -6817,7 +7174,11 @@ window.cotizarEnvioCarrito = async function() {
 
 
 window.elegirOpcionEnvio = function(nombre, precio, tipo, cp) {
-  envioSeleccionado = { tipo: 'andreani', zona: nombre + ' (CP ' + cp + ')', precio: precio };
+  // Durante Cyber Monday el envío es gratis: guardamos la opción elegida (para saber
+  // domicilio/sucursal y el CP del despacho) pero con precio 0.
+  const _cyberOn = (typeof cyberActivo === 'function') && cyberActivo();
+  const precioFinal = _cyberOn ? 0 : precio;
+  envioSeleccionado = { tipo: 'andreani', zona: nombre + ' (CP ' + cp + ')', precio: precioFinal };
   window._tipoEnvio = tipo;
   window._servicioEnvio = nombre;
 
@@ -6830,7 +7191,7 @@ window.elegirOpcionEnvio = function(nombre, precio, tipo, cp) {
 
   // Update total
   updateCartUI();
-  showToast(nombre + ' — $' + Math.round(precio).toLocaleString('es-AR'));
+  showToast(_cyberOn ? (nombre + ' — Envío GRATIS ⚡') : (nombre + ' — $' + Math.round(precio).toLocaleString('es-AR')));
 };
 
 window.seleccionarTipoEnvio = function(tipo) {
@@ -7136,6 +7497,8 @@ function loadUser() {
 loadUser();
 loadBanner();
 loadPromosConfig();
+loadCyberConfig();
+loadBannersConfig();
 // Auto-open product from URL
 (function() {
   const params = new URLSearchParams(window.location.search);
@@ -7581,9 +7944,25 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
             </div>
           </div>
           <div>
-            <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">Imagen de fondo del hero</div>
-            <div style="font-size:11px;color:var(--ink-light);margin-bottom:6px">URL de la imagen. Dejá vacío para usar el color de fondo.</div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">Imagen única del banner (modo clásico)</div>
+            <div style="font-size:11px;color:var(--ink-light);margin-bottom:6px">Se usa solo si abajo no cargás fotos para el carrusel. URL de la imagen.</div>
             <input type="text" id="config-hero-bg" style="width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink);background:#fff;outline:none;box-sizing:border-box" placeholder="https://...">
+          </div>
+          <div style="border-top:1px dashed var(--border);padding-top:14px">
+            <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">🖼️ Banner carrusel (varias fotos)</div>
+            <div style="font-size:11px;color:var(--ink-light);margin-bottom:10px">Subí una o más fotos y van a rotar solas en el banner principal. Para que no se vean cortadas, usá fotos del mismo tamaño (ideal ~1200×480). Arrastrá para ordenar. Acordate de apretar "Guardar banner".</div>
+            <label style="display:inline-block;padding:9px 16px;background:var(--rose);color:#fff;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:6px">＋ Agregar fotos
+              <input type="file" accept="image/*" multiple onchange="subirBannerImgs(this)" style="display:none">
+            </label>
+            <span id="banner-upload-estado" style="font-size:12px;color:var(--rose);font-style:italic;margin-left:8px"></span>
+            <div id="banner-thumbs" style="margin-top:10px"></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap">
+              <label style="font-size:12px;color:var(--ink-mid)">Cambia cada
+                <input type="number" id="banner-speed" value="5" min="2" max="30" style="width:60px;padding:6px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;margin:0 4px">
+                segundos
+              </label>
+              <button onclick="guardarBanners()" style="padding:9px 20px;background:var(--ink);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:500;cursor:pointer">Guardar banner 🖼️</button>
+            </div>
           </div>
           <div>
             <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink-mid);text-transform:uppercase;margin-bottom:4px">Número de WhatsApp</div>
@@ -7609,6 +7988,25 @@ if (_navLogo && _loaderLogo) _loaderLogo.src = _navLogo.src;
             <div style="font-size:12px;font-weight:600;color:var(--ink-mid);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Interior</div>
             <input type="number" id="config-envio-interior" placeholder="ej: 6000" style="width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;box-sizing:border-box">
           </div>
+        </div>
+      </div>
+
+      <!-- CYBER MONDAY -->
+      <div style="background:linear-gradient(135deg,#0a0a2e,#140827);border:1px solid rgba(0,229,255,0.4);border-radius:var(--radius-sm);padding:1.5rem;color:#fff">
+        <div style="font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:1rem;padding-bottom:8px;border-bottom:1px solid rgba(0,229,255,0.25);color:#2ee6ff">⚡ CYBER MONDAY</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:14px;line-height:1.5">Mientras esté activo, aparece el carrusel "Cyber Monday" arriba de todo y el <strong style="color:#2ee6ff">envío es gratis en toda la tienda</strong>. Los productos del carrusel se eligen con el tilde <strong>⚡ Mostrar en "Cyber Monday"</strong> dentro de cada producto. Al pasar la fecha de fin, todo vuelve a la normalidad solo.</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <input type="checkbox" id="cyber-activo" style="width:17px;height:17px;accent-color:#2ee6ff;cursor:pointer">
+          <label for="cyber-activo" style="font-size:13px;cursor:pointer;font-weight:500">Cyber Monday activo</label>
+        </div>
+        <div style="margin-bottom:14px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:4px">Termina el (fecha y hora)</div>
+          <input type="datetime-local" id="cyber-fin" style="padding:8px 10px;border:1px solid rgba(0,229,255,0.4);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;background:rgba(255,255,255,0.08);color:#fff;outline:none;color-scheme:dark">
+          <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:5px">Por defecto: 5 de noviembre a las 00:00.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button onclick="guardarCyber()" style="padding:10px 22px;background:linear-gradient(90deg,#00e5ff,#8a2be2);border:none;border-radius:var(--radius-sm);color:#fff;font-family:DM Sans,sans-serif;font-size:13px;font-weight:600;cursor:pointer">Guardar Cyber ⚡</button>
+          <div id="cyber-estado" style="font-size:12px;font-weight:600"></div>
         </div>
       </div>
 
