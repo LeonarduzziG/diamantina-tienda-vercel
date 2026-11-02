@@ -666,14 +666,14 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 .hero-v2-btn-secondary.on-light{background:#fff;color:var(--ink);border-color:var(--border);backdrop-filter:none}
 .hero-v2-btn-secondary.on-light:hover{border-color:var(--rose);color:var(--rose);background:#fff}
 .hero-v2.banner-mode{display:block;min-height:auto;background:#fff;overflow:visible;padding:0}
-.hero-banner-img-wrap{width:100%;line-height:0;position:relative}
+.hero-banner-img-wrap{width:100%;line-height:0;position:relative;overflow:hidden}
 .hero-banner-img-wrap img{width:100%;height:auto;display:block}
 /* Altura máxima del banner: la imagen (vertical u horizontal) se ve entera y centrada,
    sin ocupar toda la pantalla. Cambiá --banner-max-h para hacerlo más alto o más bajo. */
 :root{--banner-max-h:62vh}
-#hero-v2-img{width:auto;max-width:100%;height:auto;max-height:var(--banner-max-h);margin-inline:auto}
+#hero-v2-img{width:auto;max-width:100%;height:auto;max-height:var(--banner-max-h);margin-inline:auto;position:relative;z-index:1}
 /* Carrusel del banner principal */
-.hero-carousel{position:relative;width:100%;overflow:hidden;max-height:var(--banner-max-h)}
+.hero-carousel{position:relative;width:100%;overflow:hidden;max-height:var(--banner-max-h);z-index:1}
 .hero-carousel .hero-slide-spacer{width:auto;max-width:100%;height:auto;max-height:var(--banner-max-h);display:block;visibility:hidden;margin-inline:auto}
 .hero-carousel .hero-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .8s ease}
 .hero-carousel .hero-slide.active{opacity:1}
@@ -687,8 +687,12 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 @keyframes hintBounce{0%,100%{transform:translateY(0);opacity:.85}50%{transform:translateY(7px);opacity:1}}
 @media(max-width:600px){.hero-scroll-hint{top:12px;padding:7px 15px}.hero-scroll-hint .hint-text{font-size:12px}.hero-scroll-hint .hint-arrow{font-size:18px}}
 @media(prefers-reduced-motion:reduce){.hero-scroll-hint .hint-arrow{animation:none}}
-/* En compu: banner más chico y centrado (en celular queda a lo ancho completo) */
-@media(min-width:769px){.hero-banner-img-wrap{max-width:920px;margin-inline:auto}}
+/* En compu: la imagen vertical queda centrada y los costados se rellenan con una
+   versión difuminada de la misma foto, así no queda vacío. */
+@media(min-width:769px){
+  .hero-banner-img-wrap{max-width:none;margin-inline:0}
+  .hero-banner-img-wrap::before{content:'';position:absolute;inset:0;z-index:0;background-image:var(--hero-bg-url,none);background-size:cover;background-position:center;filter:blur(16px) brightness(0.6);transform:scale(1.15)}
+}
 /* En celular el banner se limita un poco más de alto para no ocupar toda la pantalla */
 @media(max-width:600px){:root{--banner-max-h:48vh}}
 .hero-banner-actions{padding:2rem 1.5rem 2.5rem;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;position:static}
@@ -955,7 +959,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 <div id="page-tienda">
   <!-- HERO V2 (banner con foto propia, sin superponer texto) -->
   <div class="hero-v2 hero banner-mode">
-    <div class="hero-banner-img-wrap" id="hero-banner-wrap" style="cursor:pointer" title="Diamantina">
+    <div class="hero-banner-img-wrap" id="hero-banner-wrap" style="cursor:pointer;--hero-bg-url:url('https://res.cloudinary.com/dy1yckjcj/image/upload/w_1200,q_auto,f_auto/v1792430006/Caja_de_Regalo_Diamantina_1_tbllts.png')" title="Diamantina">
       <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1200,q_auto,f_auto/v1792430006/Caja_de_Regalo_Diamantina_1_tbllts.png" alt="Armá tu caja de regalo — Diamantina Lencería" loading="eager" fetchpriority="high" onclick="showPage('cajaregalo')">
       <div id="hero-carousel" class="hero-carousel" style="display:none"></div>
       <div class="hero-scroll-hint" onclick="event.stopPropagation();var c=document.getElementById('cats-section');if(c)c.scrollIntoView({behavior:'smooth'})" title="Ver productos">
@@ -2445,6 +2449,7 @@ function applyApariencia(d) {
     const heroBgOptimizada = (typeof optimizeImg === 'function') ? optimizeImg(d.heroBg, 1600) : d.heroBg;
     // Evitar re-asignar la misma URL: previene un repintado/"reload" visible de la foto
     if (heroImg && heroImg.src !== heroBgOptimizada) heroImg.src = heroBgOptimizada;
+    if (typeof setHeroBackdrop === 'function') setHeroBackdrop(heroBgOptimizada);
     const hero = document.querySelector('.hero');
     if (hero) {
       if (hero.classList.contains('banner-mode')) {
@@ -2475,6 +2480,7 @@ window.heroGoTo = function(i, manual) {
   _heroIdx = ((i % slides.length) + slides.length) % slides.length;
   slides.forEach(function(s, idx){ s.classList.toggle('active', idx === _heroIdx); });
   dots.forEach(function(dt, idx){ dt.classList.toggle('active', idx === _heroIdx); });
+  if (slides[_heroIdx]) setHeroBackdrop(slides[_heroIdx].src);
   if (manual) heroStartRotation(); // reinicia el tiempo si el usuario tocó un punto
 };
 window.heroBannerGo = function(dest) {
@@ -2493,10 +2499,11 @@ function renderHeroBanner(list, speedSec) {
     // Sin banners cargados: comportamiento clásico (imagen única)
     carousel.style.display = 'none';
     carousel.innerHTML = '';
-    if (single) single.style.display = 'block';
+    if (single) { single.style.display = 'block'; setHeroBackdrop(single.src); }
     return;
   }
   if (single) single.style.display = 'none';
+  setHeroBackdrop(imgs[0].url);
   carousel.style.display = 'block';
   _heroSpeed = Math.max(2, Number(speedSec) || 5) * 1000;
   _heroCount = imgs.length;
@@ -2519,6 +2526,13 @@ function renderHeroBanner(list, speedSec) {
   heroStartRotation();
 }
 window.renderHeroBanner = renderHeroBanner;
+
+// Fondo difuminado del banner (rellena los costados en PC con la misma foto)
+function setHeroBackdrop(url) {
+  const wrap = document.getElementById('hero-banner-wrap');
+  if (wrap && url) wrap.style.setProperty('--hero-bg-url', 'url("' + url + '")');
+}
+window.setHeroBackdrop = setHeroBackdrop;
 
 // Escucha la config del banner en Firebase y re-renderiza el carrusel en vivo
 function loadBannersConfig() {
@@ -7516,6 +7530,8 @@ loadBanner();
 loadPromosConfig();
 loadCyberConfig();
 loadBannersConfig();
+// Fondo difuminado del banner desde el arranque, sin esperar a Firebase
+try { const _hb = document.getElementById('hero-v2-img'); if (_hb) setHeroBackdrop(_hb.currentSrc || _hb.src); } catch(e){}
 // Auto-open product from URL
 (function() {
   const params = new URLSearchParams(window.location.search);
