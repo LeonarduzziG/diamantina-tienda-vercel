@@ -987,8 +987,8 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 <div id="page-tienda">
   <!-- HERO V2 (banner con foto propia, sin superponer texto) -->
   <div class="hero-v2 hero banner-mode">
-    <div class="hero-banner-img-wrap" id="hero-banner-wrap" style="cursor:pointer;--hero-bg-url:url('https://res.cloudinary.com/dy1yckjcj/image/upload/w_1200,q_auto,f_auto/v1792430006/Caja_de_Regalo_Diamantina_1_tbllts.png')" title="Diamantina">
-      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1200,q_auto,f_auto/v1792430006/Caja_de_Regalo_Diamantina_1_tbllts.png" alt="Armá tu caja de regalo — Diamantina Lencería" loading="eager" fetchpriority="high" onclick="showPage('cajaregalo')">
+    <div class="hero-banner-img-wrap" id="hero-banner-wrap" style="cursor:pointer" title="Diamantina">
+      <img id="hero-v2-img" src="https://res.cloudinary.com/dy1yckjcj/image/upload/w_1200,q_auto,f_auto/v1792430006/Caja_de_Regalo_Diamantina_1_tbllts.png" alt="Armá tu caja de regalo — Diamantina Lencería" loading="eager" fetchpriority="high" onclick="showPage('cajaregalo')" style="display:none">
       <div id="hero-carousel" class="hero-carousel" style="display:none"></div>
       <div class="hero-scroll-hint" onclick="event.stopPropagation();var c=document.getElementById('cats-section');if(c)c.scrollIntoView({behavior:'smooth'})" title="Ver productos">
         <span class="hint-text">Deslizá para encontrar tu lencería</span>
@@ -2517,7 +2517,30 @@ window.heroGoTo = function(i, manual) {
   if (manual) heroStartRotation(); // reinicia el tiempo si el usuario tocó un punto
 };
 window.heroBannerGo = function(dest) {
-  if (dest && typeof showPage === 'function') showPage(dest);
+  if (!dest) return;
+  // URL externa: abre en pestaña nueva. Sólo http/https (bloquea javascript:, etc.)
+  if (dest.indexOf('url:') === 0) {
+    let u = dest.slice(4).trim();
+    if (!u) return;
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u.replace(/^\/+/, '');
+    if (/^https?:\/\//i.test(u)) window.open(u, '_blank', 'noopener');
+    return;
+  }
+  // Categoría de la tienda: muestra la tienda, filtra y baja a los productos
+  if (dest.indexOf('cat:') === 0) {
+    const cat = dest.slice(4);
+    if (typeof showPage === 'function') showPage('tienda');
+    setTimeout(function(){
+      const card = document.querySelector('.cat-card[data-cat="' + (window.CSS && CSS.escape ? CSS.escape(cat) : cat) + '"]');
+      if (card && typeof setCatCard === 'function') setCatCard(card, cat);
+      else if (typeof activeFilter !== 'undefined') { activeFilter = cat; if (typeof renderCatalog === 'function') renderCatalog(); }
+      const sec = document.getElementById('cats-section') || document.getElementById('catalog');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+    }, 60);
+    return;
+  }
+  // Página interna (home, cajaregalo, tienda…)
+  if (typeof showPage === 'function') showPage(dest);
 };
 // list: [{ url, titulo, subtitulo, boton, link }]. speedSec: segundos entre fotos.
 // Carrusel editorial: foto a todo ancho + texto y botón superpuestos. Si no hay fotos, imagen única clásica.
@@ -2550,8 +2573,7 @@ function renderHeroBanner(list, speedSec) {
   const mob  = function(it){ return opt(it.urlMobile || it.url); };
   let html = '';
   imgs.forEach(function(it, i){
-    const link = (it.link || '').replace(/'/g, '');
-    const go = link ? "heroBannerGo('" + link + "')" : '';
+    const link = it.link || '';
     // Si tiene foto de compu Y de celular, llena la pantalla (cover). Si tiene una
     // sola, se muestra entera sin recortar + fondo difuminado (contain).
     const fitClass = (it.url && it.urlMobile) ? 'fit-cover' : 'fit-contain';
@@ -2562,12 +2584,10 @@ function renderHeroBanner(list, speedSec) {
         + '<div class="hero-eslide-content">'
         + (it.titulo ? '<h2 class="hero-eslide-title">' + _heroEsc(it.titulo) + '</h2>' : '')
         + (it.subtitulo ? '<p class="hero-eslide-sub">' + _heroEsc(it.subtitulo) + '</p>' : '')
-        + (it.boton ? '<a class="hero-eslide-cta"' + (go ? ' onclick="event.stopPropagation();' + go + '"' : '') + '>' + _heroEsc(it.boton) + '</a>' : '')
+        + (it.boton ? '<a class="hero-eslide-cta">' + _heroEsc(it.boton) + '</a>' : '')
         + '</div>';
     }
-    // Si hay enlace pero no botón, toda la foto es clickeable
-    const slideClick = (link && !it.boton) ? ' onclick="' + go + '" style="cursor:pointer"' : '';
-    html += '<div class="hero-eslide ' + fitClass + (i === 0 ? ' active' : '') + '" data-url="' + _heroEsc(desk(it)) + '"' + slideClick + '>'
+    html += '<div class="hero-eslide ' + fitClass + (i === 0 ? ' active' : '') + '" data-url="' + _heroEsc(desk(it)) + '" data-link="' + _heroEsc(link) + '">'
       + '<div class="hero-eslide-fill"></div>'
       + '<picture>'
       + '<source media="(max-width:768px)" srcset="' + _heroEsc(mob(it)) + '">'
@@ -2582,10 +2602,22 @@ function renderHeroBanner(list, speedSec) {
     html += '</div>';
   }
   carousel.innerHTML = html;
-  // Fondo difuminado de los costados (solo PC): usa la foto de compu
+  // Fondo difuminado + clics (botón o foto entera) por slide
   const slides = carousel.querySelectorAll('.hero-eslide');
   slides.forEach(function(sl){
     const fill = sl.querySelector('.hero-eslide-fill'); if (fill) fill.style.backgroundImage = 'url("' + sl.dataset.url + '")';
+    let link = sl.dataset.link || '';
+    if (link === 'url:' || link === 'url') link = ''; // URL externa sin completar = sin enlace
+    const cta = sl.querySelector('.hero-eslide-cta');
+    if (cta && link) {
+      cta.style.cursor = 'pointer';
+      cta.addEventListener('click', function(e){ e.stopPropagation(); heroBannerGo(link); });
+    }
+    // Si hay enlace y NO hay botón, toda la foto es clickeable
+    if (link && !cta) {
+      sl.style.cursor = 'pointer';
+      sl.addEventListener('click', function(){ heroBannerGo(link); });
+    }
   });
   heroStartRotation();
 }
@@ -2618,6 +2650,7 @@ const _BANNER_LINKS = [
   { v: 'cajaregalo', t: 'Caja de regalo' },
   { v: 'home',       t: 'Inicio' }
 ];
+const _BANNER_CATS = ['Conjuntos','Tops','Bodys','Babydoll','Colaless','Bikinis','Disfraces','Accesorios','Pijamas','Deportivos'];
 
 window.subirBannerImgs = async function(input) {
   const files = Array.from(input.files || []);
@@ -2657,8 +2690,19 @@ function renderBannerThumbs() {
   }
   const inp = 'width:100%;box-sizing:border-box;padding:6px 9px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;background:#fff;color:var(--ink);margin-bottom:5px';
   el.innerHTML = bannerImgs.map(function(it, i){
-    const opts = _BANNER_LINKS.map(function(o){ return '<option value="' + o.v + '"' + (o.v === (it.link || '') ? ' selected' : '') + '>' + o.t + '</option>'; }).join('');
     const v = function(s){ return String(s == null ? '' : s).replace(/"/g, '&quot;'); };
+    const linkVal = it.link || '';
+    const esUrl = linkVal.indexOf('url:') === 0;
+    const opts = '<optgroup label="Páginas">'
+      + _BANNER_LINKS.map(function(o){ return '<option value="' + o.v + '"' + (o.v === linkVal ? ' selected' : '') + '>' + o.t + '</option>'; }).join('')
+      + '</optgroup><optgroup label="Categorías">'
+      + _BANNER_CATS.map(function(c){ var vl = 'cat:' + c; return '<option value="' + vl + '"' + (vl === linkVal ? ' selected' : '') + '>' + c + '</option>'; }).join('')
+      + '</optgroup><optgroup label="Otro">'
+      + '<option value="__url__"' + (esUrl ? ' selected' : '') + '>URL externa…</option>'
+      + '</optgroup>';
+    const urlInput = esUrl
+      ? '<input type="text" value="' + v(linkVal.slice(4)) + '" oninput="bSetUrl(' + i + ',this.value)" placeholder="https://… (link externo)" style="' + inp + ';margin-top:5px;margin-bottom:0">'
+      : '';
     const movil = it.urlMobile
       ? '<div style="position:relative;margin-top:5px"><img src="' + it.urlMobile + '" alt="" style="width:62px;height:84px;object-fit:cover;border-radius:6px;display:block"><button onclick="bRemoveMobile(' + i + ')" title="Quitar foto celular" style="position:absolute;top:-7px;right:-7px;background:#fff;border:1px solid var(--border-strong);border-radius:50%;width:20px;height:20px;cursor:pointer;color:#c0392b;font-size:11px;line-height:1">✕</button></div>'
       : '<label style="display:block;margin-top:5px;font-size:10px;color:var(--rose);border:1px dashed var(--rose);border-radius:6px;padding:7px 4px;cursor:pointer;text-align:center;width:90px;box-sizing:border-box">+ Foto<br>celular<input type="file" accept="image/*" onchange="subirBannerMobile(' + i + ',this)" style="display:none"></label>';
@@ -2674,8 +2718,9 @@ function renderBannerThumbs() {
       + '<input type="text" value="' + v(it.subtitulo) + '" oninput="bSetField(' + i + ',\'subtitulo\',this.value)" placeholder="Subtítulo corto (opcional)" style="' + inp + '">'
       + '<div style="display:flex;gap:6px">'
       + '<input type="text" value="' + v(it.boton) + '" oninput="bSetField(' + i + ',\'boton\',this.value)" placeholder="Texto del botón (ej: Ver colección)" style="' + inp + ';flex:1;margin-bottom:0">'
-      + '<select onchange="bSetField(' + i + ',\'link\',this.value)" title="Destino del botón/foto" style="padding:6px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;background:#fff;color:var(--ink)">' + opts + '</select>'
+      + '<select onchange="bSetDestino(' + i + ',this.value)" title="Destino del botón/foto" style="padding:6px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;background:#fff;color:var(--ink);max-width:150px">' + opts + '</select>'
       + '</div>'
+      + urlInput
       + '</div>'
       + '<button onclick="bRemove(' + i + ')" title="Quitar" style="background:#fff;border:1px solid var(--border-strong);border-radius:50%;width:26px;height:26px;cursor:pointer;color:#c0392b;font-size:13px;flex-shrink:0">✕</button>'
       + '</div>';
@@ -2696,6 +2741,18 @@ window.bDrop = function(e, i){
 window.bRemove = function(i){ bannerImgs.splice(i, 1); renderBannerThumbs(); };
 window.bRemoveMobile = function(i){ if (bannerImgs[i]) { bannerImgs[i].urlMobile = ''; renderBannerThumbs(); } };
 window.bSetField = function(i, campo, v){ if (bannerImgs[i]) bannerImgs[i][campo] = v || ''; };
+// Destino del banner (página, categoría o URL externa)
+window.bSetDestino = function(i, val){
+  if (!bannerImgs[i]) return;
+  if (val === '__url__') {
+    // Mantener la URL ya escrita si había una; si no, abrir el campo vacío
+    if (String(bannerImgs[i].link || '').indexOf('url:') !== 0) bannerImgs[i].link = 'url:';
+  } else {
+    bannerImgs[i].link = val;
+  }
+  renderBannerThumbs();
+};
+window.bSetUrl = function(i, v){ if (bannerImgs[i]) bannerImgs[i].link = 'url:' + String(v || '').trim(); };
 // Sube la foto vertical (celular) para una foto del carrusel
 window.subirBannerMobile = async function(i, input) {
   const file = (input.files || [])[0];
@@ -7631,8 +7688,6 @@ loadBanner();
 loadPromosConfig();
 loadCyberConfig();
 loadBannersConfig();
-// Fondo difuminado del banner desde el arranque, sin esperar a Firebase
-try { const _hb = document.getElementById('hero-v2-img'); if (_hb) setHeroBackdrop(_hb.currentSrc || _hb.src); } catch(e){}
 // Auto-open product from URL
 (function() {
   const params = new URLSearchParams(window.location.search);
