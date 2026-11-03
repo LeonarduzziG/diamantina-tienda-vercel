@@ -710,7 +710,8 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
   .hero-carousel.editorial .hero-eslide.active .hero-eslide-content{animation:none}
 }
 /* Indicador "deslizá para ver más" sobre el banner */
-.hero-scroll-hint{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:6;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;text-align:center;background:rgba(26,17,24,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:8px 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.4);box-shadow:0 4px 14px rgba(0,0,0,0.25);line-height:1.1}
+.hero-scroll-hint{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:6;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;text-align:center;background:rgba(26,17,24,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:8px 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.4);box-shadow:0 4px 14px rgba(0,0,0,0.25);line-height:1.1;animation:heroHintOut 0.6s ease 4s forwards}
+@keyframes heroHintOut{from{opacity:1;visibility:visible}to{opacity:0;visibility:hidden}}
 .hero-scroll-hint .hint-text{color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.3px;text-shadow:0 1px 6px rgba(0,0,0,0.6);white-space:nowrap}
 .hero-scroll-hint .hint-arrow{color:#fff;font-size:20px;line-height:1;text-shadow:0 1px 6px rgba(0,0,0,0.6);animation:hintBounce 1.4s ease-in-out infinite}
 @keyframes hintBounce{0%,100%{transform:translateY(0);opacity:.85}50%{transform:translateY(7px);opacity:1}}
@@ -2530,17 +2531,24 @@ window.heroBannerGo = function(dest) {
     if (/^https?:\/\//i.test(u)) window.open(u, '_blank', 'noopener');
     return;
   }
-  // Categoría de la tienda: muestra la tienda, filtra y baja a los productos
+  // Categoría de la tienda: muestra la tienda, filtra y baja directo a los productos
   if (dest.indexOf('cat:') === 0) {
     const cat = dest.slice(4);
     if (typeof showPage === 'function') showPage('tienda');
     setTimeout(function(){
-      const card = document.querySelector('.cat-card[data-cat="' + (window.CSS && CSS.escape ? CSS.escape(cat) : cat) + '"]');
-      if (card && typeof setCatCard === 'function') setCatCard(card, cat);
-      else if (typeof activeFilter !== 'undefined') { activeFilter = cat; if (typeof renderCatalog === 'function') renderCatalog(); }
-      const sec = document.getElementById('cats-section') || document.getElementById('catalog');
-      if (sec) sec.scrollIntoView({ behavior: 'smooth' });
-    }, 60);
+      // Aplicar el filtro de categoría
+      try { activeFilter = cat; } catch(e){}
+      // Marcar como activa la tarjeta de categoría que corresponda (en todos los listados)
+      document.querySelectorAll('.cat-card').forEach(function(c){ c.classList.toggle('active', c.dataset.cat === cat); });
+      document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.toggle('active', (b.dataset && b.dataset.cat) === cat); });
+      // Limpiar otros filtros que podrían ocultar los productos de la categoría
+      try { if (typeof searchQuery !== 'undefined') searchQuery = ''; } catch(e){}
+      const bt = document.getElementById('buscador-tienda'); if (bt) bt.value = '';
+      if (typeof renderCatalog === 'function') renderCatalog();
+      // Bajar a los productos ya filtrados
+      const dest2 = document.getElementById('catalog') || document.getElementById('cats-section');
+      if (dest2) dest2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
     return;
   }
   // Página interna (home, cajaregalo, tienda…)
