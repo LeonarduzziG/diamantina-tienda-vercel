@@ -2248,6 +2248,33 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 <script>
 var searchQuery = ''; // declared early to avoid hoisting issues
 
+// ── Resguardo de almacenamiento ──────────────────────────────────────────────
+// Algunos navegadores internos (Instagram, Facebook, Safari en modo privado) bloquean
+// localStorage/sessionStorage y hacen que lanzar error corte TODO el JavaScript (la
+// página quedaba sin cargar los datos). Si no está disponible, lo reemplazamos por uno
+// en memoria para esta sesión, así la página siempre funciona.
+(function(){
+  function hacerShim(nombre){
+    try {
+      var s = window[nombre]; var t = '__t_' + nombre;
+      s.setItem(t, '1'); s.removeItem(t); return; // funciona OK
+    } catch(e){}
+    var mem = {};
+    var shim = {
+      getItem: function(k){ return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; },
+      setItem: function(k, v){ mem[k] = String(v); },
+      removeItem: function(k){ delete mem[k]; },
+      clear: function(){ mem = {}; },
+      key: function(i){ return Object.keys(mem)[i] || null; },
+      get length(){ return Object.keys(mem).length; }
+    };
+    try { Object.defineProperty(window, nombre, { configurable: true, get: function(){ return shim; } }); }
+    catch(e2){ try { window[nombre] = shim; } catch(e3){} }
+  }
+  hacerShim('localStorage');
+  hacerShim('sessionStorage');
+})();
+
 // EmailJS init
 try { emailjs.init('aIVvakD_ibBlrMGTF'); } catch(e) { console.warn('EmailJS not loaded'); }
 
@@ -2270,7 +2297,8 @@ const db = firebase.database();
 try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch(e){}
 
 products = [];
-cart = JSON.parse(localStorage.getItem('diamantina_cart') || '[]');
+try { cart = JSON.parse(localStorage.getItem('diamantina_cart') || '[]'); } catch(e) { cart = []; }
+if (!Array.isArray(cart)) cart = [];
 let activeFilter = 'Todas';
 let currentProd = null;
 let selectedTalla = null;
@@ -7690,10 +7718,11 @@ async function loadIgFeed() {
 // ── MOBILE MENU (defined earlier) ──
 
 // ── INIT ──
-let myName = localStorage.getItem('diamantina_user') || '';
+let myName = '';
+try { myName = localStorage.getItem('diamantina_user') || ''; } catch(e) {}
 function loadUser() {
   // Ask for name if not set (optional)
-  myName = localStorage.getItem('diamantina_user') || '';
+  try { myName = localStorage.getItem('diamantina_user') || ''; } catch(e) {}
 }
 loadUser();
 loadBanner();
