@@ -460,6 +460,8 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
   #nav-mobile-menu{display:none;position:fixed;top:60px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:9999;flex-direction:column;box-shadow:0 4px 20px rgba(26,17,24,0.12)}
   #nav-mobile-menu.open{display:flex}
   #nav-mobile-menu button,#nav-mobile-menu a{padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer;text-decoration:none;display:block}
+  #nav-mobile-menu .mm-cat{padding:11px 1.5rem 11px 2.4rem;font-size:13.5px;color:var(--ink-mid)}
+  #nav-mobile-menu .mm-cat-label{padding:13px 1.5rem 5px;font-size:11px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:var(--ink-light);border-bottom:1px solid var(--border)}
   .hero{padding:3rem 1rem 2rem}
   .filters{padding:1rem}
   .catalog{padding:1rem;grid-template-columns:repeat(2,1fr);gap:12px}
@@ -978,6 +980,17 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 <!-- Mobile dropdown menu -->
 <div id="nav-mobile-menu" style="display:none;position:fixed;top:60px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:9999;flex-direction:column;box-shadow:0 4px 20px rgba(26,17,24,0.12)">
   <button onclick="showPage('tienda');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Tienda</button>
+  <div class="mm-cat-label">Categorías</div>
+  <button class="mm-cat" onclick="heroBannerGo('cat:Conjuntos');closeMobileMenu()">Conjuntos</button>
+  <button class="mm-cat" onclick="heroBannerGo('cat:Tops');closeMobileMenu()">Tops</button>
+  <button class="mm-cat" onclick="heroBannerGo('cat:Bodys');closeMobileMenu()">Bodys</button>
+  <button class="mm-cat" onclick="heroBannerGo('cat:Babydoll');closeMobileMenu()">Babydoll</button>
+  <button class="mm-cat" onclick="heroBannerGo('cat:Colaless');closeMobileMenu()">Colaless</button>
+  <button class="mm-cat" onclick="heroBannerGo('cat:Bikinis');closeMobileMenu()">Bikinis</button>
+  <button class="mm-cat" onclick="heroBannerGo('cat:Disfraces');closeMobileMenu()">Disfraces</button>
+  <button class="mm-cat" onclick="heroBannerGo('cat:Accesorios');closeMobileMenu()">Accesorios</button>
+  <button class="mm-cat" onclick="heroBannerGo('cat:Pijamas');closeMobileMenu()">Pijamas</button>
+  <button class="mm-cat" onclick="heroBannerGo('cat:Deportivos');closeMobileMenu()">Deportivos</button>
   <button onclick="showPage('cajaregalo');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--rose);font-weight:500;cursor:pointer">🎁 Caja de regalo</button>
   <button onclick="showPage('nosotras');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Guía de talles</button>
   <button onclick="showPage('politicas');closeMobileMenu()" style="padding:14px 1.5rem;font-size:14px;border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;font-family:DM Sans,sans-serif;color:var(--ink-mid);cursor:pointer">Políticas</button>
@@ -1028,6 +1041,17 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
           <div class="quick-search-chips" id="qs-chips-color"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- BUSCADOR COLAPSABLE (reubicado: debajo del buscador rápido) -->
+  <div id="buscador-bar" style="display:block;padding:0.75rem 2rem;background:#fff;border-bottom:1px solid var(--border)">
+    <div style="display:flex;gap:8px;max-width:600px;margin:0 auto">
+      <div style="position:relative;flex:1">
+        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-light);font-size:14px;pointer-events:none">⌕</span>
+        <input type="text" id="buscador-tienda" placeholder="Buscar productos..." oninput="buscarProductos(this.value)" style="width:100%;padding:9px 12px 9px 36px;border:1px solid var(--border-strong);border-radius:999px;background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color 0.2s">
+      </div>
+      <button onclick="toggleBuscador()" style="padding:7px 16px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;white-space:nowrap">Cerrar</button>
     </div>
   </div>
 
@@ -1197,17 +1221,6 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
         <button class="ofertas-carousel-btn right" onclick="combosScroll(1)" aria-label="Siguiente">›</button>
       </div>
       <div class="carousel-dots" data-for="combos-grid"></div>
-    </div>
-  </div>
-
-  <!-- BUSCADOR COLAPSABLE -->
-  <div id="buscador-bar" style="display:block;padding:0.75rem 2rem;background:#fff;border-bottom:1px solid var(--border)">
-    <div style="display:flex;gap:8px;max-width:600px;margin:0 auto">
-      <div style="position:relative;flex:1">
-        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-light);font-size:14px;pointer-events:none">⌕</span>
-        <input type="text" id="buscador-tienda" placeholder="Buscar productos..." oninput="buscarProductos(this.value)" style="width:100%;padding:9px 12px 9px 36px;border:1px solid var(--border-strong);border-radius:999px;background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color 0.2s">
-      </div>
-      <button onclick="toggleBuscador()" style="padding:7px 16px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;white-space:nowrap">Cerrar</button>
     </div>
   </div>
 
