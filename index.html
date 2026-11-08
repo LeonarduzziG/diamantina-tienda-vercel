@@ -683,7 +683,8 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 /* Altura máxima del banner: la imagen (vertical u horizontal) se ve entera y centrada,
    sin ocupar toda la pantalla. Cambiá --banner-max-h para hacerlo más alto o más bajo. */
 :root{--banner-max-h:62vh}
-#hero-v2-img{width:auto;max-width:100%;height:auto;max-height:var(--banner-max-h);margin-inline:auto;position:relative;z-index:1}
+#hero-v2-img{width:auto;max-width:100%;height:auto;max-height:var(--banner-max-h);margin-inline:auto;position:relative;z-index:1;transition:opacity 0.5s ease}
+.hero-carousel{transition:opacity 0.5s ease}
 .hero-banner-img-wrap > picture{display:block}
 /* Carrusel del banner principal */
 .hero-carousel{position:relative;width:100%;overflow:hidden;max-height:var(--banner-max-h);z-index:1}
@@ -2635,13 +2636,14 @@ function renderHeroBanner(list, speedSec) {
     carousel.style.display = 'none';
     carousel.className = 'hero-carousel';
     carousel.innerHTML = '';
-    if (single) { single.style.display = 'block'; setHeroBackdrop(single.src); }
+    if (single) { single.style.display = 'block'; single.style.opacity = '1'; setHeroBackdrop(single.src); }
     return;
   }
-  if (single) single.style.display = 'none';
   setHeroBackdrop(imgs[0].url);
-  carousel.style.display = 'block';
+  // Armamos el carrusel oculto; luego hacemos el fundido (bienvenida sale, carrusel entra)
   carousel.className = 'hero-carousel editorial';
+  carousel.style.display = 'none';
+  carousel.style.opacity = '0';
   _heroSpeed = Math.max(2, Number(speedSec) || 5) * 1000;
   _heroCount = imgs.length;
   _heroIdx = 0;
