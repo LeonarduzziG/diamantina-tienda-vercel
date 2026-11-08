@@ -678,14 +678,13 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 .hero-v2-btn-secondary.on-light{background:#fff;color:var(--ink);border-color:var(--border);backdrop-filter:none}
 .hero-v2-btn-secondary.on-light:hover{border-color:var(--rose);color:var(--rose);background:#fff}
 .hero-v2.banner-mode{display:block;min-height:auto;background:#fff;overflow:visible;padding:0}
-.hero-banner-img-wrap{width:100%;line-height:0;position:relative;overflow:hidden;aspect-ratio:16/7;max-height:78vh}
+.hero-banner-img-wrap{width:100%;line-height:0;position:relative;overflow:hidden}
 .hero-banner-img-wrap img{width:100%;height:auto;display:block}
+/* Altura máxima del banner: la imagen (vertical u horizontal) se ve entera y centrada,
+   sin ocupar toda la pantalla. Cambiá --banner-max-h para hacerlo más alto o más bajo. */
 :root{--banner-max-h:62vh}
-/* Imagen de bienvenida (carga / respaldo): ocupa el mismo recuadro que el carrusel
-   y se FUNDE suavemente hacia él, sin salto de tamaño. */
-.hero-banner-img-wrap > picture{position:absolute;inset:0;z-index:2;transition:opacity 0.7s ease}
-.hero-banner-img-wrap > picture.hero-faded{opacity:0;pointer-events:none}
-#hero-v2-img{width:100%;height:100%;object-fit:contain;object-position:center;background:#fff;display:block}
+#hero-v2-img{width:auto;max-width:100%;height:auto;max-height:var(--banner-max-h);margin-inline:auto;position:relative;z-index:1}
+.hero-banner-img-wrap > picture{display:block}
 /* Carrusel del banner principal */
 .hero-carousel{position:relative;width:100%;overflow:hidden;max-height:var(--banner-max-h);z-index:1}
 .hero-carousel .hero-slide-spacer{width:auto;max-width:100%;height:auto;max-height:var(--banner-max-h);display:block;visibility:hidden;margin-inline:auto}
@@ -697,8 +696,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 /* ── Carrusel del banner: muestra cada foto ENTERA (sin recortar). En PC los
    costados se rellenan con una versión difuminada de la misma foto. Si la foto
    trae título/subtítulo/botón, se superponen (modo editorial para fotos limpias). ── */
-.hero-carousel.editorial{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;opacity:0;transition:opacity 0.7s ease;z-index:1}
-.hero-carousel.editorial.hero-shown{opacity:1}
+.hero-carousel.editorial{position:relative;width:100%;overflow:hidden;aspect-ratio:16/7;max-height:78vh}
 .hero-carousel.editorial picture{display:block;line-height:0}
 .hero-carousel.editorial .hero-eslide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease;pointer-events:none}
 .hero-carousel.editorial .hero-eslide.active{opacity:1;pointer-events:auto}
@@ -717,7 +715,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
 @keyframes heroFadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 /* En celular el banner es vertical (usa la foto de celular si la cargaste) */
 @media(max-width:768px){
-  .hero-banner-img-wrap{aspect-ratio:4/5;max-height:76vh}
+  .hero-carousel.editorial{aspect-ratio:4/5;max-height:76vh}
   .hero-carousel.editorial .hero-eslide-content{padding:0 18px 34px;gap:9px}
 }
 @media(prefers-reduced-motion:reduce){
@@ -1076,7 +1074,7 @@ body.cart-abierto #wa-float-wrap,body.cart-abierto #back-to-top-btn{display:none
     <div style="display:flex;gap:8px;max-width:600px;margin:0 auto">
       <div style="position:relative;flex:1">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--rose)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" id="buscador-tienda" placeholder="Buscar productos..." oninput="buscarProductos(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();buscarProductos(this.value);this.blur();var c=document.getElementById('catalog');if(c)c.scrollIntoView({behavior:'smooth',block:'start'});}" enterkeyhint="search" style="width:100%;padding:10px 12px 10px 44px;border:1px solid var(--border-strong);border-radius:999px;background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color 0.2s">
+        <input type="text" id="buscador-tienda" placeholder="Buscar productos..." oninput="buscarProductos(this.value)" style="width:100%;padding:10px 12px 10px 44px;border:1px solid var(--border-strong);border-radius:999px;background:var(--surface-2);font-family:DM Sans,sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color 0.2s">
       </div>
       <button onclick="toggleBuscador()" style="padding:7px 16px;border:1px solid var(--border-strong);border-radius:999px;background:transparent;font-family:DM Sans,sans-serif;font-size:13px;color:var(--ink-mid);cursor:pointer;white-space:nowrap">Cerrar</button>
     </div>
@@ -2637,9 +2635,10 @@ function renderHeroBanner(list, speedSec) {
     carousel.style.display = 'none';
     carousel.className = 'hero-carousel';
     carousel.innerHTML = '';
-    if (single) { single.style.display = 'block'; var _p0 = single.parentElement; if (_p0) _p0.classList.remove('hero-faded'); setHeroBackdrop(single.src); }
+    if (single) { single.style.display = 'block'; setHeroBackdrop(single.src); }
     return;
   }
+  if (single) single.style.display = 'none';
   setHeroBackdrop(imgs[0].url);
   carousel.style.display = 'block';
   carousel.className = 'hero-carousel editorial';
@@ -2698,12 +2697,6 @@ function renderHeroBanner(list, speedSec) {
       sl.addEventListener('click', function(){ heroBannerGo(link); });
     }
   });
-  // Fundido suave: el carrusel aparece y la bienvenida se desvanece encima
-  var _pic = single && single.parentElement;
-  requestAnimationFrame(function(){ requestAnimationFrame(function(){
-    carousel.classList.add('hero-shown');
-    if (_pic) _pic.classList.add('hero-faded');
-  }); });
   heroStartRotation();
 }
 window.renderHeroBanner = renderHeroBanner;
