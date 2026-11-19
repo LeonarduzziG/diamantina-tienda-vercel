@@ -7368,62 +7368,27 @@ async function tarifasAndreani(cpO, cpD, pesoRealG, alto, ancho, largo, valor) {
   }
 }
 
-// ── ENVÍO EXPRESS UBER MOTO (zona cercana, radio de 9 km) ────────────────────
-// Si el CP/dirección del cliente cae dentro del radio de alguno de los puntos de
-// despacho, se le ofrece consultar un envío por Uber Moto. Geocodifica en el navegador
-// (OpenStreetMap/Nominatim) con caché. Si algo falla, no muestra la opción (nunca rompe).
-const UBERMOTO_RADIO_KM = 9;
-const UBERMOTO_ORIGENES = [
-  // _pt: coordenada aproximada fija (respaldo). Se afina sola con geolocalización si responde.
-  { nombre: 'Quilmes Oeste', dir: 'Aimé Tschiffely 4184, Quilmes Oeste, Buenos Aires, Argentina', cp: '1881', _pt: { lat: -34.7450, lon: -58.2950 }, _geoTried: false },
-  { nombre: 'Castelar',      dir: 'Leandro Niceforo Alem 2975, Castelar, Buenos Aires, Argentina', cp: '1712', _pt: { lat: -34.6540, lon: -58.6430 }, _geoTried: false }
+// ── ENVÍO EXPRESS UBER MOTO (zona Castelar) ──────────────────────────────────
+// Lista fija de códigos postales dentro de ~9 km de Castelar (CP 1712). Si el CP del
+// cliente está en esta lista, se le ofrece consultar un envío por Uber Moto.
+// Para sumar o sacar zonas, editá esta lista (es solo el número de CP).
+const UBERMOTO_CPS = [
+  '1712', // Castelar
+  '1714', // Ituzaingó
+  '1708', // Morón
+  '1718', // San Antonio de Padua
+  '1706', // Haedo
+  '1684', // El Palomar
+  '1686', // Hurlingham / William Morris
+  '1688', // Villa Tesei
+  '1704', // Ramos Mejía
+  '1678', // Caseros
+  '1676', // Santos Lugares
+  '1722'  // Merlo
 ];
-function _geoGet(k){ try { const v = localStorage.getItem('dmgeo_' + k); return v ? JSON.parse(v) : null; } catch(e){ return null; } }
-function _geoSet(k, v){ try { localStorage.setItem('dmgeo_' + k, JSON.stringify(v)); } catch(e){} }
-async function geocodeAR(query, cacheKey){
-  const cached = _geoGet(cacheKey);
-  if (cached) return cached;
-  try {
-    const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=ar&q=' + encodeURIComponent(query);
-    const opts = { headers: { 'Accept': 'application/json' } };
-    try { opts.signal = AbortSignal.timeout(9000); } catch(e){}
-    const r = await fetch(url, opts);
-    const d = await r.json();
-    if (d && d[0] && d[0].lat) {
-      const pt = { lat: parseFloat(d[0].lat), lon: parseFloat(d[0].lon) };
-      _geoSet(cacheKey, pt);
-      return pt;
-    }
-  } catch(e){}
-  return null;
-}
-function _distKm(a, b){
-  const R = 6371, rad = function(x){ return x * Math.PI / 180; };
-  const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
-  const s = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)*Math.sin(dLon/2);
-  return 2 * R * Math.asin(Math.sqrt(s));
-}
-async function ubermotoEnRango(cp, direccion){
+function ubermotoEnRango(cp){
   cp = String(cp || '').trim();
-  // Los CP de los propios puntos de despacho siempre entran (aunque falle el geocoding)
-  const propio = UBERMOTO_ORIGENES.find(function(o){ return o.cp === cp; });
-  if (propio) return { origen: propio.nombre, km: 0 };
-  // Geocodificar al cliente: primero la dirección (si la hay), si no el CP
-  let cliente = null;
-  const dir = (direccion || '').trim();
-  if (dir.length > 6) cliente = await geocodeAR(dir + ', Argentina', 'dir_' + dir.toLowerCase().replace(/[^a-z0-9]+/g,'_').slice(0,50));
-  if (!cliente && cp.length >= 4) cliente = await geocodeAR('código postal ' + cp + ', Buenos Aires, Argentina', 'cp_' + cp);
-  if (!cliente) return null;
-  let mejor = null;
-  for (let i = 0; i < UBERMOTO_ORIGENES.length; i++) {
-    const o = UBERMOTO_ORIGENES[i];
-    if (!o._geoTried) { o._geoTried = true; const g = await geocodeAR(o.dir, 'orig_' + o.cp); if (g) o._pt = g; }
-    if (o._pt) {
-      const km = _distKm(cliente, o._pt);
-      if (km <= UBERMOTO_RADIO_KM && (!mejor || km < mejor.km)) mejor = { origen: o.nombre, km: km };
-    }
-  }
-  return mejor;
+  return (UBERMOTO_CPS.indexOf(cp) !== -1) ? { origen: 'Castelar' } : null;
 }
 
 window.cotizarEnvioCarrito = async function() {
@@ -7495,14 +7460,13 @@ window.cotizarEnvioCarrito = async function() {
   });
   resCont.innerHTML = resHtml;
 
-  // Envío express por Uber Moto si el cliente está dentro del radio de 9 km
+  // Envío express por Uber Moto si el CP está en la zona Castelar (lista fija)
   try {
-    const _dirCli = (document.getElementById('direccion-envio')?.value || '').trim();
-    const rango = await ubermotoEnRango(cp, _dirCli);
+    const rango = ubermotoEnRango(cp);
     const cont = document.getElementById('res-cotizador');
     if (rango && cont && window._cpCotizador === cp) {
       const waNum = window._waNumber || '541155627689';
-      const msg = 'Hola! Quiero consultar el envío por Uber Moto (zona ' + rango.origen + '). Mi código postal es ' + cp + (_dirCli ? (' — dirección: ' + _dirCli) : '') + '.';
+      const msg = 'Hola! Quiero consultar el envío por Uber Moto (zona ' + rango.origen + '). Mi código postal es ' + cp + '.';
       const waLink = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg);
       const extra = document.createElement('a');
       extra.href = waLink; extra.target = '_blank'; extra.rel = 'noopener';
