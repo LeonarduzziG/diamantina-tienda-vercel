@@ -7368,6 +7368,64 @@ async function tarifasAndreani(cpO, cpD, pesoRealG, alto, ancho, largo, valor) {
   }
 }
 
+// ── ENVÍO EXPRESS UBER MOTO (zona cercana, radio de 9 km) ────────────────────
+// Si el CP/dirección del cliente cae dentro del radio de alguno de los puntos de
+// despacho, se le ofrece consultar un envío por Uber Moto. Geocodifica en el navegador
+// (OpenStreetMap/Nominatim) con caché. Si algo falla, no muestra la opción (nunca rompe).
+const UBERMOTO_RADIO_KM = 9;
+const UBERMOTO_ORIGENES = [
+  // _pt: coordenada aproximada fija (respaldo). Se afina sola con geolocalización si responde.
+  { nombre: 'Quilmes Oeste', dir: 'Aimé Tschiffely 4184, Quilmes Oeste, Buenos Aires, Argentina', cp: '1881', _pt: { lat: -34.7450, lon: -58.2950 }, _geoTried: false },
+  { nombre: 'Castelar',      dir: 'Leandro Niceforo Alem 2975, Castelar, Buenos Aires, Argentina', cp: '1712', _pt: { lat: -34.6540, lon: -58.6430 }, _geoTried: false }
+];
+function _geoGet(k){ try { const v = localStorage.getItem('dmgeo_' + k); return v ? JSON.parse(v) : null; } catch(e){ return null; } }
+function _geoSet(k, v){ try { localStorage.setItem('dmgeo_' + k, JSON.stringify(v)); } catch(e){} }
+async function geocodeAR(query, cacheKey){
+  const cached = _geoGet(cacheKey);
+  if (cached) return cached;
+  try {
+    const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=ar&q=' + encodeURIComponent(query);
+    const opts = { headers: { 'Accept': 'application/json' } };
+    try { opts.signal = AbortSignal.timeout(9000); } catch(e){}
+    const r = await fetch(url, opts);
+    const d = await r.json();
+    if (d && d[0] && d[0].lat) {
+      const pt = { lat: parseFloat(d[0].lat), lon: parseFloat(d[0].lon) };
+      _geoSet(cacheKey, pt);
+      return pt;
+    }
+  } catch(e){}
+  return null;
+}
+function _distKm(a, b){
+  const R = 6371, rad = function(x){ return x * Math.PI / 180; };
+  const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+  const s = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)*Math.sin(dLon/2);
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+async function ubermotoEnRango(cp, direccion){
+  cp = String(cp || '').trim();
+  // Los CP de los propios puntos de despacho siempre entran (aunque falle el geocoding)
+  const propio = UBERMOTO_ORIGENES.find(function(o){ return o.cp === cp; });
+  if (propio) return { origen: propio.nombre, km: 0 };
+  // Geocodificar al cliente: primero la dirección (si la hay), si no el CP
+  let cliente = null;
+  const dir = (direccion || '').trim();
+  if (dir.length > 6) cliente = await geocodeAR(dir + ', Argentina', 'dir_' + dir.toLowerCase().replace(/[^a-z0-9]+/g,'_').slice(0,50));
+  if (!cliente && cp.length >= 4) cliente = await geocodeAR('código postal ' + cp + ', Buenos Aires, Argentina', 'cp_' + cp);
+  if (!cliente) return null;
+  let mejor = null;
+  for (let i = 0; i < UBERMOTO_ORIGENES.length; i++) {
+    const o = UBERMOTO_ORIGENES[i];
+    if (!o._geoTried) { o._geoTried = true; const g = await geocodeAR(o.dir, 'orig_' + o.cp); if (g) o._pt = g; }
+    if (o._pt) {
+      const km = _distKm(cliente, o._pt);
+      if (km <= UBERMOTO_RADIO_KM && (!mejor || km < mejor.km)) mejor = { origen: o.nombre, km: km };
+    }
+  }
+  return mejor;
+}
+
 window.cotizarEnvioCarrito = async function() {
   const cp = (document.getElementById('cp-cotizador')?.value || '').trim();
   if (!cp || cp.length < 4) { showToast('Ingresá un CP válido', 'error'); return; }
@@ -7436,6 +7494,28 @@ window.cotizarEnvioCarrito = async function() {
       + '</div>';
   });
   resCont.innerHTML = resHtml;
+
+  // Envío express por Uber Moto si el cliente está dentro del radio de 9 km
+  try {
+    const _dirCli = (document.getElementById('direccion-envio')?.value || '').trim();
+    const rango = await ubermotoEnRango(cp, _dirCli);
+    const cont = document.getElementById('res-cotizador');
+    if (rango && cont && window._cpCotizador === cp) {
+      const waNum = window._waNumber || '541155627689';
+      const msg = 'Hola! Quiero consultar el envío por Uber Moto (zona ' + rango.origen + '). Mi código postal es ' + cp + (_dirCli ? (' — dirección: ' + _dirCli) : '') + '.';
+      const waLink = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg);
+      const extra = document.createElement('a');
+      extra.href = waLink; extra.target = '_blank'; extra.rel = 'noopener';
+      extra.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:var(--radius-sm);border:2px dashed #111;background:#faf6fb;margin-top:2px;text-decoration:none';
+      extra.innerHTML = '<div>'
+        + '<div style="font-size:10px;font-weight:700;color:#111;letter-spacing:0.3px;margin-bottom:2px">🏍️ ENVÍO EXPRESS · ZONA CERCANA</div>'
+        + '<div style="font-size:12px;font-weight:600;color:var(--ink)">Uber Moto — consultá el precio</div>'
+        + '<div style="font-size:11px;color:var(--ink-light)">Entrega en el día · coordinás por WhatsApp</div>'
+        + '</div>'
+        + '<div style="font-size:12px;font-weight:700;color:#25D366;white-space:nowrap">Consultar ↗</div>';
+      cont.appendChild(extra);
+    }
+  } catch(e){}
 
 }
 
